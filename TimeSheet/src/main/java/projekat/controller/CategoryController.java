@@ -2,6 +2,7 @@ package projekat.controller;
 
 import java.util.Collection;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import projekat.repository.CategoryRepository;
 @RestController
 public class CategoryController {
 	
+	@Autowired(required = false)
 	private CategoryRepository categoryRepository;
 	
 	@GetMapping("category")
