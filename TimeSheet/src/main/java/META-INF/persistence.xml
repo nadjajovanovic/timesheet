@@ -3,5 +3,6 @@
 	<persistence-unit name="TimeSheet">
 		<class>projekat.models.Client</class>
 		<class>projekat.models.Country</class>
+		<class>projekat.models.Category</class>
 	</persistence-unit>
 </persistence>
