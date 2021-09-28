@@ -2,6 +2,7 @@ package projekat.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import projekat.repository.CountryRepository;
 @RestController
 public class CountryController {
 
+	@Autowired(required = false)
 	private CountryRepository countryRepository;
 	
 	
