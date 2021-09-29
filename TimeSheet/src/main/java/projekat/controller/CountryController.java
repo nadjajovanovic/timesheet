@@ -19,7 +19,6 @@ import projekat.repository.CountryRepository;
 @RestController
 public class CountryController {
 
-	@Autowired(required = false)
 	private CountryRepository countryRepository;
 	
 	
@@ -33,10 +32,10 @@ public class CountryController {
 		return countryRepository.getById(countryId);
 	}
 	
-	@GetMapping("country/{countryName}")
+	/*@GetMapping("country/{countryName}")
 	public List<Country> findByCountryName (@PathVariable String countryName) {
 		return countryRepository.findByCountryNameContainingIgnoreCase(countryName);
-	}
+	}*/
 	
 	@PostMapping("country")
 	public ResponseEntity<Country> insertCountry (@RequestBody Country country) {

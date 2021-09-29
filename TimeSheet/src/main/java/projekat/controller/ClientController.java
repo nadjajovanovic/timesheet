@@ -19,7 +19,6 @@ import projekat.repository.ClientRepository;
 @RestController
 public class ClientController {
 
-	@Autowired(required = false)
 	private ClientRepository clientRepository;
 	
 	@GetMapping(value = "client")
@@ -32,7 +31,7 @@ public class ClientController {
 		return clientRepository.getById(clientid);
 	}
 	
-	@GetMapping("/client/{clientName}")
+	/*@GetMapping("/client/{clientName}")
 	public List<Client> findByName(@PathVariable String clientName) {
 		return clientRepository.findByNameContainingIgnoreCase(clientName);
 	}
@@ -40,7 +39,7 @@ public class ClientController {
 	@GetMapping("/client/{clientAddress}")
 	public List<Client> findByAddress(@PathVariable String clientAddress) {
 		return clientRepository.findByAddressContainingIgnoreCase(clientAddress);
-	}
+	}*/
 	
 	@PostMapping("client")
 	public ResponseEntity<Client> insertClient(@RequestBody Client client) {
