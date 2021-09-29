@@ -1,5 +1,6 @@
 package projekat.controller;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,15 @@ import projekat.repository.ClientRepository;
 @RestController
 public class ClientController {
 
+	@Autowired
 	private ClientRepository clientRepository;
 	
+	public ClientController(ClientRepository clientRepository) {
+		this.clientRepository = clientRepository;
+	}
+	
 	@GetMapping(value = "client")
-	public List<Client> getClients() {
+	public Collection<Client> getClients() {
 		return clientRepository.findAll();
 	}
 	
@@ -54,10 +60,10 @@ public class ClientController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@DeleteMapping("client/{clientId}")
-	public ResponseEntity<Client> deleteClient(@PathVariable Integer clientId) {
-		if (clientRepository.existsById(clientId))
-			clientRepository.deleteById(clientId);
+	@DeleteMapping("client/{clientid}")
+	public ResponseEntity<Client> deleteClient(@PathVariable Integer clientid) {
+		if (clientRepository.existsById(clientid))
+			clientRepository.deleteById(clientid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

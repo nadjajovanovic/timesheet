@@ -19,17 +19,21 @@ import projekat.repository.CountryRepository;
 @RestController
 public class CountryController {
 
+	@Autowired
 	private CountryRepository countryRepository;
 	
+	public CountryController(CountryRepository countryRepository) {
+		this.countryRepository = countryRepository;
+	}
 	
 	@GetMapping(value = "/country")
 	public List<Country> getCountries() {
 		return countryRepository.findAll();
 	}
 	
-	@GetMapping("country/{countryId}")
-	public Country getCountry(@PathVariable Integer countryId) {
-		return countryRepository.getById(countryId);
+	@GetMapping("country/{countryid}")
+	public Country getCountry(@PathVariable Integer countryid) {
+		return countryRepository.getById(countryid);
 	}
 	
 	/*@GetMapping("country/{countryName}")
@@ -50,10 +54,10 @@ public class CountryController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@DeleteMapping("country/{countryId}")
-	public ResponseEntity<Country> deleteCountry (@PathVariable Integer countryId) {
-		if (countryRepository.existsById(countryId))
-			countryRepository.deleteById(countryId);
+	@DeleteMapping("country/{countryid}")
+	public ResponseEntity<Country> deleteCountry (@PathVariable Integer countryid) {
+		if (countryRepository.existsById(countryid))
+			countryRepository.deleteById(countryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

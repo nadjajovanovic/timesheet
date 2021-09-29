@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,16 +19,21 @@ import projekat.repository.CategoryRepository;
 @RestController
 public class CategoryController {
 	
+	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	public CategoryController(CategoryRepository categoryRepository) {
+		this.categoryRepository = categoryRepository;
+	}
 	
 	@GetMapping("category")
 	public Collection<Category> getAllCategories() {
 		return categoryRepository.findAll();
 	}
 	
-	@GetMapping("category/{categoryId}")
-	public Category getCategory(@PathVariable Integer categoryId) {
-		return categoryRepository.getById(categoryId);
+	@GetMapping("category/{categoryid}")
+	public Category getCategory(@PathVariable Integer categoryid) {
+		return categoryRepository.getById(categoryid);
 	}
 	
 	/*@GetMapping("category/{categoryName}")
@@ -48,9 +54,10 @@ public class CategoryController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	public ResponseEntity<Category> deleteCategory(@PathVariable Integer categoryId) {
-		if(categoryRepository.existsById(categoryId))
-			categoryRepository.deleteById(categoryId);
+	@DeleteMapping("category/{categoryid}")
+	public ResponseEntity<Category> deleteCategory(@PathVariable Integer categoryid) {
+		if(categoryRepository.existsById(categoryid))
+			categoryRepository.deleteById(categoryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
