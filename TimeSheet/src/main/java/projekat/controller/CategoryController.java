@@ -18,7 +18,6 @@ import projekat.repository.CategoryRepository;
 @RestController
 public class CategoryController {
 	
-	@Autowired(required = false)
 	private CategoryRepository categoryRepository;
 	
 	@GetMapping("category")
@@ -31,10 +30,10 @@ public class CategoryController {
 		return categoryRepository.getById(categoryId);
 	}
 	
-	@GetMapping("category/{categoryName}")
+	/*@GetMapping("category/{categoryName}")
 	public Collection<Category> findByCategoryName(@PathVariable String categoryName) {
 		return categoryRepository.findByCategoryNameContainingIgnoreCase(categoryName);
-	}
+	}*/
 	
 	@PostMapping("category")
 	public ResponseEntity<Category> insertCategory(@RequestBody Category category) {
