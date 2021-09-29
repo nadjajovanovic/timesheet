@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,12 +48,14 @@ public class ClientController {
 		return clientRepository.findByAddressContainingIgnoreCase(clientAddress);
 	}*/
 	
+	@CrossOrigin
 	@PostMapping("client")
 	public ResponseEntity<Client> insertClient(@RequestBody Client client) {
 		clientRepository.save(client);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@CrossOrigin
 	@PutMapping("client")
 	public ResponseEntity<Client> updateClient (@RequestBody Client client) {
 		if (clientRepository.existsById(client.getClientid()))
@@ -60,6 +63,7 @@ public class ClientController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@CrossOrigin
 	@DeleteMapping("client/{clientid}")
 	public ResponseEntity<Client> deleteClient(@PathVariable Integer clientid) {
 		if (clientRepository.existsById(clientid))

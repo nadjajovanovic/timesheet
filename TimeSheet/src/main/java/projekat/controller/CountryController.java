@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,12 +42,14 @@ public class CountryController {
 		return countryRepository.findByCountryNameContainingIgnoreCase(countryName);
 	}*/
 	
+	@CrossOrigin
 	@PostMapping("country")
 	public ResponseEntity<Country> insertCountry (@RequestBody Country country) {
 		countryRepository.save(country);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@CrossOrigin
 	@PutMapping("country")
 	public ResponseEntity<Country> updateCountry(@RequestBody Country country) {
 		if(countryRepository.existsById(country.getCountryid()))
@@ -54,6 +57,7 @@ public class CountryController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@CrossOrigin
 	@DeleteMapping("country/{countryid}")
 	public ResponseEntity<Country> deleteCountry (@PathVariable Integer countryid) {
 		if (countryRepository.existsById(countryid))
