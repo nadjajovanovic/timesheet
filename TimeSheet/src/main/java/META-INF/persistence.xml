@@ -4,5 +4,6 @@
 		<class>projekat.models.Client</class>
 		<class>projekat.models.Country</class>
 		<class>projekat.models.Category</class>
+		<class>projekat.models.Teammember</class>
 	</persistence-unit>
 </persistence>
