@@ -3,6 +3,10 @@ package projekat.models;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.List;
+
 
 /**
  * The persistent class for the teammember database table.
@@ -14,7 +18,7 @@ public class Teammember implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="TEAMMEMBER_TEAMMEMBERID_GENERATOR", sequenceName="TEAMMEMBER_SEQ", allocationSize=1)
+	@SequenceGenerator(name="TEAMMEMBER_TEAMMEMBERID_GENERATOR", sequenceName="TEAMMEMBER_SEQ", allocationSize = 1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="TEAMMEMBER_TEAMMEMBERID_GENERATOR")
 	private Integer teammemberid;
 
@@ -29,6 +33,11 @@ public class Teammember implements Serializable {
 	private String teammembername;
 
 	private String username;
+
+	//bi-directional many-to-one association to Project
+	@JsonIgnore
+	@OneToMany(mappedBy="teammember")
+	private List<Project> projects;
 
 	public Teammember() {
 	}
@@ -87,6 +96,28 @@ public class Teammember implements Serializable {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public List<Project> getProjects() {
+		return this.projects;
+	}
+
+	public void setProjects(List<Project> projects) {
+		this.projects = projects;
+	}
+
+	public Project addProject(Project project) {
+		getProjects().add(project);
+		project.setTeammember(this);
+
+		return project;
+	}
+
+	public Project removeProject(Project project) {
+		getProjects().remove(project);
+		project.setTeammember(null);
+
+		return project;
 	}
 
 }
