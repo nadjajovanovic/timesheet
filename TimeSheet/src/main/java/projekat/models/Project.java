@@ -14,7 +14,7 @@ public class Project implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="PROJECT_PROJECTID_GENERATOR", sequenceName="PROJECT_SEQ", allocationSize = 1)
+	@SequenceGenerator(name="PROJECT_PROJECTID_GENERATOR", sequenceName="PROJECT_SEQ", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="PROJECT_PROJECTID_GENERATOR")
 	private Integer projectid;
 
@@ -26,6 +26,11 @@ public class Project implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="teammemberid")
 	private Teammember teammember;
+
+	//bi-directional many-to-one association to Client
+	@ManyToOne
+	@JoinColumn(name="clientid")
+	private Client client;
 
 	public Project() {
 	}
@@ -60,6 +65,14 @@ public class Project implements Serializable {
 
 	public void setTeammember(Teammember teammember) {
 		this.teammember = teammember;
+	}
+
+	public Client getClient() {
+		return this.client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
 	}
 
 }

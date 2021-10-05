@@ -3,6 +3,10 @@ package projekat.models;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.List;
+
 
 /**
  * The persistent class for the client database table.
@@ -30,6 +34,11 @@ public class Client implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="countryid")
 	private Country country;
+
+	//bi-directional many-to-one association to Project
+	@JsonIgnore
+	@OneToMany(mappedBy="client")
+	private List<Project> projects;
 
 	public Client() {
 	}
@@ -80,6 +89,28 @@ public class Client implements Serializable {
 
 	public void setCountry(Country country) {
 		this.country = country;
+	}
+
+	public List<Project> getProjects() {
+		return this.projects;
+	}
+
+	public void setProjects(List<Project> projects) {
+		this.projects = projects;
+	}
+
+	public Project addProject(Project project) {
+		getProjects().add(project);
+		project.setClient(this);
+
+		return project;
+	}
+
+	public Project removeProject(Project project) {
+		getProjects().remove(project);
+		project.setClient(null);
+
+		return project;
 	}
 
 }
