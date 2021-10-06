@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import projekat.models.Category;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
 

@@ -3,6 +3,10 @@ package projekat.models;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.List;
+
 
 /**
  * The persistent class for the category database table.
@@ -19,6 +23,11 @@ public class Category implements Serializable {
 	private Integer categoryid;
 
 	private String categoryname;
+
+	//bi-directional many-to-one association to Report
+	@JsonIgnore
+	@OneToMany(mappedBy="category")
+	private List<Report> reports;
 
 	public Category() {
 	}
@@ -37,6 +46,28 @@ public class Category implements Serializable {
 
 	public void setCategoryname(String categoryname) {
 		this.categoryname = categoryname;
+	}
+
+	public List<Report> getReports() {
+		return this.reports;
+	}
+
+	public void setReports(List<Report> reports) {
+		this.reports = reports;
+	}
+
+	public Report addReport(Report report) {
+		getReports().add(report);
+		report.setCategory(this);
+
+		return report;
+	}
+
+	public Report removeReport(Report report) {
+		getReports().remove(report);
+		report.setCategory(null);
+
+		return report;
 	}
 
 }

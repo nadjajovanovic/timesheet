@@ -40,6 +40,11 @@ public class Client implements Serializable {
 	@OneToMany(mappedBy="client")
 	private List<Project> projects;
 
+	//bi-directional many-to-one association to Report
+	@JsonIgnore
+	@OneToMany(mappedBy="client")
+	private List<Report> reports;
+
 	public Client() {
 	}
 
@@ -111,6 +116,28 @@ public class Client implements Serializable {
 		project.setClient(null);
 
 		return project;
+	}
+
+	public List<Report> getReports() {
+		return this.reports;
+	}
+
+	public void setReports(List<Report> reports) {
+		this.reports = reports;
+	}
+
+	public Report addReport(Report report) {
+		getReports().add(report);
+		report.setClient(this);
+
+		return report;
+	}
+
+	public Report removeReport(Report report) {
+		getReports().remove(report);
+		report.setClient(null);
+
+		return report;
 	}
 
 }

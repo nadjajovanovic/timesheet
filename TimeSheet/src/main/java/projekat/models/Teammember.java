@@ -18,7 +18,7 @@ public class Teammember implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="TEAMMEMBER_TEAMMEMBERID_GENERATOR", sequenceName="TEAMMEMBER_SEQ", allocationSize = 1)
+	@SequenceGenerator(name="TEAMMEMBER_TEAMMEMBERID_GENERATOR", sequenceName="TEAMMEMBER_SEQ",  allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="TEAMMEMBER_TEAMMEMBERID_GENERATOR")
 	private Integer teammemberid;
 
@@ -38,6 +38,11 @@ public class Teammember implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy="teammember")
 	private List<Project> projects;
+
+	//bi-directional many-to-one association to Report
+	@JsonIgnore
+	@OneToMany(mappedBy="teammember")
+	private List<Report> reports;
 
 	public Teammember() {
 	}
@@ -118,6 +123,28 @@ public class Teammember implements Serializable {
 		project.setTeammember(null);
 
 		return project;
+	}
+
+	public List<Report> getReports() {
+		return this.reports;
+	}
+
+	public void setReports(List<Report> reports) {
+		this.reports = reports;
+	}
+
+	public Report addReport(Report report) {
+		getReports().add(report);
+		report.setTeammember(this);
+
+		return report;
+	}
+
+	public Report removeReport(Report report) {
+		getReports().remove(report);
+		report.setTeammember(null);
+
+		return report;
 	}
 
 }

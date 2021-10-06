@@ -6,5 +6,6 @@
 		<class>projekat.models.Category</class>
 		<class>projekat.models.Teammember</class>
 		<class>projekat.models.Project</class>
+		<class>projekat.models.Report</class>
 	</persistence-unit>
 </persistence>
