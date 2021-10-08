@@ -37,11 +37,6 @@ public class CategoryController {
 		return categoryRepository.getById(categoryid);
 	}
 	
-	/*@GetMapping("category/{categoryName}")
-	public Collection<Category> findByCategoryName(@PathVariable String categoryName) {
-		return categoryRepository.findByCategoryNameContainingIgnoreCase(categoryName);
-	}*/
-	
 	@CrossOrigin
 	@PostMapping("category")
 	public ResponseEntity<Category> insertCategory(@RequestBody Category category) {

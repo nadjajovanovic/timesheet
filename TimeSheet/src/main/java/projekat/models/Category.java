@@ -5,6 +5,10 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 
@@ -13,6 +17,7 @@ import java.util.List;
  * 
  */
 @Entity
+@Getter @Setter @NoArgsConstructor
 @NamedQuery(name="Category.findAll", query="SELECT c FROM Category c")
 public class Category implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -28,46 +33,5 @@ public class Category implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy="category")
 	private List<Report> reports;
-
-	public Category() {
-	}
-
-	public Integer getCategoryid() {
-		return this.categoryid;
-	}
-
-	public void setCategoryid(Integer categoryid) {
-		this.categoryid = categoryid;
-	}
-
-	public String getCategoryname() {
-		return this.categoryname;
-	}
-
-	public void setCategoryname(String categoryname) {
-		this.categoryname = categoryname;
-	}
-
-	public List<Report> getReports() {
-		return this.reports;
-	}
-
-	public void setReports(List<Report> reports) {
-		this.reports = reports;
-	}
-
-	public Report addReport(Report report) {
-		getReports().add(report);
-		report.setCategory(this);
-
-		return report;
-	}
-
-	public Report removeReport(Report report) {
-		getReports().remove(report);
-		report.setCategory(null);
-
-		return report;
-	}
 
 }
