@@ -2,6 +2,11 @@ package projekat.models;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.Date;
 
 
@@ -10,6 +15,7 @@ import java.util.Date;
  * 
  */
 @Entity
+@Getter @Setter @NoArgsConstructor
 @NamedQuery(name="Report.findAll", query="SELECT r FROM Report r")
 public class Report implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -44,64 +50,5 @@ public class Report implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="teammemberid")
 	private Teammember teammember;
-
-	public Report() {
-	}
-
-	public Integer getReportid() {
-		return this.reportid;
-	}
-
-	public void setReportid(Integer reportid) {
-		this.reportid = reportid;
-	}
-
-	public Date getEnddate() {
-		return this.enddate;
-	}
-
-	public void setEnddate(Date enddate) {
-		this.enddate = enddate;
-	}
-
-	public Date getStartdate() {
-		return this.startdate;
-	}
-
-	public void setStartdate(Date startdate) {
-		this.startdate = startdate;
-	}
-
-	public Category getCategory() {
-		return this.category;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
-	public Client getClient() {
-		return this.client;
-	}
-
-	public void setClient(Client client) {
-		this.client = client;
-	}
-
-	public Project getProject() {
-		return this.project;
-	}
-
-	public void setProject(Project project) {
-		this.project = project;
-	}
-
-	public Teammember getTeammember() {
-		return this.teammember;
-	}
-
-	public void setTeammember(Teammember teammember) {
-		this.teammember = teammember;
-	}
 
 }
