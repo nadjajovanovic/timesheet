@@ -37,16 +37,6 @@ public class ClientController {
 		return clientRepository.getById(clientid);
 	}
 	
-	/*@GetMapping("/client/{clientName}")
-	public List<Client> findByName(@PathVariable String clientName) {
-		return clientRepository.findByNameContainingIgnoreCase(clientName);
-	}
-	
-	@GetMapping("/client/{clientAddress}")
-	public List<Client> findByAddress(@PathVariable String clientAddress) {
-		return clientRepository.findByAddressContainingIgnoreCase(clientAddress);
-	}*/
-	
 	@CrossOrigin
 	@PostMapping("client")
 	public ResponseEntity<Client> insertClient(@RequestBody Client client) {

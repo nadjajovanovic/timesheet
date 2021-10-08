@@ -37,11 +37,6 @@ public class CountryController {
 		return countryRepository.getById(countryid);
 	}
 	
-	/*@GetMapping("country/{countryName}")
-	public List<Country> findByCountryName (@PathVariable String countryName) {
-		return countryRepository.findByCountryNameContainingIgnoreCase(countryName);
-	}*/
-	
 	@CrossOrigin
 	@PostMapping("country")
 	public ResponseEntity<Country> insertCountry (@RequestBody Country country) {

@@ -5,6 +5,10 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 
@@ -13,6 +17,7 @@ import java.util.List;
  * 
  */
 @Entity
+@Getter @Setter @NoArgsConstructor
 @NamedQuery(name="Country.findAll", query="SELECT c FROM Country c")
 public class Country implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -21,19 +26,20 @@ public class Country implements Serializable {
 	@SequenceGenerator(name="COUNTRY_COUNTRYID_GENERATOR", sequenceName="COUNTRY_SEQ", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="COUNTRY_COUNTRYID_GENERATOR")
 	private Integer countryid;
-
+	
 	private String countryname;
 
 	//bi-directional many-to-one association to Client
 	@JsonIgnore
 	@OneToMany(mappedBy="country")
 	private List<Client> clients;
-
-	public Country() {
+	
+	/*public Country() {
+		
 	}
 
 	public Integer getCountryid() {
-		return this.countryid;
+		return countryid;
 	}
 
 	public void setCountryid(Integer countryid) {
@@ -41,7 +47,7 @@ public class Country implements Serializable {
 	}
 
 	public String getCountryname() {
-		return this.countryname;
+		return countryname;
 	}
 
 	public void setCountryname(String countryname) {
@@ -49,25 +55,11 @@ public class Country implements Serializable {
 	}
 
 	public List<Client> getClients() {
-		return this.clients;
+		return clients;
 	}
 
 	public void setClients(List<Client> clients) {
 		this.clients = clients;
-	}
-
-	public Client addClient(Client client) {
-		getClients().add(client);
-		client.setCountry(this);
-
-		return client;
-	}
-
-	public Client removeClient(Client client) {
-		getClients().remove(client);
-		client.setCountry(null);
-
-		return client;
-	}
+	}*/
 
 }
