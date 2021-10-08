@@ -34,32 +34,4 @@ public class Country implements Serializable {
 	@OneToMany(mappedBy="country")
 	private List<Client> clients;
 	
-	/*public Country() {
-		
-	}
-
-	public Integer getCountryid() {
-		return countryid;
-	}
-
-	public void setCountryid(Integer countryid) {
-		this.countryid = countryid;
-	}
-
-	public String getCountryname() {
-		return countryname;
-	}
-
-	public void setCountryname(String countryname) {
-		this.countryname = countryname;
-	}
-
-	public List<Client> getClients() {
-		return clients;
-	}
-
-	public void setClients(List<Client> clients) {
-		this.clients = clients;
-	}*/
-
 }
