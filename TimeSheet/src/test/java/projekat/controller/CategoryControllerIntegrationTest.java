@@ -237,6 +237,24 @@ class CategoryControllerIntegrationTest {
     }
 
     @Test
+    public void  testUpdateCategoryWrongId() throws Exception {
+        //Arrange
+        final var categoryName = "My Category";
+        final var insertedCategory = createTestCategory(categoryName);
+        insertedCategory.setCategoryid(9999);
+
+        // Act
+        final var response = mvc.perform(put("/category")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(insertedCategory))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        // Assert
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
     public void deleteCategory() throws Exception {
         //Arrange
         final var categoryName = "Delete Me";
