@@ -65,7 +65,7 @@ class ClientControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final List<Client> clients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
+        final var clients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
 
         //Assert
         assertEquals(clients.size(), 1);
@@ -76,7 +76,7 @@ class ClientControllerIntegrationTest {
     public void getOneClient() throws Exception {
         //Arrange
         final var clientName = "First";
-        final Client inserted = createTestClient(clientName);
+        final var inserted = createTestClient(clientName);
 
         //Act
         final var response = mvc.perform(get("/client/{clientid}", inserted.getClientid())
@@ -96,7 +96,7 @@ class ClientControllerIntegrationTest {
         final var clientId = "100";
 
         //Act
-        final MvcResult response = mvc.perform(get("/client/{clientid}", clientId)
+        final var response = mvc.perform(get("/client/{clientid}", clientId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -263,7 +263,7 @@ class ClientControllerIntegrationTest {
     }
 
     private Client createTestClient(String clientName) {
-        final Client client = new Client();
+        final var client = new Client();
         client.setClientname(clientName);
         return repository.saveAndFlush(client);
     }
