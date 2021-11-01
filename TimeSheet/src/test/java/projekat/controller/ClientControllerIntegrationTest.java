@@ -100,7 +100,7 @@ class ClientControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
     @Test
@@ -142,7 +142,7 @@ class ClientControllerIntegrationTest {
     }
 
     @Test
-    public void testCreateClientNAmeNotExist() throws Exception {
+    public void testCreateClientNameNotExist() throws Exception {
         //Arange
         final var client = new Client();
 
