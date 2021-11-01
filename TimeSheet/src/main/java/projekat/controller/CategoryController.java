@@ -1,6 +1,7 @@
 package projekat.controller;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,30 +34,46 @@ public class CategoryController {
 	}
 	
 	@GetMapping("category/{categoryid}")
-	public Category getCategory(@PathVariable Integer categoryid) {
-		return categoryRepository.getById(categoryid);
+	public ResponseEntity<Category> getCategory(@PathVariable Integer categoryid) {
+		Optional<Category> category = categoryRepository.findById(categoryid);
+		if (!category.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(category.get(), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@PostMapping("category")
 	public ResponseEntity<Category> insertCategory(@RequestBody Category category) {
-		categoryRepository.save(category);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if ( category.getCategoryname() == null || category.getCategoryname().trim().equals("")
+				|| category.getCategoryid() != null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		Category cat = categoryRepository.save(category);
+		return new ResponseEntity<Category>(cat, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
 	@PutMapping("category")
 	public ResponseEntity<Category> updateCategory(@RequestBody Category category) {
-		if(categoryRepository.existsById(category.getCategoryid()))
-			categoryRepository.save(category);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if(!categoryRepository.existsById(category.getCategoryid())){
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		if ( category.getCategoryname() == null || category.getCategoryname().trim().equals("")
+				|| category.getCategoryid() == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		Category inserted = categoryRepository.save(category);
+		return new ResponseEntity<>(inserted, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("category/{categoryid}")
 	public ResponseEntity<Category> deleteCategory(@PathVariable Integer categoryid) {
-		if(categoryRepository.existsById(categoryid))
-			categoryRepository.deleteById(categoryid);
+		if(!categoryRepository.existsById(categoryid)){
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		categoryRepository.deleteById(categoryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
