@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import projekat.TimeSheetApplication;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
@@ -112,7 +111,7 @@ class ProjectControllerIntegrationTest {
 
     @Test
     public void  testCreateProject() throws Exception {
-        //Arange
+        //Arrange
         final var projectName = "Cinema App";
         final var projectDescription = "Make App for ticket reservation";
         final var project = new Project();
@@ -136,12 +135,12 @@ class ProjectControllerIntegrationTest {
 
     @Test
     public void  testCreateProjectBadRequest() throws Exception {
-        //Arange
+        //Arrange
         final var project = new Project();
         project.setProjectname("  ");
 
         // Act
-        final MvcResult response = mvc.perform(post("/project")
+        final var response = mvc.perform(post("/project")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(project)))
                 .andReturn();
@@ -152,7 +151,7 @@ class ProjectControllerIntegrationTest {
 
     @Test
     public void  testCreateProjectNameNotExist() throws Exception {
-        //Arange
+        //Arrange
         final var project = new Project();
 
         // Act
@@ -167,7 +166,7 @@ class ProjectControllerIntegrationTest {
 
     @Test
     public void  testCreateProjectIdExists() throws Exception {
-        //Arange
+        //Arrange
         final var projectName = "Weather App";
         final var projectDescription = "Make app for weather forecast";
         final var project = new Project();
@@ -187,7 +186,7 @@ class ProjectControllerIntegrationTest {
 
     @Test
     public void  testUpdateProject() throws Exception {
-        //Arange
+        //Arrange
         final var projectName = "Project Title";
         final var projectDescription = "Project Description";
         final var insertedProject = createTestProject(projectName, projectDescription);
@@ -211,7 +210,7 @@ class ProjectControllerIntegrationTest {
 
     @Test
     public void  testUpdateProjectBadRequest() throws Exception {
-        //Arange
+        //Arrange
         final var projectName = "Cinema App";
         final var projectDescription = "App for ticket reservation";
         final var inserted = createTestProject(projectName, projectDescription);
