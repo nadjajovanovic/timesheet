@@ -30,6 +30,7 @@ public class CategoryController {
 	
 	@GetMapping("category")
 	public Collection<Category> getAllCategories() {
+
 		return categoryRepository.findAll();
 	}
 	
