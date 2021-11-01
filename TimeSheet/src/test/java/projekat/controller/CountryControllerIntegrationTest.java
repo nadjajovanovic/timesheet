@@ -1,7 +1,7 @@
 package projekat.controller;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 import projekat.TimeSheetApplication;
 import projekat.models.Country;
 import projekat.repository.CountryRepository;
@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -56,17 +55,17 @@ class CountryControllerIntegrationTest {
     @Test
     public void getAllCountries() throws Exception {
         //Arrange
-        final String firstCountryName = "Romania";
-        final String secondCountryName = "Spain";
+        final var firstCountryName = "Romania";
+        final var secondCountryName = "Spain";
         createTestCountry(firstCountryName);
         createTestCountry(secondCountryName);
 
         //Act
-        final MvcResult response = mvc.perform(get("/country")
+        final var response = mvc.perform(get("/country")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final List<Country> countries = Arrays.asList(ResponseReader.readResponse(response, Country[].class));
+        final var countries = Arrays.asList(ResponseReader.readResponse(response, Country[].class));
 
         //Assert
         assertEquals(countries.size(), 2);
@@ -77,15 +76,15 @@ class CountryControllerIntegrationTest {
     @Test
     public void getOneCountry() throws Exception {
         //Arrange
-        final String countryName = "Romania";
-        final Country inserted = createTestCountry(countryName);
+        final var countryName = "Romania";
+        final var inserted = createTestCountry(countryName);
 
         //Act
-        final MvcResult response = mvc.perform(get("/country/{id}", inserted.getCountryid())
+        final var response = mvc.perform(get("/country/{id}", inserted.getCountryid())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final Country country = ResponseReader.readResponse(response, Country.class);
+        final var country = ResponseReader.readResponse(response, Country.class);
 
         //Assert
         assertEquals(country.getCountryname(), countryName);
@@ -95,30 +94,31 @@ class CountryControllerIntegrationTest {
     @Test
     public void  getOneCountryNotFound() throws Exception {
         //Arrange
+        final var countryId = 123;
 
         //Act
-        final MvcResult response = mvc.perform(get("/country/{id}", 432))
+        final var response = mvc.perform(get("/country/{id}", countryId))
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), 404);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
     @Test
     public void  testCreateCountry() throws Exception {
         //Arange
-        final String countryName = "Spain";
-        final Country country = new Country();
+        final var countryName = "Spain";
+        final var country = new Country();
         country.setCountryname(countryName);
 
         // Act
-        final MvcResult response = mvc.perform(post("/country")
+        final var response = mvc.perform(post("/country")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final Country responseCountry = ResponseReader.readResponse(response, Country.class);
+        final var responseCountry = ResponseReader.readResponse(response, Country.class);
 
         // Assert
         assertNotNull(responseCountry.getCountryid());
@@ -128,69 +128,69 @@ class CountryControllerIntegrationTest {
     @Test
     public void  testCreateCountryBadRequest() throws Exception {
         //Arange
-        final Country country = new Country();
+        final var country = new Country();
         country.setCountryname("   ");
 
         // Act
-        final MvcResult response = mvc.perform(post("/country")
+        final var response = mvc.perform(post("/country")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country)))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void  testCreateCountryNameNotExist() throws Exception {
         //Arange
-        final Country country = new Country();
+        final var country = new Country();
 
         // Act
-        final MvcResult response = mvc.perform(post("/country")
+        final var response = mvc.perform(post("/country")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country)))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void  testCreateCountryIdExists() throws Exception {
-        //Arange
-        final String countryName = "Greece";
-        final Country country = new Country();
+        //Arrange
+        final var countryName = "Greece";
+        final var country = new Country();
         country.setCountryname(countryName);
         country.setCountryid(123);
 
         // Act
-        final MvcResult response = mvc.perform(post("/country")
+        final var response = mvc.perform(post("/country")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country)))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void  testUpdateCountry() throws Exception {
 
-        //Arange
-        final String countryName = "Itly";
-        final Country insertedCountry = createTestCountry(countryName);
-        final String updatedName = "Italy";
+        //Arrange
+        final var countryName = "Itly";
+        final var insertedCountry = createTestCountry(countryName);
+        final var updatedName = "Italy";
         insertedCountry.setCountryname(updatedName);
 
         // Act
-        final MvcResult response = mvc.perform(put("/country")
+        final var response = mvc.perform(put("/country")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(insertedCountry))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final Country responseCountry = ResponseReader.readResponse(response, Country.class);
+        final var responseCountry = ResponseReader.readResponse(response, Country.class);
 
         // Assert
         assertNotNull(responseCountry.getCountryid());
@@ -200,49 +200,49 @@ class CountryControllerIntegrationTest {
     @Test
     public void  testUpdateCountryBadRequest() throws Exception {
         //Arange
-        final String countryName = "nameForInsert";
-        final Country insertedCountry = createTestCountry(countryName);
-        final String updatedName = "   ";
+        final var countryName = "nameForInsert";
+        final var insertedCountry = createTestCountry(countryName);
+        final var updatedName = "   ";
         insertedCountry.setCountryname(updatedName);
 
         // Act
-        final MvcResult response = mvc.perform(put("/country")
+        final var response = mvc.perform(put("/country")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(insertedCountry)))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void deleteCountry() throws Exception {
         //Arrange
-        final String countryName = "Italy";
-        final Country insertedCountry = createTestCountry(countryName);
+        final var countryName = "Italy";
+        final var insertedCountry = createTestCountry(countryName);
 
         //Act
-        final MvcResult response = mvc.perform(delete("/country/{id}", insertedCountry.getCountryid()))
+        final var response = mvc.perform(delete("/country/{id}", insertedCountry.getCountryid()))
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), 200);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.OK.value());
     }
 
     @Test
     public void deleteCountryNotFound() throws Exception {
         //Arrange
-
+        final var countryId = 99;
         //Act
-        final MvcResult response = mvc.perform(delete("/country/{id}", 99))
+        final var response = mvc.perform(delete("/country/{id}", countryId))
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), 404);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
     private Country createTestCountry(String countryName) {
-        final Country country = new Country();
+        final var country = new Country();
         country.setCountryname(countryName);
         return repository.saveAndFlush(country);
     }
