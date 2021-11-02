@@ -1,6 +1,7 @@
 package projekat.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,30 +34,44 @@ public class CountryController {
 	}
 	
 	@GetMapping("country/{countryid}")
-	public Country getCountry(@PathVariable Integer countryid) {
-		return countryRepository.getById(countryid);
+	public ResponseEntity<Country> getCountry(@PathVariable Integer countryid) {
+		Optional<Country> countryOptional = countryRepository.findById(countryid);
+		if (!countryOptional.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(countryOptional.get(), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@PostMapping("country")
 	public ResponseEntity<Country> insertCountry (@RequestBody Country country) {
-		countryRepository.save(country);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if (country.getCountryname() == null || country.getCountryname().trim().equals("")
+				|| country.getCountryid() != null){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		final Country insertedCountry = countryRepository.save(country);
+		return new ResponseEntity<>(insertedCountry, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
 	@PutMapping("country")
 	public ResponseEntity<Country> updateCountry(@RequestBody Country country) {
-		if(countryRepository.existsById(country.getCountryid()))
-			countryRepository.save(country);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if(!countryRepository.existsById(country.getCountryid()))
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		if (country.getCountryname() == null || country.getCountryname().trim().equals("")
+				|| country.getCountryid() == null){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		final Country updatedCountry = countryRepository.save(country);
+		return new ResponseEntity<>(updatedCountry, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("country/{countryid}")
 	public ResponseEntity<Country> deleteCountry (@PathVariable Integer countryid) {
-		if (countryRepository.existsById(countryid))
-			countryRepository.deleteById(countryid);
+		if (!countryRepository.existsById(countryid))
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		countryRepository.deleteById(countryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
