@@ -216,7 +216,7 @@ class ClientControllerIntegrationTest {
         assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
-    @Test @Disabled
+    @Test //@Disabled
     public void testUpdateClientNoId() throws Exception {
         //Arange
         final var client = new Client();
@@ -259,7 +259,7 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
     private Client createTestClient(String clientName) {
