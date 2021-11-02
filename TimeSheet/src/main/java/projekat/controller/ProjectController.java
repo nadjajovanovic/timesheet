@@ -3,6 +3,7 @@ package projekat.controller;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -75,4 +76,9 @@ public class ProjectController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@GetMapping("project/filter")
+	public ResponseEntity<Collection<Project>> filterProjectsByName(@Param("keyword") String keyword) {
+		return new ResponseEntity<>(projectRepository.findByProjectnameStartingWithIgnoreCase(keyword)
+										, HttpStatus.OK);
+	}
 }

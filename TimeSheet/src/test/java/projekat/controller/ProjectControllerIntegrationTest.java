@@ -255,6 +255,57 @@ class ProjectControllerIntegrationTest {
         assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
+    @Test
+    public void filterProjectsTest() throws Exception {
+        // Arrange
+        final var firstProjectName = "App for Cinema";
+        final var secondProjectName = "Time Tracking App";
+        final var thirdProjectName = "App for Booking";
+        final var fourthProjectName = "App for Food Ordering";
+        createTestProject(firstProjectName, null);
+        createTestProject(secondProjectName, null);
+        createTestProject(thirdProjectName, null);
+        createTestProject(fourthProjectName, null);
+        final var paramName = "keyword";
+        final var paramValue = "app";
+
+        // Act
+        final var response = mvc.perform(get("/project/filter")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .queryParam(paramName, paramValue))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
+
+        // Assert
+        assertEquals(filteredProjects.size(), 3);
+        assertEquals(filteredProjects.get(0).getProjectname(), firstProjectName);
+        assertEquals(filteredProjects.get(1).getProjectname(), thirdProjectName);
+        assertEquals(filteredProjects.get(2).getProjectname(), fourthProjectName);
+    }
+
+    @Test
+    public void filterProjectsEmptyTest() throws Exception {
+        // Arrange
+        final var firstProjectName = "App for Cinema";
+        final var secondProjectName = "Time Tracking App";
+        createTestProject(firstProjectName, null);
+        createTestProject(secondProjectName, null);
+        final var paramName = "keyword";
+        final var paramValue = "very long value";
+
+        // Act
+        final var response = mvc.perform(get("/project/filter")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .queryParam(paramName, paramValue))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
+
+        // Assert
+        assertEquals(filteredProjects.size(), 0);
+    }
+
     private Project createTestProject(String projectName, String projectDescription) {
         final var project = new Project();
         project.setProjectname(projectName);
