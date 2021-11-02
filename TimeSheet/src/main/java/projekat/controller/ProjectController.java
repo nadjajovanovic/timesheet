@@ -33,30 +33,45 @@ public class ProjectController {
 	}
 	
 	@GetMapping("project/{projectid}")
-	public Project getProject(@PathVariable Integer projectid) {
-		return projectRepository.getById(projectid);
+	public ResponseEntity<Project> getProject(@PathVariable Integer projectid) {
+		final var optionalProject = projectRepository.findById(projectid);
+		if (optionalProject.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(optionalProject.get(), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@PostMapping("project")
 	public ResponseEntity<Project> insertProject(@RequestBody Project project) {
-		projectRepository.save(project);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if (project.getProjectname() == null || project.getProjectname().trim().equals("")
+			|| project.getProjectid() != null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		final var insertedProject = projectRepository.save(project);
+		return new ResponseEntity<>(insertedProject, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
 	@PutMapping("project")
 	public ResponseEntity<Project> updateProject(@RequestBody Project project) {
-		if(projectRepository.existsById(project.getProjectid()))
-			projectRepository.save(project);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if (project.getProjectname() == null || project.getProjectname().trim().equals("")
+				|| project.getProjectid() == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		if(!projectRepository.existsById(project.getProjectid()))
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+		final var updatedProject = projectRepository.save(project);
+		return new ResponseEntity<>(updatedProject, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("project/{projectid}")
 	public ResponseEntity<Project> deleteProject(@PathVariable Integer projectid) {
-		if(projectRepository.existsById(projectid))
-			projectRepository.deleteById(projectid);
+		if(!projectRepository.existsById(projectid))
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		projectRepository.deleteById(projectid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
