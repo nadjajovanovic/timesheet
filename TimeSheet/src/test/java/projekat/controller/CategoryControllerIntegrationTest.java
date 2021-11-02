@@ -1,18 +1,17 @@
 package projekat.controller;
+import org.springframework.http.HttpStatus;
 import projekat.TimeSheetApplication;
 import projekat.models.Category;
 import projekat.util.ResponseReader;
 import projekat.repository.CategoryRepository;
 import java.util.Arrays;
-import java.util.List;
 import org.junit.runner.RunWith;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import  static  org.junit.jupiter.api.Assertions.assertEquals;
-import  static  org.junit.jupiter.api.Assertions.assertNotNull;
-import org.springframework.test.web.servlet.MvcResult;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,17 +54,17 @@ class CategoryControllerIntegrationTest {
     @Test
     public void getAllCategories() throws Exception {
         //Arrange
-        final String firstCatName = "First";
-        final String secondCatName = "Second";
+        final var firstCatName = "First";
+        final var secondCatName = "Second";
         createTestCategory(firstCatName);
         createTestCategory(secondCatName);
 
         //Act
-        final MvcResult response = mvc.perform(get("/category")
+        final var response = mvc.perform(get("/category")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final List<Category> categories = Arrays.asList(ResponseReader.readResponse(response, Category[].class));
+        final var categories = Arrays.asList(ResponseReader.readResponse(response, Category[].class));
 
         //Assert
         assertEquals(categories.size(), 2);
@@ -76,15 +75,15 @@ class CategoryControllerIntegrationTest {
     @Test
     public void getOneCategory() throws Exception {
         //Arrange
-        final String categoryName = "First";
-        final Category inserted = createTestCategory(categoryName);
+        final var categoryName = "First";
+        final var inserted = createTestCategory(categoryName);
 
         //Act
-        final MvcResult response = mvc.perform(get("/category/{id}", inserted.getCategoryid())
+        final var response = mvc.perform(get("/category/{id}", inserted.getCategoryid())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final Category category = ResponseReader.readResponse(response, Category.class);
+        final var category = ResponseReader.readResponse(response, Category.class);
 
         //Assert
         assertEquals(category.getCategoryname(), categoryName);
@@ -94,31 +93,32 @@ class CategoryControllerIntegrationTest {
     @Test
     public void  getOneCategoryNotFound() throws Exception {
         //Arrange
+        final var categoryId = 100;
 
         //Act
-        final MvcResult response = mvc.perform(get("/category/{id}", 100)
+        final var response = mvc.perform(get("/category/{id}", categoryId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), 404);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
     @Test
     public void  testCreateCategory() throws Exception {
-        //Arange
-        final String categoryName = "Please insert me";
-        final Category category = new Category();
+        //Arrange
+        final var categoryName = "Please insert me";
+        final var category = new Category();
         category.setCategoryname(categoryName);
 
         // Act
-        final MvcResult response = mvc.perform(post("/category")
+        final var response = mvc.perform(post("/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(category))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final Category responseCategory = ResponseReader.readResponse(response, Category.class);
+        final var responseCategory = ResponseReader.readResponse(response, Category.class);
 
         // Assert
         assertNotNull(responseCategory.getCategoryid());
@@ -128,73 +128,72 @@ class CategoryControllerIntegrationTest {
     @Test
     public void  testCreateCategoryBadRequest() throws Exception {
 
-        //Arange
-        final Category category = new Category();
+        //Arrange
+        final var category = new Category();
         category.setCategoryname("   ");
 
         // Act
-        final MvcResult response = mvc.perform(post("/category")
+        final var response = mvc.perform(post("/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(category))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void  testCreateCategoryNameNotExist() throws Exception {
-        //Arange
-        final Category category = new Category();
+        //Arrange
+        final var category = new Category();
 
         // Act
-        final MvcResult response = mvc.perform(post("/category")
+        final var response = mvc.perform(post("/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(category))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void  testCreateCategoryIdExists() throws Exception {
-        //Arange
-        final String categoryName = "Please insert me";
-        final Category category = new Category();
+        //Arrange
+        final var categoryName = "Please insert me";
+        final var category = new Category();
         category.setCategoryname(categoryName);
         category.setCategoryid(5);
 
         // Act
-        final MvcResult response = mvc.perform(post("/category")
+        final var response = mvc.perform(post("/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(category))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void  testUpdateCategory() throws Exception {
-
-        //Arange
-        final String categoryName = "nameForInsert";
-        final Category inserted = createTestCategory(categoryName);
-        final String updatedName = "nameForUpdate";
+        //Arrange
+        final var categoryName = "nameForInsert";
+        final var inserted = createTestCategory(categoryName);
+        final var updatedName = "nameForUpdate";
         inserted.setCategoryname(updatedName);
 
         // Act
-        final MvcResult response = mvc.perform(put("/category")
+        final var response = mvc.perform(put("/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inserted))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final Category responseCategory = ResponseReader.readResponse(response, Category.class);
+        final var responseCategory = ResponseReader.readResponse(response, Category.class);
 
         // Assert
         assertNotNull(responseCategory.getCategoryid());
@@ -203,70 +202,89 @@ class CategoryControllerIntegrationTest {
 
     @Test
     public void  testUpdateCategoryBadRequest() throws Exception {
-        //Arange
-        final String categoryName = "nameForInsert";
-        final Category inserted = createTestCategory(categoryName);
-        final String updatedName = "   ";
+        //Arrange
+        final var categoryName = "nameForInsert";
+        final var inserted = createTestCategory(categoryName);
+        final var updatedName = "   ";
         inserted.setCategoryname(updatedName);
 
         // Act
-        final MvcResult response = mvc.perform(put("/category")
+        final var response = mvc.perform(put("/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inserted))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test @Disabled
     public void  testUpdateCategoryNoId() throws Exception {
-        //Arange
-        final Category category = new Category();
+        //Arrange
+        final var category = new Category();
         category.setCategoryname("Not important");
 
         // Act
-        final MvcResult response = mvc.perform(put("/category")
+        final var response = mvc.perform(put("/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(category))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), 400);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void  testUpdateCategoryWrongId() throws Exception {
+        //Arrange
+        final var categoryName = "My Category";
+        final var insertedCategory = createTestCategory(categoryName);
+        insertedCategory.setCategoryid(9999);
+
+        // Act
+        final var response = mvc.perform(put("/category")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(insertedCategory))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        // Assert
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
     @Test
     public void deleteCategory() throws Exception {
         //Arrange
-        final String categoryName = "Delete Me";
-        final Category inserted = createTestCategory(categoryName);
+        final var categoryName = "Delete Me";
+        final var inserted = createTestCategory(categoryName);
 
         //Act
-        final MvcResult response = mvc.perform(delete("/category/{id}", inserted.getCategoryid())
+        final var response = mvc.perform(delete("/category/{id}", inserted.getCategoryid())
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), 200);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.OK.value());
     }
 
     @Test
     public void deleteCategoryNotFound() throws Exception {
         //Arrange
+        final var categoryId = 100;
 
         //Act
-        final MvcResult response = mvc.perform(delete("/category/{id}", 100)
+        final var response = mvc.perform(delete("/category/{id}", categoryId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), 404);
+        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
     }
 
     private Category createTestCategory(String categoryName) {
-        final Category category = new Category();
+        final var category = new Category();
         category.setCategoryname(categoryName);
         return repository.saveAndFlush(category);
     }
