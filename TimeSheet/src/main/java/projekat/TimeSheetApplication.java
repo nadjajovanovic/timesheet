@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @Configuration
 @EntityScan
-//@EnableJpaRepositories(basePackages = "projekat.repository")
 @EnableTransactionManagement
 @ComponentScan(basePackages = "projekat.*")
 public class TimeSheetApplication {

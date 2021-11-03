@@ -65,17 +65,20 @@ public class ClientController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		final var updated = clientService.update(client);
-		if (updated == null)
+		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 		return new ResponseEntity<>(updated, HttpStatus.OK);
+
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("client/{clientid}")
 	public ResponseEntity<Client> deleteClient(@PathVariable Integer clientid) {
 		final var deleted = clientService.delete(clientid);
-		if (!deleted)
+		if (!deleted) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
