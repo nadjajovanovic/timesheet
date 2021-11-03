@@ -6,6 +6,7 @@ import projekat.models.Project;
 import projekat.repository.ProjectRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class ProjectService {
@@ -22,12 +23,9 @@ public class ProjectService {
         return projects;
     }
 
-    public Project getOne(Integer id){
-        final var optionalProject = projectRepository.findById(id);
-        if (optionalProject.isEmpty()) {
-            return null;
-        }
-        return optionalProject.get();
+    public Optional<Project> getOne(Integer id){
+        final var project = projectRepository.findById(id);
+        return project;
     }
 
     public Project create(Project project){

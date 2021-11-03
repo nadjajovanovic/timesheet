@@ -36,11 +36,11 @@ public class ProjectController {
 	
 	@GetMapping("project/{projectid}")
 	public ResponseEntity<Project> getProject(@PathVariable Integer projectid) {
-		final var project = projectService.getOne(projectid);
-		if (project == null) {
+		final var optionalProject = projectService.getOne(projectid);
+		if (optionalProject.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(project, HttpStatus.OK);
+		return new ResponseEntity<>(optionalProject.get(), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
