@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
-import services.ClientService;
+import projekat.services.ClientService;
+
 
 @RestController
 public class ClientController {

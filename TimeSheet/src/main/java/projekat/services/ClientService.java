@@ -1,4 +1,4 @@
-package services;
+package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class ClientService {
     }
 
     public Collection<Client> filterByName(String keyword){
-        final var filteredClients = clientRepository.findByClientNameStartingWithIgnoreCase(keyword);
+        final var filteredClients = clientRepository.findByClientnameStartingWithIgnoreCase(keyword);
         return filteredClients;
     }
 }

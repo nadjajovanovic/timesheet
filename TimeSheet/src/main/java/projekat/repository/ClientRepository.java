@@ -11,5 +11,5 @@ import java.util.Collection;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Integer>{
-    Collection<Client> findByClientNameStartingWithIgnoreCase(String name);
+    Collection<Client> findByClientnameStartingWithIgnoreCase(String name);
 }
