@@ -7,8 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import projekat.models.Client;
 
+import java.util.Collection;
+
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Integer>{
-	/*List<Client> findByNameContainingIgnoreCase(String clientName);
-	List<Client> findByAddressContainingIgnoreCase(String clientAddress);*/
+    Collection<Client> findByClientNameStartingWithIgnoreCase(String name);
 }

@@ -1,7 +1,7 @@
 package projekat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -260,6 +260,57 @@ class ClientControllerIntegrationTest {
 
         //Assert
         assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void filterClientsTest() throws Exception {
+        //Arange
+        final var firstClientName = "Nadja";
+        final var secondClientName = "Nikola";
+        final var thirdClientName = "Nikolina";
+        final var fourthClientName = "Bojana";
+        createTestClient(firstClientName);
+        createTestClient(secondClientName);
+        createTestClient(thirdClientName);
+        createTestClient(fourthClientName);
+        final var paramName = "keyword";
+        final var paramValue = "n";
+
+        //act
+        final var response = mvc.perform(get("/client/filter")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .queryParam(paramName, paramValue))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var filteredClients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
+
+        //Assert
+        assertEquals(filteredClients.size(), 3);
+        assertEquals(filteredClients.get(0).getClientname(), firstClientName);
+        assertEquals(filteredClients.get(1).getClientname(), secondClientName);
+        assertEquals(filteredClients.get(2).getClientname(), thirdClientName);
+    }
+
+    @Test
+    public void filterClientsEmptyTest() throws Exception {
+        // Arrange
+        final var firstClientName = "Bojana";
+        final var secondClientName = "Tijana";
+        createTestClient(firstClientName);
+        createTestClient(secondClientName);
+        final var paramName = "keyword";
+        final var paramValue = "Nadja";
+
+        // Act
+        final var response = mvc.perform(get("/client/filter")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .queryParam(paramName, paramValue))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var filteredClients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
+
+        // Assert
+        assertEquals(filteredClients.size(), 0);
     }
 
     private Client createTestClient(String clientName) {
