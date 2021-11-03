@@ -3,6 +3,7 @@ package projekat.controller;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,26 +16,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import projekat.models.Project;
-import projekat.repository.ProjectRepository;
+import projekat.service.ProjectService;
 
 @RestController
 public class ProjectController {
-	
+
 	@Autowired
-	private ProjectRepository projectRepository;
-	
-	public ProjectController(ProjectRepository projectRepository) {
-		this.projectRepository = projectRepository;
+	private final ProjectService projectService;
+
+	public ProjectController(ProjectService projectService) {
+		this.projectService = projectService;
 	}
 	
 	@GetMapping("project")
-	public Collection<Project> getAllProjects() {
-		return projectRepository.findAll();
+	public ResponseEntity<Collection<Project>> getAllProjects() {
+		final var projects = projectService.getAll();
+		return new ResponseEntity<>(projects, HttpStatus.OK);
 	}
 	
 	@GetMapping("project/{projectid}")
 	public ResponseEntity<Project> getProject(@PathVariable Integer projectid) {
-		final var optionalProject = projectRepository.findById(projectid);
+		final var optionalProject = projectService.getOne(projectid);
 		if (optionalProject.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -48,7 +50,7 @@ public class ProjectController {
 			|| project.getProjectid() != null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		final var insertedProject = projectRepository.save(project);
+		final var insertedProject = projectService.create(project);
 		return new ResponseEntity<>(insertedProject, HttpStatus.CREATED);
 	}
 	
@@ -59,20 +61,24 @@ public class ProjectController {
 				|| project.getProjectid() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		if(!projectRepository.existsById(project.getProjectid()))
+		final var updatedProject = projectService.update(project);
+		if(updatedProject == null)
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-		final var updatedProject = projectRepository.save(project);
 		return new ResponseEntity<>(updatedProject, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("project/{projectid}")
 	public ResponseEntity<Project> deleteProject(@PathVariable Integer projectid) {
-		if(!projectRepository.existsById(projectid))
+		final var deleted = projectService.delete(projectid);
+		if(!deleted)
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		projectRepository.deleteById(projectid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@GetMapping("project/filter")
+	public ResponseEntity<Collection<Project>> filterProjectsByName(@Param("keyword") String keyword) {
+		final var filteredProjects = projectService.filterByName(keyword);
+		return new ResponseEntity<>(filteredProjects, HttpStatus.OK);
+	}
 }

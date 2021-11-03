@@ -5,7 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import projekat.models.Project;
 
+import java.util.Collection;
+
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Integer>{
 
+    Collection<Project> findByProjectnameStartingWithIgnoreCase(String name);
 }
