@@ -1,7 +1,6 @@
 package projekat.controller;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,32 +14,32 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import projekat.models.Category;
-import projekat.repository.CategoryRepository;
+import projekat.models.Category;;
+import projekat.services.CategoryService;
 
 @RestController
 public class CategoryController {
 	
 	@Autowired
-	private CategoryRepository categoryRepository;
+	private CategoryService categoryService;
 	
-	public CategoryController(CategoryRepository categoryRepository) {
-		this.categoryRepository = categoryRepository;
+	public CategoryController(CategoryService categoryService) {
+		this.categoryService = categoryService;
 	}
 	
 	@GetMapping("category")
-	public Collection<Category> getAllCategories() {
-
-		return categoryRepository.findAll();
+	public ResponseEntity<Collection<Category>> getAllCategories() {
+		final var categories = categoryService.getAll();
+		return new ResponseEntity<>(categories, HttpStatus.OK);
 	}
 	
 	@GetMapping("category/{categoryid}")
 	public ResponseEntity<Category> getCategory(@PathVariable Integer categoryid) {
-		Optional<Category> category = categoryRepository.findById(categoryid);
-		if (!category.isPresent()) {
+		final var optionalCategory = categoryService.getOne(categoryid);
+		if (optionalCategory.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(category.get(), HttpStatus.OK);
+		return new ResponseEntity<>(optionalCategory.get(), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
@@ -50,31 +49,31 @@ public class CategoryController {
 				|| category.getCategoryid() != null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		Category cat = categoryRepository.save(category);
-		return new ResponseEntity<Category>(cat, HttpStatus.CREATED);
+		final var insertedCategory = categoryService.create(category);
+		return new ResponseEntity<>(insertedCategory, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
 	@PutMapping("category")
 	public ResponseEntity<Category> updateCategory(@RequestBody Category category) {
-		if(!categoryRepository.existsById(category.getCategoryid())){
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		if ( category.getCategoryname() == null || category.getCategoryname().trim().equals("")
 				|| category.getCategoryid() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		Category inserted = categoryRepository.save(category);
-		return new ResponseEntity<>(inserted, HttpStatus.OK);
+		final var updatedCategory = categoryService.update(category);
+		if (updatedCategory == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("category/{categoryid}")
 	public ResponseEntity<Category> deleteCategory(@PathVariable Integer categoryid) {
-		if(!categoryRepository.existsById(categoryid)){
+		final var deleted = categoryService.delete(categoryid);
+		if(!deleted){
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		categoryRepository.deleteById(categoryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

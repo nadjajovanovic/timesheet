@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import projekat.models.Project;
-import projekat.service.ProjectService;
+import projekat.services.ProjectService;
 
 @RestController
 public class ProjectController {
