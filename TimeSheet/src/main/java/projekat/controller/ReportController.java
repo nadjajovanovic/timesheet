@@ -14,49 +14,66 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import projekat.models.Client;
 import projekat.models.Report;
 import projekat.repository.ReportRepository;
+import projekat.services.ReportService;
 
 @RestController
 public class ReportController {
 	
 	@Autowired
-	private ReportRepository reportRepository;
+	private ReportService reportService;
 	
-	public ReportController(ReportRepository reportRepository) {
-		this.reportRepository = reportRepository;
+	public ReportController(ReportService reportService) {
+		this.reportService = reportService;
 	}
 	
 	@GetMapping("report")
-	public Collection<Report> getAllReports() {
-		return reportRepository.findAll();
+	public ResponseEntity<Collection<Report>> getAllReports() {
+		final var reports = reportService.getAll();
+		return new ResponseEntity<>(reports, HttpStatus.OK);
 	}
 	
 	@GetMapping("report/{reportid}")
-	public Report getReport(@PathVariable Integer reportid) {
-		return reportRepository.getById(reportid);
+	public ResponseEntity<Report> getReport(@PathVariable Integer reportid) {
+		final var oneReport = reportService.getOne(reportid);
+		if (oneReport.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(oneReport.get(), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@PostMapping("report")
 	public ResponseEntity<Report> insertReport(@RequestBody Report report) {
-		reportRepository.save(report);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if (report.getReportid() != null) {
+			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		final var inserted = reportService.insert(report);
+		return new ResponseEntity<Report>(inserted, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
 	@PutMapping("report")
 	public ResponseEntity<Report> updateReport(@RequestBody Report report) {
-		if(reportRepository.existsById(report.getReportid()))
-			reportRepository.save(report);
-		return new ResponseEntity<>(HttpStatus.OK);
+		if (report.getReportid() == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		final var updated = reportService.update(report);
+		if (updated == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(updated, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("report/{reportid}")
 	public ResponseEntity<Report> deleteReport(@PathVariable Integer reportid) {
-		if (reportRepository.existsById(reportid))
-			reportRepository.deleteById(reportid);
+		final var deleted = reportService.delete(reportid);
+		if (!deleted) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
