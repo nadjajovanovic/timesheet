@@ -1,7 +1,6 @@
 package projekat.controller;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,27 +15,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import projekat.models.Country;
-import projekat.repository.CountryRepository;
+import projekat.services.CountryService;
 
 @RestController
 public class CountryController {
 
 	@Autowired
-	private CountryRepository countryRepository;
-	
-	public CountryController(CountryRepository countryRepository) {
-		this.countryRepository = countryRepository;
+	private final CountryService countryService;
+
+	public CountryController(CountryService countryService) {
+		this.countryService = countryService;
 	}
-	
+
 	@GetMapping(value = "/country")
-	public List<Country> getCountries() {
-		return countryRepository.findAll();
+	public ResponseEntity<Collection<Country>> getCountries() {
+		final var countries = countryService.getAll();
+		return new ResponseEntity<>(countries, HttpStatus.OK);
 	}
 	
 	@GetMapping("country/{countryid}")
 	public ResponseEntity<Country> getCountry(@PathVariable Integer countryid) {
-		Optional<Country> countryOptional = countryRepository.findById(countryid);
-		if (!countryOptional.isPresent()) {
+		final var countryOptional = countryService.getOne(countryid);
+		if (countryOptional.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<>(countryOptional.get(), HttpStatus.OK);
@@ -49,31 +49,31 @@ public class CountryController {
 				|| country.getCountryid() != null){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		final Country insertedCountry = countryRepository.save(country);
+		final var insertedCountry = countryService.create(country);
 		return new ResponseEntity<>(insertedCountry, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
 	@PutMapping("country")
 	public ResponseEntity<Country> updateCountry(@RequestBody Country country) {
-		if(!countryRepository.existsById(country.getCountryid()))
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		if (country.getCountryname() == null || country.getCountryname().trim().equals("")
 				|| country.getCountryid() == null){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		final Country updatedCountry = countryRepository.save(country);
+		final var updatedCountry = countryService.update(country);
+		if (updatedCountry == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 		return new ResponseEntity<>(updatedCountry, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@DeleteMapping("country/{countryid}")
 	public ResponseEntity<Country> deleteCountry (@PathVariable Integer countryid) {
-		if (!countryRepository.existsById(countryid))
+		final var deleted = countryService.delete(countryid);
+		if (!deleted) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		countryRepository.deleteById(countryid);
+		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-
 }
