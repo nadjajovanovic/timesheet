@@ -1,6 +1,6 @@
 package projekat.enums;
 
-public enum EProject {
+public enum ProjectStatus {
     Inactive,
     Active,
     Archive
