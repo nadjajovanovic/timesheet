@@ -46,5 +46,9 @@ public class Project implements Serializable {
 	@OneToMany(mappedBy="project")
 	private List<Report> reports;
 
+	@Enumerated(EnumType.STRING)
+	@Column(length = 10)
+	private EProject status;
+
 
 }

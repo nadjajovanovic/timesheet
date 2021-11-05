@@ -8,6 +8,62 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/TimeSheetApplication.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/ClientController.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/ReportController.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/TeamMemberController.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/models/EProject.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/models/Project.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/repository/ClientRepository.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/ClientService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/ReportService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/TeamMemberService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/services/ClientService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/test/java/projekat/TimeSheetApplicationTests.java">
           <value>
             <set />
           </value>
