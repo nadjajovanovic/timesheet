@@ -60,6 +60,26 @@ public class TimeSheetEntryService {
         return insertedEntry;
     }
 
+    public TimeSheetEntry update(TimeSheetEntry entry) {
+        if (!timeSheetEntryRepository.existsById(entry.getEntryId())){
+            return null;
+        }
+
+        final var category = categoryRepository.findById(entry.getCategory().getCategoryid());
+        final var client = clientRepository.findById(entry.getClient().getClientid());
+        final var project = projectRepository.findById(entry.getProject().getProjectid());
+
+        if (category.isPresent() && client.isPresent() && project.isPresent()){
+            entry.setCategory(category.get());
+            entry.setProject(project.get());
+            entry.setClient(client.get());
+        } else {
+            return null;
+        }
+        final var updatedEntry = timeSheetEntryRepository.save(entry);
+        return updatedEntry;
+    }
+
     public boolean delete (Integer id) {
         if (!timeSheetEntryRepository.existsById(id)){
             return false;

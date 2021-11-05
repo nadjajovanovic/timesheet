@@ -13,7 +13,7 @@ public class TimeSheetEntry {
 
     @Id
     @SequenceGenerator(name="ENTRY_ENTRYID_GENERATOR", sequenceName="ENTRY_SEQ", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CATEGORY_ENTRYID_GENERATOR")
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ENTRY_ENTRYID_GENERATOR")
     private Integer entryId;
 
     // TODO add user when authentication is done

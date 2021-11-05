@@ -3,12 +3,10 @@ package projekat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.*;
 import projekat.models.TimeSheetEntry;
 import projekat.services.TimeSheetEntryService;
 
-import java.sql.Time;
 import java.util.Collection;
 
 @RestController
@@ -39,11 +37,33 @@ public class TimeSheetEntryController {
     @CrossOrigin
     @PostMapping("/entry")
     public ResponseEntity<TimeSheetEntry> insertEntry(@RequestBody TimeSheetEntry entry){
+        if (entry.getEntryId() != null || entry.getCategory() == null || entry.getCategory().getCategoryid() == null
+            || entry.getProject() == null || entry.getProject().getProjectid() == null
+            || entry.getClient() == null || entry.getClient().getClientid() == null
+            || entry.getTime() == null || entry.getTime() < 0 || entry.getTime() > 24){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         final var insertedEntry = timeSheetEntryService.create(entry);
         if (insertedEntry == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(insertedEntry, HttpStatus.CREATED);
+    }
+
+    @CrossOrigin
+    @PutMapping("/entry")
+    public ResponseEntity<TimeSheetEntry> updateEntry(@RequestBody TimeSheetEntry entry) {
+        if (entry.getEntryId() == null || entry.getCategory() == null || entry.getCategory().getCategoryid() == null
+                || entry.getProject() == null || entry.getProject().getProjectid() == null
+                || entry.getClient() == null || entry.getClient().getClientid() == null
+                || entry.getTime() == null || entry.getTime() < 0 || entry.getTime() > 24){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        final var updatedEntry = timeSheetEntryService.update(entry);
+        if (updatedEntry == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(updatedEntry, HttpStatus.OK);
     }
 
     @CrossOrigin
