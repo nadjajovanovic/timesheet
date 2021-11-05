@@ -1,4 +1,4 @@
-package projekat.models;
+package projekat.enums;
 
 public enum EProject {
     Inactive,
