@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import projekat.enums.TeamMemberRoles;
 
 import java.util.List;
 
@@ -29,11 +30,11 @@ public class Teammember implements Serializable {
 
 	private String email;
 
-	private String hoursperweek;
+	private Double hoursperweek;
 
-	private String role;
+	private TeamMemberRoles role;
 
-	private String status;
+	private Boolean status;
 
 	private String teammembername;
 
@@ -48,7 +49,4 @@ public class Teammember implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy="teammember")
 	private List<Report> reports;
-
-	
-
 }
