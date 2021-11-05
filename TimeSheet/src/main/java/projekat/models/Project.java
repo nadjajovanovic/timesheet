@@ -46,5 +46,7 @@ public class Project implements Serializable {
 	@OneToMany(mappedBy="project")
 	private List<Report> reports;
 
-
+	@JsonIgnore
+	@OneToMany(mappedBy="project")
+	private List<TimeSheetEntry> entries;
 }

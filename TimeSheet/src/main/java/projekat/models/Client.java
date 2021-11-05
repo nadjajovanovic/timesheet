@@ -50,4 +50,9 @@ public class Client implements Serializable {
 	@OneToMany(mappedBy="client")
 	private List<Report> reports;
 
+	//bi-directional many-to-one association to TimeSheetEntry
+	@JsonIgnore
+	@OneToMany(mappedBy="client")
+	private List<TimeSheetEntry> entries;
+
 }
