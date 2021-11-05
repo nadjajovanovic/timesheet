@@ -3,18 +3,201 @@
   <component name="issues">
     <option name="index">
       <map>
-        <entry key="/Dummy.txt">
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/TimeSheetApplication.java">
           <value>
-            <set />
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS03qP_qATKmQGWQv" />
+                <option name="line" value="34" />
+                <option name="message" value="Replace this use of System.out or System.err by a logger." />
+                <option name="ruleKey" value="java:S106" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS03qP_qATKmQGWQu" />
+                <option name="line" value="29" />
+                <option name="message" value="Replace this use of System.out or System.err by a logger." />
+                <option name="ruleKey" value="java:S106" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+            </set>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/CategoryController.java">
           <value>
-            <set />
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS02jP_qATKmQGWQX" />
+                <option name="line" value="49" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS02jP_qATKmQGWQV" />
+                <option name="line" value="42" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+            </set>
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/TimeSheet/src/test/java/projekat/controller/ClientControllerIntegrationTest.java">
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/ClientController.java">
           <value>
-            <set />
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS03QP_qATKmQGWQr" />
+                <option name="line" value="49" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS03QP_qATKmQGWQp" />
+                <option name="line" value="42" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/CountryController.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS03HP_qATKmQGWQm" />
+                <option name="line" value="49" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS03GP_qATKmQGWQk" />
+                <option name="line" value="42" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/ProjectController.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS02UP_qATKmQGWQS" />
+                <option name="line" value="49" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS02UP_qATKmQGWQQ" />
+                <option name="line" value="42" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/ReportController.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS026P_qATKmQGWQh" />
+                <option name="line" value="49" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS026P_qATKmQGWQf" />
+                <option name="line" value="42" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/TeamMemberController.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS02tP_qATKmQGWQc" />
+                <option name="line" value="47" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS02tP_qATKmQGWQa" />
+                <option name="line" value="40" />
+                <option name="message" value="Replace this persistent entity with a simple POJO or DTO object." />
+                <option name="ruleKey" value="java:S4684" />
+                <option name="severity" value="CRITICAL" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/repository/ClientRepository.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS0wRP_qATKmQGWQN" />
+                <option name="line" value="12" />
+                <option name="message" value="This block of commented-out lines of code should be removed." />
+                <option name="ruleKey" value="java:S125" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/repository/CountryRepository.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMS02DP_qATKmQGWQP" />
+                <option name="line" value="13" />
+                <option name="message" value="This block of commented-out lines of code should be removed." />
+                <option name="ruleKey" value="java:S125" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/test/java/projekat/TimeSheetApplicationTests.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AXzMTHdfP_qATKmQGWgW" />
+                <option name="line" value="7" />
+                <option name="message" value="Add some tests to this class." />
+                <option name="ruleKey" value="java:S2187" />
+                <option name="severity" value="BLOCKER" />
+              </SonarIssue>
+            </set>
+>>>>>>> Stashed changes
           </value>
         </entry>
       </map>
