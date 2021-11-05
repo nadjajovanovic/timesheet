@@ -32,6 +32,7 @@ public class Teammember implements Serializable {
 
 	private Double hoursperweek;
 
+	@Enumerated(EnumType.STRING)
 	private TeamMemberRoles role;
 
 	private Boolean status;
