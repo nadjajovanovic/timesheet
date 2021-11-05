@@ -47,7 +47,6 @@ public class Teammember implements Serializable {
 	private List<Project> projects;
 
 	//bi-directional many-to-one association to Report
-	@JsonIgnore
 	@OneToMany(mappedBy="teammember")
 	private List<Report> reports;
 }
