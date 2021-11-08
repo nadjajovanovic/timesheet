@@ -4,17 +4,54 @@ info:
   description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
   version: 0.1.9
 
+tags:
+  - name: "TimeSheet"
+  - name: "TeamMember"
+
 paths:
-  /users:
+  /teammember:
     get:
-      summary: Returns a list of users.
-      description: Optional extended description in CommonMark or HTML.
+      summary: This gets all teammembers
+      description: This is description
+      tags:
+        - "TeamMember"
+      operationId: getTeamMembers
       responses:
-        '200':    # status code
-          description: A JSON array of user names
+        "200":
+          description: This means it is ok
           content:
-            application/json:
+            aplication/json:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/TeamMember'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+
+components:
+  schemas:
+
+    TeamMember:
+      description: This is the TeamMember object.
+      type: object
+      properties:
+        id:
+          description: The id of TeamMember
+          type: integer
+        name:
+          description: The name of TeamMember
+          type: string
+        username:
+          description: The username of TeamMember
+          type: string
+        email:
+          description: The email of TeamMember
+          type: string
+        status:
+          description: The status of TeamMember
+          type: boolean
+        hoursePerWeek:
+          description: The hourse per week of TeamMember
+          type: number
