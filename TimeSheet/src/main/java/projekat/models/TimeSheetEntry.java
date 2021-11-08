@@ -19,23 +19,34 @@ public class TimeSheetEntry {
     // TODO add user when authentication is done
 
     @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
     private Date entryDate;
 
     //bi-directional many-to-one association to Client
     @ManyToOne
-    @JoinColumn(name="clientid")
+    @JoinColumn(name="client")
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name="projectid")
+    @JoinColumn(name="project")
     private Project project;
 
     @ManyToOne
-    @JoinColumn(name="categoryid")
+    @JoinColumn(name="category")
     private Category category;
+
+    @Column(name = "clientid", nullable = false)
+    private Integer clientid;
+
+    @Column(name = "projectid", nullable = false)
+    private Integer projectid;
+
+    @Column(name = "categoryid", nullable = false)
+    private Integer categoryid;
 
     private String description;
 
+    @Column(nullable = false)
     private Double time;
 
     private Double overtime;

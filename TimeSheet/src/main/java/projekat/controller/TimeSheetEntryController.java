@@ -37,12 +37,13 @@ public class TimeSheetEntryController {
     @CrossOrigin
     @PostMapping("/entry")
     public ResponseEntity<TimeSheetEntry> insertEntry(@RequestBody TimeSheetEntry entry){
-        if (entry.getEntryId() != null || entry.getCategory() == null || entry.getCategory().getCategoryid() == null
-            || entry.getProject() == null || entry.getProject().getProjectid() == null
-            || entry.getClient() == null || entry.getClient().getClientid() == null
-            || entry.getTime() == null || entry.getTime() < 0 || entry.getTime() > 24){
+
+        if (entry.getEntryId() != null || entry.getCategoryid() == null || entry.getEntryDate() == null
+                || entry.getProjectid() == null || entry.getClientid() == null
+                || entry.getTime() == null || entry.getTime() < 0 || entry.getTime() > 24){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         final var insertedEntry = timeSheetEntryService.create(entry);
         if (insertedEntry == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -53,9 +54,8 @@ public class TimeSheetEntryController {
     @CrossOrigin
     @PutMapping("/entry")
     public ResponseEntity<TimeSheetEntry> updateEntry(@RequestBody TimeSheetEntry entry) {
-        if (entry.getEntryId() == null || entry.getCategory() == null || entry.getCategory().getCategoryid() == null
-                || entry.getProject() == null || entry.getProject().getProjectid() == null
-                || entry.getClient() == null || entry.getClient().getClientid() == null
+        if (entry.getEntryId() == null || entry.getCategoryid() == null || entry.getEntryDate() == null
+                || entry.getProjectid() == null || entry.getClientid() == null
                 || entry.getTime() == null || entry.getTime() < 0 || entry.getTime() > 24){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

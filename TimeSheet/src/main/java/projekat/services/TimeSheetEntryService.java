@@ -2,6 +2,9 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.models.Category;
+import projekat.models.Client;
+import projekat.models.Project;
 import projekat.models.TimeSheetEntry;
 import projekat.repository.CategoryRepository;
 import projekat.repository.ClientRepository;
@@ -45,17 +48,19 @@ public class TimeSheetEntryService {
     }
 
     public TimeSheetEntry create(TimeSheetEntry entry) {
-        final var category = categoryRepository.findById(entry.getCategory().getCategoryid());
-        final var client = clientRepository.findById(entry.getClient().getClientid());
-        final var project = projectRepository.findById(entry.getProject().getProjectid());
 
-        if (category.isPresent() && client.isPresent() && project.isPresent()){
-            entry.setCategory(category.get());
-            entry.setProject(project.get());
-            entry.setClient(client.get());
-        } else {
+        if (!categoryRepository.existsById(entry.getCategoryid())
+                || !clientRepository.existsById(entry.getClientid())
+                || !projectRepository.existsById(entry.getProjectid())){
             return null;
         }
+
+        final var emptyCategory = createEmptyCategory(entry.getCategoryid());
+        entry.setCategory(emptyCategory);
+        final var emptyClient = createEmptyClient(entry.getClientid());
+        entry.setClient(emptyClient);
+        final var emptyProject = createEmptyProject(entry.getProjectid());
+        entry.setProject(emptyProject);
         final var insertedEntry = timeSheetEntryRepository.save(entry);
         return insertedEntry;
     }
@@ -65,17 +70,19 @@ public class TimeSheetEntryService {
             return null;
         }
 
-        final var category = categoryRepository.findById(entry.getCategory().getCategoryid());
-        final var client = clientRepository.findById(entry.getClient().getClientid());
-        final var project = projectRepository.findById(entry.getProject().getProjectid());
-
-        if (category.isPresent() && client.isPresent() && project.isPresent()){
-            entry.setCategory(category.get());
-            entry.setProject(project.get());
-            entry.setClient(client.get());
-        } else {
+        if (!categoryRepository.existsById(entry.getCategoryid())
+                || !clientRepository.existsById(entry.getClientid())
+                || !projectRepository.existsById(entry.getProjectid())){
             return null;
         }
+
+        final var emptyCategory = createEmptyCategory(entry.getCategoryid());
+        entry.setCategory(emptyCategory);
+        final var emptyClient = createEmptyClient(entry.getClientid());
+        entry.setClient(emptyClient);
+        final var emptyProject = createEmptyProject(entry.getProjectid());
+        entry.setProject(emptyProject);
+
         final var updatedEntry = timeSheetEntryRepository.save(entry);
         return updatedEntry;
     }
@@ -86,5 +93,23 @@ public class TimeSheetEntryService {
         }
         timeSheetEntryRepository.deleteById(id);
         return true;
+    }
+
+    private Category createEmptyCategory(Integer categoryId) {
+        final var category = new Category();
+        category.setCategoryid(categoryId);
+        return category;
+    }
+
+    private Client createEmptyClient(Integer clientId) {
+        final var client = new Client();
+        client.setClientid(clientId);
+        return client;
+    }
+
+    private Project createEmptyProject(Integer projectId) {
+        final var project = new Project();
+        project.setProjectid(projectId);
+        return project;
     }
 }

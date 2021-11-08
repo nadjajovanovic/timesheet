@@ -23,6 +23,8 @@ import projekat.repository.TimeSheetEntryRepository;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -119,13 +121,18 @@ class TimeSheetEntryControllerIntegrationTest {
     void testCreateEntry() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        final var category = createTestCategory("test category");
-        final var client = createTestClient("Steve");
-        final var project = createTestProject("Weather App", "Description");
-        entry.setCategory(category);
-        entry.setClient(client);
-        entry.setProject(project);
+        final var categoryName = "test category";
+        final var category = createTestCategory(categoryName);
+        final var clientName = "Steve";
+        final var client = createTestClient(clientName);
+        final var projectName = "Weather App";
+        final var projectDescription = "This is Project Description";
+        final var project = createTestProject(projectName, projectDescription);
+        entry.setCategoryid(category.getCategoryid());
+        entry.setClientid(client.getClientid());
+        entry.setProjectid(project.getProjectid());
         entry.setTime(4.5);
+        entry.setEntryDate(new Date());
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -135,11 +142,14 @@ class TimeSheetEntryControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
         final var responseEntry = ResponseReader.readResponse(response, TimeSheetEntry.class);
+        final var fetchedEntry = fetchEntry(responseEntry.getEntryId());
 
         // Assert
         assertNotNull(responseEntry.getEntryId());
         assertEquals(category.getCategoryid(), responseEntry.getCategory().getCategoryid());
+        assertEquals(categoryName, fetchedEntry.get().getCategory().getCategoryname());
         assertEquals(client.getClientid(), responseEntry.getClient().getClientid());
+        assertEquals(client.getClientname(), fetchedEntry.get().getClient().getClientname());
         assertEquals(project.getProjectid(), responseEntry.getProject().getProjectid());
     }
 
@@ -149,10 +159,11 @@ class TimeSheetEntryControllerIntegrationTest {
         final var entry = new TimeSheetEntry();
         final var category = createTestCategory("test category");
         final var client = createTestClient("Steve");
-        entry.setCategory(category);
-        entry.setClient(client);
-        entry.setProject(null);
+        entry.setCategoryid(category.getCategoryid());
+        entry.setClientid(client.getClientid());
+        entry.setProjectid(null);
         entry.setTime(4.5);
+        entry.setEntryDate(new Date());
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -170,10 +181,11 @@ class TimeSheetEntryControllerIntegrationTest {
         final var entry = new TimeSheetEntry();
         final var category = createTestCategory("test category");
         final var project = createTestProject("Test project", "test description");
-        entry.setCategory(category);
-        entry.setClient(null);
-        entry.setProject(project);
+        entry.setCategoryid(category.getCategoryid());
+        entry.setClientid(null);
+        entry.setProjectid(project.getProjectid());
         entry.setTime(4.5);
+        entry.setEntryDate(new Date());
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -191,10 +203,11 @@ class TimeSheetEntryControllerIntegrationTest {
         final var entry = new TimeSheetEntry();
         final var client = createTestClient("test client");
         final var project = createTestProject("Test project", "test description");
-        entry.setCategory(null);
-        entry.setClient(client);
-        entry.setProject(project);
+        entry.setCategoryid(null);
+        entry.setClientid(client.getClientid());
+        entry.setProjectid(project.getProjectid());
         entry.setTime(4.5);
+        entry.setEntryDate(new Date());
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -210,14 +223,13 @@ class TimeSheetEntryControllerIntegrationTest {
     void testCreateEntryBadRequestCategoryNotFound() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        final var category = createTestCategory("test category");
         final var client = createTestClient("test client");
         final var project = createTestProject("Test project", "test description");
-        category.setCategoryid(456);
-        entry.setCategory(category);
-        entry.setClient(client);
-        entry.setProject(project);
+        entry.setCategoryid(456);
+        entry.setClientid(client.getClientid());
+        entry.setProjectid(project.getProjectid());
         entry.setTime(4.5);
+        entry.setEntryDate(new Date());
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -236,9 +248,10 @@ class TimeSheetEntryControllerIntegrationTest {
         final var category = createTestCategory("test category");
         final var client = createTestClient("test client");
         final var project = createTestProject("Test project", "test description");
-        entry.setCategory(category);
-        entry.setClient(client);
-        entry.setProject(project);
+        entry.setCategoryid(category.getCategoryid());
+        entry.setClientid(client.getClientid());
+        entry.setProjectid(project.getProjectid());
+        entry.setEntryDate(new Date());
         entry.setTime(-2.3);
 
         // Act
@@ -340,13 +353,19 @@ class TimeSheetEntryControllerIntegrationTest {
         final var entry = new TimeSheetEntry();
         entry.setDescription(description);
         final var category = categoryRepository.saveAndFlush(new Category());
-        entry.setCategory(category);
+        entry.setCategoryid(category.getCategoryid());
         final var client = clientRepository.saveAndFlush(new Client());
-        entry.setClient(client);
+        entry.setClientid(client.getClientid());
         final var project = projectRepository.saveAndFlush(new Project());
-        entry.setProject(project);
+        entry.setProjectid(project.getProjectid());
         entry.setTime(3.5);
+        entry.setEntryDate(new Date());
         return entryRepository.saveAndFlush(entry);
+    }
+
+    private Optional<TimeSheetEntry> fetchEntry(Integer id) {
+        final var entry = entryRepository.findById(id);
+        return entry;
     }
 
     private Category createTestCategory(String categoryName) {
