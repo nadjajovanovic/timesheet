@@ -6,7 +6,6 @@ import projekat.models.Project;
 import projekat.repository.ProjectRepository;
 
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
