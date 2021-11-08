@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import projekat.enums.ProjectStatus;
 
 import java.util.List;
 
@@ -41,10 +42,9 @@ public class Project implements Serializable {
 	@JoinColumn(name="teammemberid")
 	private Teammember teammember;
 
-	//bi-directional many-to-one association to Report
-	@JsonIgnore
-	@OneToMany(mappedBy="project")
-	private List<Report> reports;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 10)
+	private ProjectStatus status;
 
 
 }
