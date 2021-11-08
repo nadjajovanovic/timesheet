@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.models.Category;
@@ -32,11 +30,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-public class TimeSheetEntryControllerIntegrationTest {
+class TimeSheetEntryControllerIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
@@ -61,12 +58,12 @@ public class TimeSheetEntryControllerIntegrationTest {
     }
 
     @BeforeEach
-    public void doCleanDataBase() {
+    void doCleanDataBase() {
         cleanDataBase();
     }
 
     @Test
-    public void getAllEntries() throws Exception {
+    void getAllEntries() throws Exception {
         //Arrange
         final var firstEntryDescription = "FirstEntryDescription";
         final var secondEntryDescription = "SecondEntryDescription";
@@ -81,13 +78,13 @@ public class TimeSheetEntryControllerIntegrationTest {
         final var entries = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
 
         //Assert
-        assertEquals(entries.size(), 2);
-        assertEquals(entries.get(0).getDescription(), firstEntryDescription);
-        assertEquals(entries.get(1).getDescription(), secondEntryDescription);
+        assertEquals(2, entries.size());
+        assertEquals(firstEntryDescription, entries.get(0).getDescription());
+        assertEquals(secondEntryDescription, entries.get(1).getDescription());
     }
 
     @Test
-    public void getOneEntry() throws Exception {
+    void getOneEntry() throws Exception {
         //Arrange
         final var entryDescription = "FirstEntry";
         final var inserted = createTestEntry(entryDescription);
@@ -100,12 +97,12 @@ public class TimeSheetEntryControllerIntegrationTest {
         final var entry = ResponseReader.readResponse(response, TimeSheetEntry.class);
 
         //Assert
-        assertEquals(entry.getDescription(), entryDescription);
-        assertEquals(entry.getEntryId(), inserted.getEntryId());
+        assertEquals(entryDescription, entry.getDescription());
+        assertEquals(inserted.getEntryId(), entry.getEntryId());
     }
 
     @Test
-    public void  getOneEntryNotFound() throws Exception {
+    void getOneEntryNotFound() throws Exception {
         //Arrange
         final var entryId = 100;
 
@@ -115,14 +112,13 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateEntry() throws Exception {
+    void testCreateEntry() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        createTestCategory("da");
         final var category = createTestCategory("test category");
         final var client = createTestClient("Steve");
         final var project = createTestProject("Weather App", "Description");
@@ -142,13 +138,13 @@ public class TimeSheetEntryControllerIntegrationTest {
 
         // Assert
         assertNotNull(responseEntry.getEntryId());
-        assertEquals(responseEntry.getCategory().getCategoryid(), category.getCategoryid());
-        assertEquals(responseEntry.getClient().getClientid(), client.getClientid());
-        assertEquals(responseEntry.getProject().getProjectid(), project.getProjectid());
+        assertEquals(category.getCategoryid(), responseEntry.getCategory().getCategoryid());
+        assertEquals(client.getClientid(), responseEntry.getClient().getClientid());
+        assertEquals(project.getProjectid(), responseEntry.getProject().getProjectid());
     }
 
     @Test
-    public void  testCreateEntryBadRequestNoProject() throws Exception {
+    void testCreateEntryBadRequestNoProject() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
         final var category = createTestCategory("test category");
@@ -165,11 +161,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateEntryBadRequestNoClient() throws Exception {
+    void testCreateEntryBadRequestNoClient() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
         final var category = createTestCategory("test category");
@@ -186,11 +182,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateEntryBadRequestNoCategory() throws Exception {
+    void testCreateEntryBadRequestNoCategory() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
         final var client = createTestClient("test client");
@@ -207,11 +203,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateEntryBadRequestCategoryNotFound() throws Exception {
+    void testCreateEntryBadRequestCategoryNotFound() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
         final var category = createTestCategory("test category");
@@ -230,11 +226,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateEntryBadRequestTimeLessThatZero() throws Exception {
+    void testCreateEntryBadRequestTimeLessThatZero() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
         final var category = createTestCategory("test category");
@@ -252,11 +248,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testUpdateEntry() throws Exception {
+    void testUpdateEntry() throws Exception {
         //Arrange
         final var description = "5h total";
         final var entry = createTestEntry(description);
@@ -274,11 +270,11 @@ public class TimeSheetEntryControllerIntegrationTest {
 
         // Assert
         assertNotNull(responseEntry);
-        assertEquals(responseEntry.getDescription(), updatedDescription);
+        assertEquals(updatedDescription, responseEntry.getDescription());
     }
 
     @Test
-    public void  testUpdateEntryBadRequest() throws Exception {
+    void testUpdateEntryBadRequest() throws Exception {
         //Arrange
         final var description = "Work day";
         final var entry = createTestEntry(description);
@@ -291,11 +287,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testUpdateEntryNotFound() throws Exception {
+    void testUpdateEntryNotFound() throws Exception {
         //Arrange
         final var description = "Demo project";
         final var entry = createTestEntry(description);
@@ -308,11 +304,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteEntry() throws Exception {
+    void deleteEntry() throws Exception {
         //Arrange
         final var entryDescription = "FirstEntry";
         final var inserted = createTestEntry(entryDescription);
@@ -323,11 +319,11 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteEntryNotFound() throws Exception {
+    void deleteEntryNotFound() throws Exception {
         //Arrange
         final var entryId = 100;
 
@@ -337,7 +333,7 @@ public class TimeSheetEntryControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     private TimeSheetEntry createTestEntry(String description) {

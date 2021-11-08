@@ -34,8 +34,4 @@ public class Category implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy="category")
 	private List<Report> reports;
-
-	@JsonIgnore
-	@OneToMany(mappedBy="category")
-	private List<TimeSheetEntry> entries;
 }

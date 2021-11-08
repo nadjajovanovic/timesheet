@@ -11,12 +11,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.util.ResponseReader;
 
@@ -28,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
@@ -48,12 +45,12 @@ class CountryControllerIntegrationTest {
     }
 
     @BeforeEach
-    public void doCleanDataBase() {
+    void doCleanDataBase() {
         cleanDataBase();
     }
 
     @Test
-    public void getAllCountries() throws Exception {
+    void getAllCountries() throws Exception {
         //Arrange
         final var firstCountryName = "Romania";
         final var secondCountryName = "Spain";
@@ -68,13 +65,13 @@ class CountryControllerIntegrationTest {
         final var countries = Arrays.asList(ResponseReader.readResponse(response, Country[].class));
 
         //Assert
-        assertEquals(countries.size(), 2);
-        assertEquals(countries.get(0).getCountryname(), firstCountryName);
-        assertEquals(countries.get(1).getCountryname(), secondCountryName);
+        assertEquals(2, countries.size());
+        assertEquals(firstCountryName, countries.get(0).getCountryname());
+        assertEquals(secondCountryName, countries.get(1).getCountryname());
     }
 
     @Test
-    public void getOneCountry() throws Exception {
+    void getOneCountry() throws Exception {
         //Arrange
         final var countryName = "Romania";
         final var inserted = createTestCountry(countryName);
@@ -87,12 +84,12 @@ class CountryControllerIntegrationTest {
         final var country = ResponseReader.readResponse(response, Country.class);
 
         //Assert
-        assertEquals(country.getCountryname(), countryName);
-        assertEquals(country.getCountryid(), inserted.getCountryid());
+        assertEquals(countryName, country.getCountryname());
+        assertEquals(inserted.getCountryid(), country.getCountryid());
     }
 
     @Test
-    public void  getOneCountryNotFound() throws Exception {
+    void getOneCountryNotFound() throws Exception {
         //Arrange
         final var countryId = 123;
 
@@ -101,11 +98,11 @@ class CountryControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateCountry() throws Exception {
+    void testCreateCountry() throws Exception {
         //Arange
         final var countryName = "Spain";
         final var country = new Country();
@@ -122,11 +119,11 @@ class CountryControllerIntegrationTest {
 
         // Assert
         assertNotNull(responseCountry.getCountryid());
-        assertEquals(responseCountry.getCountryname(), countryName);
+        assertEquals(countryName, responseCountry.getCountryname());
     }
 
     @Test
-    public void  testCreateCountryBadRequest() throws Exception {
+    void testCreateCountryBadRequest() throws Exception {
         //Arange
         final var country = new Country();
         country.setCountryname("   ");
@@ -138,11 +135,11 @@ class CountryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateCountryNameNotExist() throws Exception {
+    void testCreateCountryNameNotExist() throws Exception {
         //Arange
         final var country = new Country();
 
@@ -153,11 +150,11 @@ class CountryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateCountryIdExists() throws Exception {
+    void testCreateCountryIdExists() throws Exception {
         //Arrange
         final var countryName = "Greece";
         final var country = new Country();
@@ -171,12 +168,11 @@ class CountryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testUpdateCountry() throws Exception {
-
+    void testUpdateCountry() throws Exception {
         //Arrange
         final var countryName = "Itly";
         final var insertedCountry = createTestCountry(countryName);
@@ -194,11 +190,11 @@ class CountryControllerIntegrationTest {
 
         // Assert
         assertNotNull(responseCountry.getCountryid());
-        assertEquals(responseCountry.getCountryname(), updatedName);
+        assertEquals(updatedName, responseCountry.getCountryname());
     }
 
     @Test
-    public void  testUpdateCountryBadRequest() throws Exception {
+    void testUpdateCountryBadRequest() throws Exception {
         //Arange
         final var countryName = "nameForInsert";
         final var insertedCountry = createTestCountry(countryName);
@@ -212,11 +208,11 @@ class CountryControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteCountry() throws Exception {
+    void deleteCountry() throws Exception {
         //Arrange
         final var countryName = "Italy";
         final var insertedCountry = createTestCountry(countryName);
@@ -226,11 +222,11 @@ class CountryControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteCountryNotFound() throws Exception {
+    void deleteCountryNotFound() throws Exception {
         //Arrange
         final var countryId = 99;
         //Act
@@ -238,7 +234,7 @@ class CountryControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     private Country createTestCountry(String countryName) {

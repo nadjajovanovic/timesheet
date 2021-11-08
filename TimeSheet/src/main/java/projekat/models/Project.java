@@ -47,6 +47,6 @@ public class Project implements Serializable {
 	private List<Report> reports;
 
 	@JsonIgnore
-	@OneToMany(mappedBy="project")
+	@OneToMany(mappedBy="project", fetch = FetchType.LAZY)
 	private List<TimeSheetEntry> entries;
 }
