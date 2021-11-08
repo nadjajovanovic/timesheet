@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Time;
 import java.util.List;
 
 
@@ -33,5 +34,4 @@ public class Category implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy="category")
 	private List<Report> reports;
-
 }

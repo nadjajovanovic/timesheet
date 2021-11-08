@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.models.Project;
@@ -27,7 +25,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
@@ -47,12 +44,12 @@ class ProjectControllerIntegrationTest {
     }
 
     @BeforeEach
-    public void doCleanDataBase() {
+    void doCleanDataBase() {
         cleanDataBase();
     }
 
     @Test
-    public void getAllProjectsTest() throws Exception {
+    void getAllProjectsTest() throws Exception {
         //Arrange
         final var firstProjectName = "TimeSheet Application";
         final var firstProjectDescription = "Make TimeSheet Application";
@@ -69,15 +66,15 @@ class ProjectControllerIntegrationTest {
         final var projects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
 
         //Assert
-        assertEquals(projects.size(), 2);
-        assertEquals(projects.get(0).getProjectname(), firstProjectName);
-        assertEquals(projects.get(0).getProjectdescription(), firstProjectDescription);
-        assertEquals(projects.get(1).getProjectname(), secondProjectName);
-        assertEquals(projects.get(1).getProjectdescription(), secondProjectDescription);
+        assertEquals(2, projects.size());
+        assertEquals(firstProjectName, projects.get(0).getProjectname());
+        assertEquals(firstProjectDescription, projects.get(0).getProjectdescription());
+        assertEquals(secondProjectName, projects.get(1).getProjectname());
+        assertEquals(secondProjectDescription, projects.get(1).getProjectdescription());
     }
 
     @Test
-    public void getOneProjectTest() throws Exception {
+    void getOneProjectTest() throws Exception {
         //Arrange
         final var projectName = "Booking Software";
         final var projectDescription = "Make Application for Booking";
@@ -91,13 +88,13 @@ class ProjectControllerIntegrationTest {
         final var project = ResponseReader.readResponse(response, Project.class);
 
         //Assert
-        assertEquals(project.getProjectid(), insertedProject.getProjectid());
-        assertEquals(project.getProjectname(), projectName);
-        assertEquals(project.getProjectdescription(), projectDescription);
+        assertEquals(insertedProject.getProjectid(), project.getProjectid());
+        assertEquals(projectName, project.getProjectname());
+        assertEquals(projectDescription, project.getProjectdescription());
     }
 
     @Test
-    public void  getOneProjectNotFoundTest() throws Exception {
+    void getOneProjectNotFoundTest() throws Exception {
         //Arrange
         final var projectId = 100;
 
@@ -106,11 +103,11 @@ class ProjectControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateProject() throws Exception {
+    void testCreateProject() throws Exception {
         //Arrange
         final var projectName = "Cinema App";
         final var projectDescription = "Make App for ticket reservation";
@@ -129,12 +126,12 @@ class ProjectControllerIntegrationTest {
 
         // Assert
         assertNotNull(responseProject.getProjectid());
-        assertEquals(responseProject.getProjectname(), projectName);
-        assertEquals(responseProject.getProjectdescription(), projectDescription);
+        assertEquals(projectName, responseProject.getProjectname());
+        assertEquals(projectDescription, responseProject.getProjectdescription());
     }
 
     @Test
-    public void  testCreateProjectBadRequest() throws Exception {
+    void testCreateProjectBadRequest() throws Exception {
         //Arrange
         final var project = new Project();
         project.setProjectname("  ");
@@ -146,11 +143,11 @@ class ProjectControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateProjectNameNotExist() throws Exception {
+    void testCreateProjectNameNotExist() throws Exception {
         //Arrange
         final var project = new Project();
 
@@ -161,11 +158,11 @@ class ProjectControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testCreateProjectIdExists() throws Exception {
+    void testCreateProjectIdExists() throws Exception {
         //Arrange
         final var projectName = "Weather App";
         final var projectDescription = "Make app for weather forecast";
@@ -181,11 +178,11 @@ class ProjectControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void  testUpdateProject() throws Exception {
+    void testUpdateProject() throws Exception {
         //Arrange
         final var projectName = "Project Title";
         final var projectDescription = "Project Description";
@@ -204,12 +201,12 @@ class ProjectControllerIntegrationTest {
 
         // Assert
         assertNotNull(responseProject.getProjectid());
-        assertEquals(responseProject.getProjectname(), updatedName);
-        assertEquals(responseProject.getProjectdescription(), projectDescription);
+        assertEquals(updatedName, responseProject.getProjectname());
+        assertEquals(projectDescription, responseProject.getProjectdescription());
     }
 
     @Test
-    public void  testUpdateProjectBadRequest() throws Exception {
+    void testUpdateProjectBadRequest() throws Exception {
         //Arrange
         final var projectName = "Cinema App";
         final var projectDescription = "App for ticket reservation";
@@ -224,11 +221,11 @@ class ProjectControllerIntegrationTest {
                 .andReturn();
 
         // Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteCProjectTest() throws Exception {
+    void deleteCProjectTest() throws Exception {
         //Arrange
         final var projectName = "TimeSheet App";
         final var projectDescription = "Application for time tracking";
@@ -239,11 +236,11 @@ class ProjectControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteProjectNotFound() throws Exception {
+    void deleteProjectNotFound() throws Exception {
         //Arrange
         final var projectId = 100;
 
@@ -252,11 +249,11 @@ class ProjectControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void filterProjectsTest() throws Exception {
+    void filterProjectsTest() throws Exception {
         // Arrange
         final var firstProjectName = "App for Cinema";
         final var secondProjectName = "Time Tracking App";
@@ -278,14 +275,14 @@ class ProjectControllerIntegrationTest {
         final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
 
         // Assert
-        assertEquals(filteredProjects.size(), 3);
-        assertEquals(filteredProjects.get(0).getProjectname(), firstProjectName);
-        assertEquals(filteredProjects.get(1).getProjectname(), thirdProjectName);
-        assertEquals(filteredProjects.get(2).getProjectname(), fourthProjectName);
+        assertEquals(3, filteredProjects.size());
+        assertEquals(firstProjectName, filteredProjects.get(0).getProjectname());
+        assertEquals(thirdProjectName, filteredProjects.get(1).getProjectname());
+        assertEquals(fourthProjectName, filteredProjects.get(2).getProjectname());
     }
 
     @Test
-    public void filterProjectsEmptyTest() throws Exception {
+    void filterProjectsEmptyTest() throws Exception {
         // Arrange
         final var firstProjectName = "App for Cinema";
         final var secondProjectName = "Time Tracking App";
@@ -303,7 +300,7 @@ class ProjectControllerIntegrationTest {
         final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
 
         // Assert
-        assertEquals(filteredProjects.size(), 0);
+        assertEquals(0, filteredProjects.size());
     }
 
     private Project createTestProject(String projectName, String projectDescription) {

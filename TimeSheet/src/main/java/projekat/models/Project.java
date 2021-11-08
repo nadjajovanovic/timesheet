@@ -46,5 +46,7 @@ public class Project implements Serializable {
 	@Column(length = 10)
 	private ProjectStatus status;
 
-
+	@JsonIgnore
+	@OneToMany(mappedBy="project", fetch = FetchType.LAZY)
+	private List<TimeSheetEntry> entries;
 }
