@@ -25,7 +25,6 @@
             </set>
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/CategoryController.java">
           <value>
             <set>
               <SonarIssue>
@@ -184,22 +183,7 @@
               </SonarIssue>
             </set>
           </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/TimeSheet/src/test/java/projekat/TimeSheetApplicationTests.java">
-          <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AXzMTHdfP_qATKmQGWgW" />
-                <option name="line" value="7" />
-                <option name="message" value="Add some tests to this class." />
-                <option name="ruleKey" value="java:S2187" />
-                <option name="severity" value="BLOCKER" />
-              </SonarIssue>
-            </set>
->>>>>>> Stashed changes
-          </value>
-        </entry>
+      </entry>
       </map>
     </option>
   </component>
