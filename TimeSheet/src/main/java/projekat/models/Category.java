@@ -30,8 +30,4 @@ public class Category implements Serializable {
 
 	private String categoryname;
 
-	//bi-directional many-to-one association to Report
-	@JsonIgnore
-	@OneToMany(mappedBy="category")
-	private List<Report> reports;
 }

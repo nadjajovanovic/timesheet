@@ -45,8 +45,4 @@ public class Client implements Serializable {
 	@OneToMany(mappedBy="client")
 	private List<Project> projects;
 
-	//bi-directional many-to-one association to Report
-	@JsonIgnore
-	@OneToMany(mappedBy="client")
-	private List<Report> reports;
 }
