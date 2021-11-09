@@ -49,5 +49,4 @@ public class Client implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy="client")
 	private List<Report> reports;
-
 }

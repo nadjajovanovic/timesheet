@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,24 +11,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import projekat.TimeSheetApplication;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
@@ -50,12 +43,12 @@ class ClientControllerIntegrationTest {
     }
 
     @BeforeEach
-    public void doCleanDatabase() {
+    void doCleanDatabase() {
         cleanDataBase();
     }
 
     @Test
-    public void getAllClients() throws Exception {
+    void getAllClients() throws Exception {
         //Arrange
         final var firstClientName = "First";
         createTestClient(firstClientName);
@@ -68,12 +61,12 @@ class ClientControllerIntegrationTest {
         final var clients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
 
         //Assert
-        assertEquals(clients.size(), 1);
-        assertEquals(clients.get(0).getClientname(), firstClientName);
+        assertEquals(1, clients.size());
+        assertEquals(firstClientName, clients.get(0).getClientname());
     }
 
     @Test
-    public void getOneClient() throws Exception {
+    void getOneClient() throws Exception {
         //Arrange
         final var clientName = "First";
         final var inserted = createTestClient(clientName);
@@ -86,12 +79,12 @@ class ClientControllerIntegrationTest {
         final var client = ResponseReader.readResponse(response, Client.class);
 
         //Assert
-        assertEquals(client.getClientname(), clientName);
-        assertEquals(client.getClientid(), Integer.valueOf(inserted.getClientid()));
+        assertEquals(clientName, client.getClientname());
+        assertEquals(inserted.getClientid(), client.getClientid());
     }
 
     @Test
-    public void getOneClientNotFound() throws Exception{
+    void getOneClientNotFound() throws Exception{
         //Arrange
         final var clientId = "100";
 
@@ -100,11 +93,11 @@ class ClientControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testCreateClient() throws Exception {
+    void testCreateClient() throws Exception {
         //Arrange
         final var clientName = "Please insert me";
         final var client = new Client();
@@ -121,11 +114,11 @@ class ClientControllerIntegrationTest {
 
         //Assert
         assertNotNull(responseClient.getClientid());
-        assertEquals(responseClient.getClientname(), clientName);
+        assertEquals(clientName, responseClient.getClientname());
     }
 
     @Test
-    public void testCreateClientBadRequest() throws Exception {
+    void testCreateClientBadRequest() throws Exception {
         //Arange
         final var client = new Client();
         client.setClientname("");
@@ -138,11 +131,11 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testCreateClientNameNotExist() throws Exception {
+    void testCreateClientNameNotExist() throws Exception {
         //Arange
         final var client = new Client();
 
@@ -154,11 +147,11 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testCreateClientIdExists() throws Exception {
+    void testCreateClientIdExists() throws Exception {
         //Arange
         final var clientName = "Please insert me";
         final var client = new Client();
@@ -173,11 +166,11 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testUpdateClient() throws Exception {
+    void testUpdateClient() throws Exception {
         //Arange
         final var clientName = "nameForInsert";
         final var inserted = createTestClient(clientName);
@@ -194,11 +187,11 @@ class ClientControllerIntegrationTest {
         final var reponseClient = ResponseReader.readResponse(response, Client.class);
 
         assertNotNull(reponseClient.getClientid());
-        assertEquals(reponseClient.getClientname(), updateName);
+        assertEquals(updateName, reponseClient.getClientname());
     }
 
     @Test
-    public void testUpdateClientBadRequest() throws Exception {
+    void testUpdateClientBadRequest() throws Exception {
         //Arange
         final var clientName = "nameForInsert";
         final var inserted = createTestClient(clientName);
@@ -213,11 +206,11 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
-    @Test //@Disabled
-    public void testUpdateClientNoId() throws Exception {
+    @Test
+    void testUpdateClientNoId() throws Exception {
         //Arange
         final var client = new Client();
         client.setClientname("Not important");
@@ -230,11 +223,11 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteClient() throws Exception {
+    void deleteClient() throws Exception {
         //Arange
         final var clientName = "Delete Me";
         final var inserted = createTestClient(clientName);
@@ -245,11 +238,11 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteClientNotFound() throws Exception {
+    void deleteClientNotFound() throws Exception {
         //Arrange
         final var clientId = "100";
 
@@ -259,11 +252,11 @@ class ClientControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void filterClientsTest() throws Exception {
+    void filterClientsTest() throws Exception {
         //Arange
         final var firstClientName = "Nadja";
         final var secondClientName = "Nikola";
@@ -285,14 +278,14 @@ class ClientControllerIntegrationTest {
         final var filteredClients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
 
         //Assert
-        assertEquals(filteredClients.size(), 3);
-        assertEquals(filteredClients.get(0).getClientname(), firstClientName);
-        assertEquals(filteredClients.get(1).getClientname(), secondClientName);
-        assertEquals(filteredClients.get(2).getClientname(), thirdClientName);
+        assertEquals(3, filteredClients.size());
+        assertEquals(firstClientName, filteredClients.get(0).getClientname());
+        assertEquals(secondClientName, filteredClients.get(1).getClientname());
+        assertEquals(thirdClientName, filteredClients.get(2).getClientname());
     }
 
     @Test
-    public void filterClientsEmptyTest() throws Exception {
+    void filterClientsEmptyTest() throws Exception {
         // Arrange
         final var firstClientName = "Bojana";
         final var secondClientName = "Tijana";
@@ -310,7 +303,7 @@ class ClientControllerIntegrationTest {
         final var filteredClients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
 
         // Assert
-        assertEquals(filteredClients.size(), 0);
+        assertEquals(0, filteredClients.size());
     }
 
     private Client createTestClient(String clientName) {

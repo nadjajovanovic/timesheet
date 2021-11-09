@@ -1,23 +1,17 @@
 package projekat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.checkerframework.common.value.qual.ArrayLenRange;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.postgresql.util.MD5Digest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
-import projekat.models.Client;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.ResponseReader;
@@ -26,15 +20,11 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.springframework.test.web.servlet.MvcResult;
-
-import javax.print.attribute.standard.Media;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
@@ -54,12 +44,12 @@ class TeamMemberControllerIntegrationTest {
     }
 
     @BeforeEach
-    public void doCleanDatabase() {
+    void doCleanDatabase() {
         cleanDataBase();
     }
 
     @Test
-    public void getAllTeamMembers() throws Exception {
+    void getAllTeamMembers() throws Exception {
         //Arrange
         final var teamMemberName = "First";
         createTeamMember(teamMemberName);
@@ -72,13 +62,12 @@ class TeamMemberControllerIntegrationTest {
         final var teamMembers = Arrays.asList(ResponseReader.readResponse(response, Teammember[].class));
 
         //Assert
-        assertEquals(teamMembers.size(), 1);
-        assertEquals(teamMembers.get(0).getTeammembername(), teamMemberName);
+        assertEquals(1, teamMembers.size());
+        assertEquals(teamMemberName, teamMembers.get(0).getTeammembername());
     }
 
-    //@org.junit.Test
     @Test
-    public void getOneTeamMember() throws Exception {
+    void getOneTeamMember() throws Exception {
         //Arrange
         final var teamMemberName = "First";
         final var inserted = createTeamMember(teamMemberName);
@@ -91,12 +80,12 @@ class TeamMemberControllerIntegrationTest {
         final var teamMember = ResponseReader.readResponse(response, Teammember.class);
 
         //Assert
-        assertEquals(teamMember.getTeammembername(), teamMemberName);
-        assertEquals(teamMember.getTeammemberid(), Integer.valueOf(inserted.getTeammemberid()));
+        assertEquals(teamMemberName, teamMember.getTeammembername());
+        assertEquals(inserted.getTeammemberid(), teamMember.getTeammemberid());
     }
 
     @Test
-    public void getOneTeamMemberNotFound() throws Exception {
+    void getOneTeamMemberNotFound() throws Exception {
         //Arange
         final var teamMemberId = "100";
 
@@ -106,11 +95,11 @@ class TeamMemberControllerIntegrationTest {
                 .andReturn();
 
         //assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testCreateTeamMember() throws Exception {
+    void testCreateTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "Please insert me";
         final var teamMember = new Teammember();
@@ -127,11 +116,11 @@ class TeamMemberControllerIntegrationTest {
 
         //Assert
         assertNotNull(responseTeamMember.getTeammemberid());
-        assertEquals(responseTeamMember.getTeammembername(), teamMemberName);
+        assertEquals(teamMemberName, responseTeamMember.getTeammembername());
     }
 
     @Test
-    public void testCreateTeamMemberBadRequest() throws Exception {
+    void testCreateTeamMemberBadRequest() throws Exception {
         //Arange
         final var teamMember = new Teammember();
         teamMember.setTeammembername("");
@@ -144,11 +133,11 @@ class TeamMemberControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testCreateTeamMemberNameNotExist() throws Exception {
+    void testCreateTeamMemberNameNotExist() throws Exception {
         //Arange
         final var teamMember = new Teammember();
 
@@ -159,11 +148,11 @@ class TeamMemberControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testCreateTeamMemberIdExists() throws Exception {
+    void testCreateTeamMemberIdExists() throws Exception {
         //Arange
         final var teamMemberName = "Please insert me";
         final var teamMember = new Teammember();
@@ -178,11 +167,11 @@ class TeamMemberControllerIntegrationTest {
                 .andReturn();
 
         //assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void testUpdateTeamMember() throws Exception {
+    void testUpdateTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "nameForInsert";
         final var inserted = createTeamMember(teamMemberName);
@@ -200,11 +189,11 @@ class TeamMemberControllerIntegrationTest {
 
         //Assert
         assertNotNull(responseTeamMember.getTeammemberid());
-        assertEquals(responseTeamMember.getTeammembername(), updatedName);
+        assertEquals(updatedName, responseTeamMember.getTeammembername());
     }
 
     @Test
-    public void testUpdateTeamMemberBadRequest() throws Exception {
+    void testUpdateTeamMemberBadRequest() throws Exception {
         //Arange
         final var teamMemberName = "NameForInsert";
         final var inserted = createTeamMember(teamMemberName);
@@ -219,11 +208,11 @@ class TeamMemberControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
-    @Test @Disabled
-    public void testUpdateTeamMemberNoId() throws Exception {
+    @Test
+    void testUpdateTeamMemberNoId() throws Exception {
         //Arange
         final var teamMember = new Teammember();
         teamMember.setTeammembername("Not important");
@@ -236,11 +225,11 @@ class TeamMemberControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteTeamMember() throws Exception {
+    void deleteTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "Delete me";
         final var inserted = createTeamMember(teamMemberName);
@@ -251,11 +240,11 @@ class TeamMemberControllerIntegrationTest {
                 .andReturn();
 
         //Assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
     }
 
     @Test
-    public void deleteTeamMemberNotFound() throws Exception {
+    void deleteTeamMemberNotFound() throws Exception {
         //Arange
         final var teamMemberId = "100";
 
@@ -265,7 +254,7 @@ class TeamMemberControllerIntegrationTest {
                 .andReturn();
 
         //assert
-        assertEquals(response.getResponse().getStatus(), HttpStatus.NOT_FOUND.value());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
     private Teammember createTeamMember(String teammemberName) {
