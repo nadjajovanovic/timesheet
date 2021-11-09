@@ -12,13 +12,13 @@ paths:
   /teammembers:
     get:
       summary: This gets all teammembers
-      description: This is description
+      description: This method return list of TeamMembers
       tags:
         - "TeamMember"
       operationId: getTeamMembers
       responses:
         "200":
-          description: This means it is ok
+          description: Success
           content:
             aplication/json:
               schema:
@@ -52,6 +52,6 @@ components:
         status:
           description: The status of TeamMember
           type: boolean
-        hoursePerWeek:
+        hourse:
           description: The hourse per week of TeamMember
           type: number

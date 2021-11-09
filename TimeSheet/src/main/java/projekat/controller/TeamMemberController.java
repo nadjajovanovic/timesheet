@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import projekat.api.api.TeammemberApi;
+import projekat.api.api.TeammembersApi;
 import projekat.api.model.TeamMember;
 import projekat.models.Teammember;
 import projekat.services.TeamMemberService;
 
 @RestController
-public class TeamMemberController implements TeammemberApi {
+public class TeamMemberController implements TeammembersApi {
 	
 	@Autowired
 	private TeamMemberService teamMemberService;
