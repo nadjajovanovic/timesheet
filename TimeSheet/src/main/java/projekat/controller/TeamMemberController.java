@@ -29,6 +29,7 @@ public class TeamMemberController implements TeammemberApi {
 		this.teamMemberService = teamMemberService;
 	}
 
+	@Override
 	public ResponseEntity<List<TeamMember>> getTeamMembers() {
 		final var teammembers = teamMemberService.getAll();
 		return new ResponseEntity(teammembers, HttpStatus.OK);
