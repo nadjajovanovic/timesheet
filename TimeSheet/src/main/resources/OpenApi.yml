@@ -20,11 +20,11 @@ paths:
         "200":
           description: Success
           content:
-            aplication/json:
+            application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TeamMember'
+                  $ref: '#/components/schemas/TeamMemberDTO'
         "400":
           description: BAD REQUEST
         "401":
@@ -33,14 +33,14 @@ paths:
 components:
   schemas:
 
-    TeamMember:
+    TeamMemberDTO:
       description: This is the TeamMember object.
       type: object
       properties:
-        id:
+        teammemberid:
           description: The id of TeamMember
           type: integer
-        name:
+        teammembername:
           description: The name of TeamMember
           type: string
         username:
