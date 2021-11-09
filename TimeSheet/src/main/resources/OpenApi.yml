@@ -53,5 +53,5 @@ components:
           description: The status of TeamMember
           type: boolean
         hoursPerWeek:
-          description: The hourse per week of TeamMember
+          description: The hours per week of TeamMember
           type: number
