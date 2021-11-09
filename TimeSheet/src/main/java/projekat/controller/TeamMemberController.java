@@ -1,7 +1,6 @@
 package projekat.controller;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import projekat.models.Client;
 import projekat.models.Teammember;
-import projekat.repository.TeamMemberRepository;
 import projekat.services.TeamMemberService;
 
 @RestController
@@ -53,7 +50,7 @@ public class TeamMemberController {
 			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		final var inserted = teamMemberService.insert(teamMember);
-		return new ResponseEntity<Teammember>(inserted, HttpStatus.CREATED);
+		return new ResponseEntity<>(inserted, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin

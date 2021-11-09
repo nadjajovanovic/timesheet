@@ -19,13 +19,14 @@ public class ReportService {
 
     public List<TimeSheetEntry> generateReport(Report report) {
         final var allEntries = timeSheetEntryRepository.findAll();
-        final var filteredReports = allEntries.stream()
-                                                                    .filter(e -> report.getProjectid() == null || e.getProjectid() == report.getProjectid())
-                                                                    .filter(e -> report.getCategoryid() == null || e.getCategoryid() == report.getCategoryid())
-                                                                    .filter(e -> report.getClientid() == null || e.getClientid() == report.getClientid())
-                                                                    .filter(e -> report.getStartdate() == null || e.getEntryDate().after(report.getStartdate()))
-                                                                    .filter(e -> report.getEnddate() == null || e.getEntryDate().before(report.getEnddate()))
-                                                                    .toList();
+        final var filteredReports =
+                allEntries.stream()
+                    .filter(e -> report.getProjectid() == null || e.getProjectid().equals(report.getProjectid()))
+                    .filter(e -> report.getCategoryid() == null || e.getCategoryid().equals(report.getCategoryid()))
+                    .filter(e -> report.getClientid() == null || e.getClientid().equals(report.getClientid()))
+                    .filter(e -> report.getStartdate() == null || e.getEntryDate().after(report.getStartdate()))
+                    .filter(e -> report.getEnddate() == null || e.getEntryDate().before(report.getEnddate()))
+                    .toList();
         return filteredReports;
     }
 }

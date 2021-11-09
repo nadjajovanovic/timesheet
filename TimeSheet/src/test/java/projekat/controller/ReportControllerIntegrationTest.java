@@ -1,10 +1,8 @@
 package projekat.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -18,18 +16,15 @@ import projekat.repository.*;
 import projekat.util.ResponseReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.sql.Time;
 import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-public class ReportControllerIntegrationTest {
+class ReportControllerIntegrationTest {
 
     @Autowired
     private MockMvc mvc;
@@ -59,26 +54,23 @@ public class ReportControllerIntegrationTest {
     @BeforeEach
     void settingUpDatabase() {
         cleanDataBase();
-        final var client1 = createTestClient("Nadja");
-        final var client2 = createTestClient("Bojana");
-        final var client3 = createTestClient("Dusan");
-
-        final var category1 = createTestCategory("Frontend");
-        final var category2 = createTestCategory("Backend");
-        final var category3 = createTestCategory("QA Testing");
-
-        final var project1 = createTestProject("Music App", "App for music");
-        final var project2 = createTestProject("Cooking App", "App for cooking");
-        final var project3 = createTestProject("Book App", "App for books");
-
-        final var entry1 = createTestEntry(client2.getClientid(), category1.getCategoryid(), project3.getProjectid(), new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime());
-        final var entry2 = createTestEntry(client1.getClientid(), category3.getCategoryid(), project1.getProjectid(), new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime());
-        final var entry3 = createTestEntry(client3.getClientid(), category2.getCategoryid(), project2.getProjectid(), new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime());
     }
 
     @Test
     void getAllGeneratedReports() throws Exception {
+
         //Arange
+        final var client = createTestClient("Nadja");
+        final var category = createTestCategory("Frontend");
+        final var project = createTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        final var entry1 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
+        final var entry2 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
+        final var entry3 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
+
         final var report = new Report();
 
         //Act
@@ -92,12 +84,26 @@ public class ReportControllerIntegrationTest {
 
         //assert
         assertEquals(3, reportResponse.size());
-
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
+        assertEquals(entry2.getEntryId(), reportResponse.get(1).getEntryId());
+        assertEquals(entry3.getEntryId(), reportResponse.get(2).getEntryId());
     }
 
     @Test
     void generateByDateRange() throws Exception {
+
         //Arange
+        final var client = createTestClient("Nadja");
+        final var category = createTestCategory("Frontend");
+        final var project = createTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        final var entry1 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
+        createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
+        final var entry3 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
+
         final var report = new Report();
         report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
         report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
@@ -113,15 +119,27 @@ public class ReportControllerIntegrationTest {
 
         //assert
         assertEquals(2, reportResponse.size());
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
+        assertEquals(entry3.getEntryId(), reportResponse.get(1).getEntryId());
     }
 
-    @Test @Disabled
+    @Test
     void generateByClientId() throws Exception {
+
         //Arange
+        final var client1 = createTestClient("Nadja");
+        final var client2 = createTestClient("Bojana");
+        final var category = createTestCategory("Frontend");
+        final var project = createTestProject("Music App", "App for music");
+        final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
+
+        final var entry1 = createTestEntry(client1.getClientid(), category.getCategoryid(), project.getProjectid(), date);
+        createTestEntry(client2.getClientid(), category.getCategoryid(), project.getProjectid(), date);
+
         final var report = new Report();
         report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
         report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
-        report.setClientid(2);
+        report.setClientid(client1.getClientid());
 
         //Act
         final var response = mvc.perform(get("/report")
@@ -134,15 +152,24 @@ public class ReportControllerIntegrationTest {
 
         //assert
         assertEquals(1, reportResponse.size());
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
     }
 
     @Test
     void generateByCategoryId() throws Exception {
+
         //Arange
+        final var client = createTestClient("Nadja");
+        final var category1 = createTestCategory("Frontend");
+        final var category2 = createTestCategory("Backend");
+        final var project = createTestProject("Music App", "App for music");
+        final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
+
+        final var entry1 = createTestEntry(client.getClientid(), category1.getCategoryid(), project.getProjectid(), date);
+        createTestEntry(client.getClientid(), category2.getCategoryid(), project.getProjectid(), date);
+
         final var report = new Report();
-        report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
-        report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
-        report.setCategoryid(1);
+        report.setCategoryid(category1.getCategoryid());
 
         //Act
         final var response = mvc.perform(get("/report")
@@ -155,6 +182,72 @@ public class ReportControllerIntegrationTest {
 
         //assert
         assertEquals(1, reportResponse.size());
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
+    }
+
+    @Test
+    void generateByProjectId() throws Exception {
+
+        //Arange
+        final var client = createTestClient("Nadja");
+        final var category= createTestCategory("Backend");
+        final var project1 = createTestProject("Cooking App", "App for cooking");
+        final var project2 = createTestProject("Music App", "App for music");
+        final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
+
+        createTestEntry(client.getClientid(), category.getCategoryid(), project1.getProjectid(), date);
+        final var entry2 = createTestEntry(client.getClientid(), category.getCategoryid(), project2.getProjectid(), date);
+
+        final var report = new Report();
+        report.setProjectid(project2.getProjectid());
+
+        //Act
+        final var response = mvc.perform(get("/report")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+
+        //assert
+        assertEquals(1, reportResponse.size());
+        assertEquals(entry2.getEntryId(), reportResponse.get(0).getEntryId());
+    }
+
+    @Test
+    void testGenerateNoResults() throws Exception {
+
+        //Arange
+        final var client = createTestClient("Nadja");
+        final var category1= createTestCategory("Frontend");
+        final var category2= createTestCategory("Backend");
+        final var project1 = createTestProject("Cooking App", "App for cooking");
+        final var project2 = createTestProject("Music App", "App for music");
+        final var date = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.SEPTEMBER, 5).getTime();
+
+        createTestEntry(client.getClientid(), category1.getCategoryid(), project1.getProjectid(), date);
+        createTestEntry(client.getClientid(), category1.getCategoryid(), project2.getProjectid(), date2);
+        createTestEntry(client.getClientid(), category2.getCategoryid(), project2.getProjectid(), date);
+
+        final var report = new Report();
+        report.setProjectid(project2.getProjectid());
+        report.setCategoryid(category1.getCategoryid());
+        report.setStartdate(new GregorianCalendar(2021, Calendar.OCTOBER, 1).getTime());
+        report.setEnddate(new GregorianCalendar(2021, Calendar.OCTOBER, 31).getTime());
+
+        //Act
+        final var response = mvc.perform(get("/report")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+
+        //assert
+        assertEquals(0, reportResponse.size());
     }
 
     private TimeSheetEntry createTestEntry(Integer clientid, Integer categoryid, Integer projectid, Date entryDate) {
