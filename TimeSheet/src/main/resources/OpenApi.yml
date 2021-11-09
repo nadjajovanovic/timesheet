@@ -9,7 +9,7 @@ tags:
   - name: "TeamMember"
 
 paths:
-  /teammember:
+  /teammembers:
     get:
       summary: This gets all teammembers
       description: This is description

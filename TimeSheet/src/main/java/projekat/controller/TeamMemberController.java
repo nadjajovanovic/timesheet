@@ -28,8 +28,7 @@ public class TeamMemberController implements TeammemberApi {
 	public TeamMemberController(TeamMemberService teamMemberService) {
 		this.teamMemberService = teamMemberService;
 	}
-	
-	@GetMapping("teammembers")
+
 	public ResponseEntity<List<TeamMember>> getTeamMembers() {
 		final var teammembers = teamMemberService.getAll();
 		return new ResponseEntity(teammembers, HttpStatus.OK);
