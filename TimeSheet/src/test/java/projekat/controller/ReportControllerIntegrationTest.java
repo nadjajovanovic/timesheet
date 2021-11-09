@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -75,7 +76,7 @@ public class ReportControllerIntegrationTest {
         final var entry3 = createTestEntry(client3.getClientid(), category2.getCategoryid(), project2.getProjectid(), new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime());
     }
 
-    /*@Test
+    @Test
     void getAllGeneratedReports() throws Exception {
         //Arange
         final var report = new Report();
@@ -92,7 +93,69 @@ public class ReportControllerIntegrationTest {
         //assert
         assertEquals(3, reportResponse.size());
 
-    }*/
+    }
+
+    @Test
+    void generateByDateRange() throws Exception {
+        //Arange
+        final var report = new Report();
+        report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
+        report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
+
+        //Act
+        final var response = mvc.perform(get("/report")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+
+        //assert
+        assertEquals(2, reportResponse.size());
+    }
+
+    @Test @Disabled
+    void generateByClientId() throws Exception {
+        //Arange
+        final var report = new Report();
+        report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
+        report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
+        report.setClientid(2);
+
+        //Act
+        final var response = mvc.perform(get("/report")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+
+        //assert
+        assertEquals(1, reportResponse.size());
+    }
+
+    @Test
+    void generateByCategoryId() throws Exception {
+        //Arange
+        final var report = new Report();
+        report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
+        report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
+        report.setCategoryid(1);
+
+        //Act
+        final var response = mvc.perform(get("/report")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+
+        //assert
+        assertEquals(1, reportResponse.size());
+    }
 
     private TimeSheetEntry createTestEntry(Integer clientid, Integer categoryid, Integer projectid, Date entryDate) {
         final var entry = new TimeSheetEntry();
@@ -100,6 +163,7 @@ public class ReportControllerIntegrationTest {
         entry.setCategoryid(categoryid);
         entry.setProjectid(projectid);
         entry.setEntryDate(entryDate);
+        entry.setTime(2.5);
         return timeSheetEntryRepository.saveAndFlush(entry);
     }
 
@@ -126,5 +190,11 @@ public class ReportControllerIntegrationTest {
     private void cleanDataBase() {
         timeSheetEntryRepository.deleteAll();
         timeSheetEntryRepository.flush();
+        categoryRepository.deleteAll();
+        categoryRepository.flush();
+        clientRepository.deleteAll();
+        clientRepository.flush();
+        projectRepository.deleteAll();
+        projectRepository.flush();
     }
 }
