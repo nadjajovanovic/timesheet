@@ -6,7 +6,6 @@ import projekat.models.Report;
 import projekat.models.TimeSheetEntry;
 import projekat.repository.TimeSheetEntryRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -26,7 +25,7 @@ public class ReportService {
                                                                     .filter(e -> report.getClientid() == null || e.getClientid() == report.getClientid())
                                                                     .filter(e -> report.getStartdate() == null || e.getEntryDate().after(report.getStartdate()))
                                                                     .filter(e -> report.getEnddate() == null || e.getEntryDate().before(report.getEnddate()))
-                                                                    .collect(Collectors.toList());
+                                                                    .toList();
         return filteredReports;
     }
 }

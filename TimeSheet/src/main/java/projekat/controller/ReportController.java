@@ -1,6 +1,7 @@
 package projekat.controller;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class ReportController {
 	}
 	
 	@GetMapping("report")
-	public ResponseEntity<Collection<TimeSheetEntry>> getAllReports(@RequestBody Report report) {
+	public ResponseEntity<List<TimeSheetEntry>> getAllReports(@RequestBody Report report) {
 		final var generatedReports = reportService.generateReport(report);
         return new ResponseEntity<>(generatedReports, HttpStatus.OK);
 	}
