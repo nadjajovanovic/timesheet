@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
+import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
@@ -52,7 +53,7 @@ class TeamMemberControllerIntegrationTest {
     void getAllTeamMembers() throws Exception {
         //Arrange
         final var teamMemberName = "First";
-        createTeamMember(teamMemberName);
+        saveTeamMember(teamMemberName);
 
         //act
         final var response = mvc.perform(get("/teammember")
@@ -70,7 +71,7 @@ class TeamMemberControllerIntegrationTest {
     void getOneTeamMember() throws Exception {
         //Arrange
         final var teamMemberName = "First";
-        final var inserted = createTeamMember(teamMemberName);
+        final var inserted = saveTeamMember(teamMemberName);
 
         //Act
         final var response = mvc.perform(get("/teammember/{id}", inserted.getTeammemberid())
@@ -174,7 +175,7 @@ class TeamMemberControllerIntegrationTest {
     void testUpdateTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "nameForInsert";
-        final var inserted = createTeamMember(teamMemberName);
+        final var inserted = saveTeamMember(teamMemberName);
         final var updatedName = "nameForUpdate";
         inserted.setTeammembername(updatedName);
 
@@ -196,7 +197,7 @@ class TeamMemberControllerIntegrationTest {
     void testUpdateTeamMemberBadRequest() throws Exception {
         //Arange
         final var teamMemberName = "NameForInsert";
-        final var inserted = createTeamMember(teamMemberName);
+        final var inserted = saveTeamMember(teamMemberName);
         final var updatedName = "";
         inserted.setTeammembername(updatedName);
 
@@ -232,7 +233,7 @@ class TeamMemberControllerIntegrationTest {
     void deleteTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "Delete me";
-        final var inserted = createTeamMember(teamMemberName);
+        final var inserted = saveTeamMember(teamMemberName);
 
         //act
         final var response = mvc.perform(delete("/teammember/{teammemberid}", inserted.getTeammemberid())
@@ -257,9 +258,8 @@ class TeamMemberControllerIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
-    private Teammember createTeamMember(String teammemberName) {
-        final var teammember = new Teammember();
-        teammember.setTeammembername(teammemberName);
+    private Teammember saveTeamMember(String teammemberName) {
+        final var teammember = BaseUT.createTeamMember(teammemberName);
         return repository.saveAndFlush(teammember);
     }
 

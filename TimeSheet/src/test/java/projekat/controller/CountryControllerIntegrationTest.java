@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
@@ -238,8 +239,7 @@ class CountryControllerIntegrationTest {
     }
 
     private Country createTestCountry(String countryName) {
-        final var country = new Country();
-        country.setCountryname(countryName);
+        final var country = BaseUT.createTestCountry(countryName);
         return repository.saveAndFlush(country);
     }
 

@@ -2,6 +2,7 @@ package projekat.controller;
 import org.springframework.http.HttpStatus;
 import projekat.TimeSheetApplication;
 import projekat.models.Category;
+import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 import projekat.repository.CategoryRepository;
 import java.util.Arrays;
@@ -52,8 +53,8 @@ class CategoryControllerIntegrationTest {
         //Arrange
         final var firstCatName = "First";
         final var secondCatName = "Second";
-        createTestCategory(firstCatName);
-        createTestCategory(secondCatName);
+        saveTestCategory(firstCatName);
+        saveTestCategory(secondCatName);
 
         //Act
         final var response = mvc.perform(get("/category")
@@ -72,7 +73,7 @@ class CategoryControllerIntegrationTest {
     void getOneCategory() throws Exception {
         //Arrange
         final var categoryName = "First";
-        final var inserted = createTestCategory(categoryName);
+        final var inserted = saveTestCategory(categoryName);
 
         //Act
         final var response = mvc.perform(get("/category/{id}", inserted.getCategoryid())
@@ -177,7 +178,7 @@ class CategoryControllerIntegrationTest {
     void testUpdateCategory() throws Exception {
         //Arrange
         final var categoryName = "nameForInsert";
-        final var inserted = createTestCategory(categoryName);
+        final var inserted = saveTestCategory(categoryName);
         final var updatedName = "nameForUpdate";
         inserted.setCategoryname(updatedName);
 
@@ -199,7 +200,7 @@ class CategoryControllerIntegrationTest {
     void testUpdateCategoryBadRequest() throws Exception {
         //Arrange
         final var categoryName = "nameForInsert";
-        final var inserted = createTestCategory(categoryName);
+        final var inserted = saveTestCategory(categoryName);
         final var updatedName = "   ";
         inserted.setCategoryname(updatedName);
 
@@ -235,7 +236,7 @@ class CategoryControllerIntegrationTest {
     void testUpdateCategoryWrongId() throws Exception {
         //Arrange
         final var categoryName = "My Category";
-        final var insertedCategory = createTestCategory(categoryName);
+        final var insertedCategory = saveTestCategory(categoryName);
         insertedCategory.setCategoryid(9999);
 
         // Act
@@ -253,7 +254,7 @@ class CategoryControllerIntegrationTest {
     void deleteCategory() throws Exception {
         //Arrange
         final var categoryName = "Delete Me";
-        final var inserted = createTestCategory(categoryName);
+        final var inserted = saveTestCategory(categoryName);
 
         //Act
         final var response = mvc.perform(delete("/category/{id}", inserted.getCategoryid())
@@ -278,9 +279,8 @@ class CategoryControllerIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
-    private Category createTestCategory(String categoryName) {
-        final var category = new Category();
-        category.setCategoryname(categoryName);
+    private Category saveTestCategory(String categoryName) {
+        final var category = BaseUT.createTestCategory(categoryName);
         return repository.saveAndFlush(category);
     }
 

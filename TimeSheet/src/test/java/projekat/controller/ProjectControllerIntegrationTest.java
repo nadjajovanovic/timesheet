@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
+import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
@@ -55,8 +56,8 @@ class ProjectControllerIntegrationTest {
         final var firstProjectDescription = "Make TimeSheet Application";
         final var secondProjectName = "Booking Software";
         final var secondProjectDescription = "Make Application for Booking";
-        createTestProject(firstProjectName, firstProjectDescription);
-        createTestProject(secondProjectName, secondProjectDescription);
+        saveTestProject(firstProjectName, firstProjectDescription);
+        saveTestProject(secondProjectName, secondProjectDescription);
 
         //Act
         final var response = mvc.perform(get("/project")
@@ -78,7 +79,7 @@ class ProjectControllerIntegrationTest {
         //Arrange
         final var projectName = "Booking Software";
         final var projectDescription = "Make Application for Booking";
-        final var insertedProject = createTestProject(projectName, projectDescription);
+        final var insertedProject = saveTestProject(projectName, projectDescription);
 
         //Act
         final var response = mvc.perform(get("/project/{id}", insertedProject.getProjectid())
@@ -186,7 +187,7 @@ class ProjectControllerIntegrationTest {
         //Arrange
         final var projectName = "Project Title";
         final var projectDescription = "Project Description";
-        final var insertedProject = createTestProject(projectName, projectDescription);
+        final var insertedProject = saveTestProject(projectName, projectDescription);
         final var updatedName = "Booking App";
         insertedProject.setProjectname(updatedName);
 
@@ -210,7 +211,7 @@ class ProjectControllerIntegrationTest {
         //Arrange
         final var projectName = "Cinema App";
         final var projectDescription = "App for ticket reservation";
-        final var inserted = createTestProject(projectName, projectDescription);
+        final var inserted = saveTestProject(projectName, projectDescription);
         final var updatedName = "   ";
         inserted.setProjectname(updatedName);
 
@@ -229,7 +230,7 @@ class ProjectControllerIntegrationTest {
         //Arrange
         final var projectName = "TimeSheet App";
         final var projectDescription = "Application for time tracking";
-        final var insertedProject = createTestProject(projectName, projectDescription);
+        final var insertedProject = saveTestProject(projectName, projectDescription);
 
         //Act
         final var response = mvc.perform(delete("/project/{id}", insertedProject.getProjectid()))
@@ -259,10 +260,10 @@ class ProjectControllerIntegrationTest {
         final var secondProjectName = "Time Tracking App";
         final var thirdProjectName = "App for Booking";
         final var fourthProjectName = "App for Food Ordering";
-        createTestProject(firstProjectName, null);
-        createTestProject(secondProjectName, null);
-        createTestProject(thirdProjectName, null);
-        createTestProject(fourthProjectName, null);
+        saveTestProject(firstProjectName, null);
+        saveTestProject(secondProjectName, null);
+        saveTestProject(thirdProjectName, null);
+        saveTestProject(fourthProjectName, null);
         final var paramName = "keyword";
         final var paramValue = "app";
 
@@ -286,8 +287,8 @@ class ProjectControllerIntegrationTest {
         // Arrange
         final var firstProjectName = "App for Cinema";
         final var secondProjectName = "Time Tracking App";
-        createTestProject(firstProjectName, null);
-        createTestProject(secondProjectName, null);
+        saveTestProject(firstProjectName, null);
+        saveTestProject(secondProjectName, null);
         final var paramName = "keyword";
         final var paramValue = "very long value";
 
@@ -303,10 +304,8 @@ class ProjectControllerIntegrationTest {
         assertEquals(0, filteredProjects.size());
     }
 
-    private Project createTestProject(String projectName, String projectDescription) {
-        final var project = new Project();
-        project.setProjectname(projectName);
-        project.setProjectdescription(projectDescription);
+    private Project saveTestProject(String projectName, String projectDescription) {
+        final var project = BaseUT.createTestProject(projectName, projectDescription);
         return repository.saveAndFlush(project);
     }
 

@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.models.*;
 import projekat.repository.*;
+import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,16 +61,16 @@ class ReportControllerIntegrationTest {
     void getAllGeneratedReports() throws Exception {
 
         //Arange
-        final var client = createTestClient("Nadja");
-        final var category = createTestCategory("Frontend");
+        final var client = saveTestClient("Nadja");
+        final var category = saveTestCategory("Frontend");
         final var project = createTestProject("Music App", "App for music");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        final var entry1 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
-        final var entry2 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
-        final var entry3 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
+        final var entry1 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
+        final var entry2 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
+        final var entry3 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
 
         final var report = new Report();
 
@@ -93,16 +94,16 @@ class ReportControllerIntegrationTest {
     void generateByDateRange() throws Exception {
 
         //Arange
-        final var client = createTestClient("Nadja");
-        final var category = createTestCategory("Frontend");
+        final var client = saveTestClient("Nadja");
+        final var category = saveTestCategory("Frontend");
         final var project = createTestProject("Music App", "App for music");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        final var entry1 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
-        createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
-        final var entry3 = createTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
+        final var entry1 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
+        saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
+        final var entry3 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
 
         final var report = new Report();
         report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
@@ -127,14 +128,14 @@ class ReportControllerIntegrationTest {
     void generateByClientId() throws Exception {
 
         //Arange
-        final var client1 = createTestClient("Nadja");
-        final var client2 = createTestClient("Bojana");
-        final var category = createTestCategory("Frontend");
+        final var client1 = saveTestClient("Nadja");
+        final var client2 = saveTestClient("Bojana");
+        final var category = saveTestCategory("Frontend");
         final var project = createTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        final var entry1 = createTestEntry(client1.getClientid(), category.getCategoryid(), project.getProjectid(), date);
-        createTestEntry(client2.getClientid(), category.getCategoryid(), project.getProjectid(), date);
+        final var entry1 = saveTestEntry(client1.getClientid(), category.getCategoryid(), project.getProjectid(), date);
+        saveTestEntry(client2.getClientid(), category.getCategoryid(), project.getProjectid(), date);
 
         final var report = new Report();
         report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
@@ -159,14 +160,14 @@ class ReportControllerIntegrationTest {
     void generateByCategoryId() throws Exception {
 
         //Arange
-        final var client = createTestClient("Nadja");
-        final var category1 = createTestCategory("Frontend");
-        final var category2 = createTestCategory("Backend");
+        final var client = saveTestClient("Nadja");
+        final var category1 = saveTestCategory("Frontend");
+        final var category2 = saveTestCategory("Backend");
         final var project = createTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        final var entry1 = createTestEntry(client.getClientid(), category1.getCategoryid(), project.getProjectid(), date);
-        createTestEntry(client.getClientid(), category2.getCategoryid(), project.getProjectid(), date);
+        final var entry1 = saveTestEntry(client.getClientid(), category1.getCategoryid(), project.getProjectid(), date);
+        saveTestEntry(client.getClientid(), category2.getCategoryid(), project.getProjectid(), date);
 
         final var report = new Report();
         report.setCategoryid(category1.getCategoryid());
@@ -189,14 +190,14 @@ class ReportControllerIntegrationTest {
     void generateByProjectId() throws Exception {
 
         //Arange
-        final var client = createTestClient("Nadja");
-        final var category= createTestCategory("Backend");
+        final var client = saveTestClient("Nadja");
+        final var category= saveTestCategory("Backend");
         final var project1 = createTestProject("Cooking App", "App for cooking");
         final var project2 = createTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        createTestEntry(client.getClientid(), category.getCategoryid(), project1.getProjectid(), date);
-        final var entry2 = createTestEntry(client.getClientid(), category.getCategoryid(), project2.getProjectid(), date);
+        saveTestEntry(client.getClientid(), category.getCategoryid(), project1.getProjectid(), date);
+        final var entry2 = saveTestEntry(client.getClientid(), category.getCategoryid(), project2.getProjectid(), date);
 
         final var report = new Report();
         report.setProjectid(project2.getProjectid());
@@ -219,17 +220,17 @@ class ReportControllerIntegrationTest {
     void testGenerateNoResults() throws Exception {
 
         //Arange
-        final var client = createTestClient("Nadja");
-        final var category1= createTestCategory("Frontend");
-        final var category2= createTestCategory("Backend");
+        final var client = saveTestClient("Nadja");
+        final var category1= saveTestCategory("Frontend");
+        final var category2 = saveTestCategory("Backend");
         final var project1 = createTestProject("Cooking App", "App for cooking");
         final var project2 = createTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.SEPTEMBER, 5).getTime();
 
-        createTestEntry(client.getClientid(), category1.getCategoryid(), project1.getProjectid(), date);
-        createTestEntry(client.getClientid(), category1.getCategoryid(), project2.getProjectid(), date2);
-        createTestEntry(client.getClientid(), category2.getCategoryid(), project2.getProjectid(), date);
+        saveTestEntry(client.getClientid(), category1.getCategoryid(), project1.getProjectid(), date);
+        saveTestEntry(client.getClientid(), category1.getCategoryid(), project2.getProjectid(), date2);
+        saveTestEntry(client.getClientid(), category2.getCategoryid(), project2.getProjectid(), date);
 
         final var report = new Report();
         report.setProjectid(project2.getProjectid());
@@ -250,32 +251,23 @@ class ReportControllerIntegrationTest {
         assertEquals(0, reportResponse.size());
     }
 
-    private TimeSheetEntry createTestEntry(Integer clientid, Integer categoryid, Integer projectid, Date entryDate) {
-        final var entry = new TimeSheetEntry();
-        entry.setClientid(clientid);
-        entry.setCategoryid(categoryid);
-        entry.setProjectid(projectid);
-        entry.setEntryDate(entryDate);
-        entry.setTime(2.5);
+    private TimeSheetEntry saveTestEntry(Integer clientid, Integer categoryid, Integer projectid, Date entryDate) {
+        final var entry = BaseUT.createTestEntry("Description", categoryid, clientid, projectid, entryDate);
         return timeSheetEntryRepository.saveAndFlush(entry);
     }
 
-    private Category createTestCategory(String categoryName) {
-        final var category = new Category();
-        category.setCategoryname(categoryName);
+    private Category saveTestCategory(String categoryName) {
+        final var category = BaseUT.createTestCategory(categoryName);
         return categoryRepository.saveAndFlush(category);
     }
 
-    private Client createTestClient(String clientName) {
-        final var client = new Client();
-        client.setClientname(clientName);
+    private Client saveTestClient(String clientName) {
+        final var client = BaseUT.createTestClient(clientName);
         return clientRepository.saveAndFlush(client);
     }
 
     private Project createTestProject(String projectName, String projectDescription) {
-        final var project = new Project();
-        project.setProjectname(projectName);
-        project.setProjectdescription(projectDescription);
+        final var project = BaseUT.createTestProject(projectName, projectDescription);
         return projectRepository.saveAndFlush(project);
     }
 
