@@ -55,7 +55,7 @@ class TeamMemberControllerIntegrationTest {
         createTeamMember(teamMemberName);
 
         //act
-        final var response = mvc.perform(get("/teammember")
+        final var response = mvc.perform(get("/teammembers")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
