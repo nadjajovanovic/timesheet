@@ -1,6 +1,7 @@
 package projekat.controller;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import projekat.api.api.ClientsApi;
+import projekat.api.model.ClientDTO;
 import projekat.models.Client;
 import projekat.services.ClientService;
-
+import projekat.mapper.ClientMapper;
 
 @RestController
-public class ClientController {
+public class ClientController implements ClientsApi {
 
 	@Autowired
 	private ClientService clientService;
@@ -29,10 +32,13 @@ public class ClientController {
 		this.clientService = clientService;
 	}
 	
-	@GetMapping(value = "client")
-	public ResponseEntity<Collection<Client>> getClients() {
-		final var clients = clientService.getAll();
-		return new ResponseEntity<>(clients, HttpStatus.OK);
+	@Override
+	public ResponseEntity<List<ClientDTO>> getClients() {
+		final var clients = clientService.getAll()
+				.stream()
+				.map(ClientMapper::toClientDTO)
+				.toList();
+		return new ResponseEntity(clients, HttpStatus.OK);
 	}
 	
 	@GetMapping("/client/{clientid}")
