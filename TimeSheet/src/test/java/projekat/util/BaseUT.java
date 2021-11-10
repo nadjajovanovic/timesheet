@@ -49,4 +49,17 @@ public class BaseUT {
         return entry;
     }
 
+    protected TimeSheetEntry createTestEntryWithObjects(String description, Category category, Client client, Project project, Date entryDate) {
+        final var entry = new TimeSheetEntry();
+        entry.setDescription(description);
+        entry.setClient(client);
+        entry.setClientid(client.getClientid());
+        entry.setProject(project);
+        entry.setProjectid(project.getProjectid());
+        entry.setCategory(category);
+        entry.setCategoryid(category.getCategoryid());
+        entry.setTime(3.5);
+        entry.setEntryDate(entryDate);
+        return entry;
+    }
 }
