@@ -16,23 +16,22 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import projekat.api.api.ClientApi;
+import projekat.api.api.ClientsApi;
 import projekat.api.model.ClientDTO;
 import projekat.models.Client;
 import projekat.services.ClientService;
 import projekat.mapper.ClientMapper;
 
 @RestController
-public class ClientController implements ClientApi {
+public class ClientController implements ClientsApi {
 
 	@Autowired
 	private ClientService clientService;
-
+	
 	public ClientController(ClientService clientService) {
 		this.clientService = clientService;
 	}
-
+	
 	@Override
 	public ResponseEntity<List<ClientDTO>> getClients() {
 		final var clients = clientService.getAll()
@@ -41,38 +40,45 @@ public class ClientController implements ClientApi {
 				.toList();
 		return new ResponseEntity(clients, HttpStatus.OK);
 	}
-
-	@Override
+	
 	@GetMapping("/client/{clientid}")
-	public ResponseEntity<ClientDTO> getClient(@PathVariable Integer clientid) {
+	public ResponseEntity<Client> getClient(@PathVariable Integer clientid) {
 		final var oneClient = clientService.getOne(clientid);
 		if (oneClient.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return  new ResponseEntity(ClientMapper.toClientDTO(oneClient.get()), HttpStatus.OK);
+		return  new ResponseEntity<>(oneClient.get(), HttpStatus.OK);
 	}
-
+	
 	@CrossOrigin
-	@Override
-	public ResponseEntity<ClientDTO> insertClient(@RequestBody ClientDTO client) {
-		final var inserted = clientService.insert(ClientMapper.toClient(client));
-		return new ResponseEntity(ClientMapper.toClientDTO(inserted), HttpStatus.CREATED);
+	@PostMapping("client")
+	public ResponseEntity<Client> insertClient(@RequestBody Client client) {
+		if (client.getClientname() == null || client.getClientname().trim().equals("")
+				|| client.getClientid() != null) {
+			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		final var inserted = clientService.insert(client);
+		return new ResponseEntity<>(inserted, HttpStatus.CREATED);
 	}
-
+	
 	@CrossOrigin
-	@Override
-	public ResponseEntity<ClientDTO> updateClient (@RequestBody ClientDTO client) {
-		final var updated = clientService.update(ClientMapper.toClient(client));
+	@PutMapping("client")
+	public ResponseEntity<Client> updateClient (@RequestBody Client client) {
+		if (client.getClientname() == null || client.getClientname().trim().equals("")
+				|| client.getClientid() == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		final var updated = clientService.update(client);
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity(updated, HttpStatus.OK);
+		return new ResponseEntity<>(updated, HttpStatus.OK);
 
 	}
-
+	
 	@CrossOrigin
-	@Override
-	public ResponseEntity<ClientDTO> deleteClient(@PathVariable Integer clientid) {
+	@DeleteMapping("client/{clientid}")
+	public ResponseEntity<Client> deleteClient(@PathVariable Integer clientid) {
 		final var deleted = clientService.delete(clientid);
 		if (!deleted) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
