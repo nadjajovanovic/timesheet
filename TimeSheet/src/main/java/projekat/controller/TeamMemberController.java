@@ -1,6 +1,7 @@
 package projekat.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import projekat.api.api.TeammembersApi;
-import projekat.api.model.TeamMember;
+import projekat.api.model.TeamMemberDTO;
 import projekat.models.Teammember;
 import projekat.services.TeamMemberService;
+import projekat.mapper.TeamMemberMapper;
 
 @RestController
 public class TeamMemberController implements TeammembersApi {
@@ -30,8 +32,11 @@ public class TeamMemberController implements TeammembersApi {
 	}
 
 	@Override
-	public ResponseEntity<List<TeamMember>> getTeamMembers() {
-		final var teammembers = teamMemberService.getAll();
+	public ResponseEntity<List<TeamMemberDTO>> getTeamMembers() {
+		final var teammembers = teamMemberService.getAll()
+				.stream()
+				.map(TeamMemberMapper::toTeamMemberDTO)
+				.collect(Collectors.toList());
 		return new ResponseEntity(teammembers, HttpStatus.OK);
 	}
 	
@@ -78,5 +83,4 @@ public class TeamMemberController implements TeammembersApi {
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
 }

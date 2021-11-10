@@ -37,10 +37,10 @@ components:
       description: This is the TeamMember object.
       type: object
       properties:
-        teammemberid:
+        id:
           description: The id of TeamMember
           type: integer
-        teammembername:
+        name:
           description: The name of TeamMember
           type: string
         username:
