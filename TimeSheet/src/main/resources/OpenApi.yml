@@ -7,6 +7,7 @@ info:
 tags:
   - name: "TimeSheet"
   - name: "TeamMember"
+  - name: "Report"
 
 paths:
   /teammembers:
@@ -25,6 +26,32 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TeamMemberDTO'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+
+  /report:
+    post:
+      summary: This method generates requested reports
+      description: This method return list of reports that fits given paramenthers
+      tags:
+        - "Report"
+      operationId: getRequiredReports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportFilterDTO'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeSheetEntryDTO'
         "400":
           description: BAD REQUEST
         "401":
@@ -55,3 +82,52 @@ components:
         hoursPerWeek:
           description: The hours per week of TeamMember
           type: number
+
+    TimeSheetEntryDTO:
+      description: This is an object that represents one user entry
+      type: object
+      properties:
+        id:
+          description: The id of the entry
+          type: integer
+        date:
+          description: The date of user entry
+          type: string
+        description:
+          description: The description of user entry
+          type: string
+        totalTimeSpent:
+          description: Total time user entered, including overtime
+          type: number
+        projectName:
+          description: Name of the project on which time is spent
+          type: string
+        categoryName:
+          description: Name of the category where time is spent
+          type: string
+        teamMemberName:
+          description: Name of team member that made the entry
+          type: string
+
+    ReportFilterDTO:
+      description: This object represents parameters for entry filter
+      type: object
+      properties:
+        startDate:
+          description: Beginning of time range
+          type: string
+        endDate:
+          description: End of time range
+          type: string
+        categoryId:
+          description: The category of wanting entries
+          type: integer
+        projectId:
+          description: The project on which time was spent
+          type: integer
+        teamMemberId:
+          description: The team member that made wanted entries
+          type: integer
+        clientId:
+          description: The client for whom the time was spent
+          type: integer
