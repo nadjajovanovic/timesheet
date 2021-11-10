@@ -24,10 +24,6 @@ public class TimeSheetApplication {
 		SpringApplication.run(TimeSheetApplication.class, args);
 	}
 
-	@Bean
-	public ModelMapper modelMapper() {
-		return new ModelMapper();
-	}
 
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx){
@@ -41,5 +37,4 @@ public class TimeSheetApplication {
 			}
 		};
 	}
-
 }

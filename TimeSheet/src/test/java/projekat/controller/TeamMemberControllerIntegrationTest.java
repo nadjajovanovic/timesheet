@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
+import projekat.api.model.TeamMemberDTO;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
@@ -60,11 +61,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var teamMembers = Arrays.asList(ResponseReader.readResponse(response, Teammember[].class));
+        final var teamMembers = Arrays.asList(ResponseReader.readResponse(response, TeamMemberDTO[].class));
 
         //Assert
         assertEquals(1, teamMembers.size());
-        assertEquals(teamMemberName, teamMembers.get(0).getTeammembername());
+        assertEquals(teamMemberName, teamMembers.get(0).getName());
     }
 
     @Test
@@ -258,8 +259,10 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
-    private Teammember saveTeamMember(String teammemberName) {
-        final var teammember = createTeamMember(teammemberName);
+    private Teammember createTeamMember(String teammemberName) {
+        final var teammember = new Teammember();
+        teammember.setTeammembername(teammemberName);
+        teammember.setHoursperweek(2.3);
         return repository.saveAndFlush(teammember);
     }
 

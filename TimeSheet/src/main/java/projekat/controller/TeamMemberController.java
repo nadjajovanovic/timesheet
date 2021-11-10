@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import projekat.api.api.TeammembersApi;
 import projekat.api.model.TeamMemberDTO;
-
 import projekat.models.Teammember;
 import projekat.services.TeamMemberService;
+import projekat.mapper.TeamMemberMapper;
 
 @RestController
 public class TeamMemberController implements TeammembersApi {
@@ -43,7 +42,7 @@ public class TeamMemberController implements TeammembersApi {
 	public ResponseEntity<List<TeamMemberDTO>> getTeamMembers() {
 		final var teammembers = teamMemberService.getAll()
 				.stream()
-				.map(this::convertToDTO)
+				.map(TeamMemberMapper::toTeamMemberDTO)
 				.collect(Collectors.toList());
 		return new ResponseEntity(teammembers, HttpStatus.OK);
 	}
@@ -90,8 +89,5 @@ public class TeamMemberController implements TeammembersApi {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	private TeamMemberDTO convertToDTO(Teammember teammember){
-		return modelMapper.map(teammember, TeamMemberDTO.class);
 	}
 }

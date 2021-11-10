@@ -20,7 +20,7 @@ paths:
         "200":
           description: Success
           content:
-            aplication/json:
+            application/json:
               schema:
                 type: array
                 items:
