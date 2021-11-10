@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import projekat.api.api.ClientsApi;
+
+import projekat.api.api.ClientApi;
 import projekat.api.model.ClientDTO;
 import projekat.models.Client;
 import projekat.services.ClientService;
 import projekat.mapper.ClientMapper;
 
 @RestController
-public class ClientController implements ClientsApi {
+public class ClientController implements ClientApi {
 
 	@Autowired
 	private ClientService clientService;
@@ -31,7 +32,7 @@ public class ClientController implements ClientsApi {
 	public ClientController(ClientService clientService) {
 		this.clientService = clientService;
 	}
-	
+
 	@Override
 	public ResponseEntity<List<ClientDTO>> getClients() {
 		final var clients = clientService.getAll()
@@ -40,14 +41,15 @@ public class ClientController implements ClientsApi {
 				.toList();
 		return new ResponseEntity(clients, HttpStatus.OK);
 	}
-	
+
+	@Override
 	@GetMapping("/client/{clientid}")
-	public ResponseEntity<Client> getClient(@PathVariable Integer clientid) {
+	public ResponseEntity<ClientDTO> getClient(@PathVariable Integer clientid) {
 		final var oneClient = clientService.getOne(clientid);
 		if (oneClient.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return  new ResponseEntity<>(oneClient.get(), HttpStatus.OK);
+		return  new ResponseEntity(oneClient.get(), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
@@ -77,8 +79,8 @@ public class ClientController implements ClientsApi {
 	}
 	
 	@CrossOrigin
-	@DeleteMapping("client/{clientid}")
-	public ResponseEntity<Client> deleteClient(@PathVariable Integer clientid) {
+	@Override
+	public ResponseEntity<ClientDTO> deleteClient(@PathVariable Integer clientid) {
 		final var deleted = clientService.delete(clientid);
 		if (!deleted) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
+import projekat.api.model.ClientDTO;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
 import projekat.util.BaseUT;
@@ -52,18 +53,22 @@ class ClientControllerIntegrationTest extends BaseUT{
     void getAllClients() throws Exception {
         //Arrange
         final var firstClientName = "First";
-        saveTestClient(firstClientName);
+        final var allClients = saveTestClient(firstClientName);
+
+        final var client = new ClientDTO();
 
         //Act
         final var response = mvc.perform(get("/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var clients = Arrays.asList(ResponseReader.readResponse(response, Client[].class));
+        final var clients = Arrays.asList(ResponseReader.readResponse(response, ClientDTO[].class));
 
         //Assert
         assertEquals(1, clients.size());
-        assertEquals(firstClientName, clients.get(0).getClientname());
+        assertEquals(allClients.getClientname(), clients.get(0).getName());
     }
 
     @Test
