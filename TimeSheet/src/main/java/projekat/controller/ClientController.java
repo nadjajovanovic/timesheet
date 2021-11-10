@@ -1,7 +1,6 @@
 package projekat.controller;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import projekat.models.Client;
-import projekat.repository.ClientRepository;
 import projekat.services.ClientService;
 
 
@@ -54,7 +52,7 @@ public class ClientController {
 			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		final var inserted = clientService.insert(client);
-		return new ResponseEntity<Client>(inserted, HttpStatus.CREATED);
+		return new ResponseEntity<>(inserted, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin

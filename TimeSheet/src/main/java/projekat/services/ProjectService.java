@@ -7,7 +7,6 @@ import projekat.repository.ProjectRepository;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -55,7 +54,7 @@ public class ProjectService {
                             .filter(e -> e.getProjectname()
                                            .toLowerCase()
                                              .startsWith(keyword.toLowerCase()))
-                            .collect(Collectors.toList());
+                            .toList();
         return filteredProjects;
     }
 }

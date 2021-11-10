@@ -5,11 +5,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @NoArgsConstructor @Getter @Setter
-public class TimeSheetEntry {
+public class TimeSheetEntry implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @SequenceGenerator(name="ENTRY_ENTRYID_GENERATOR", sequenceName="ENTRY_SEQ", allocationSize=1)
