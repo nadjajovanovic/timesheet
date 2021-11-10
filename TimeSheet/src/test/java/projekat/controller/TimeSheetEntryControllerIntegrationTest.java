@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class TimeSheetEntryControllerIntegrationTest {
+class TimeSheetEntryControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -354,7 +354,7 @@ class TimeSheetEntryControllerIntegrationTest {
         final var category = saveTestCategory("Test category");
         final var client = saveTestClient("Test client");
         final var project = saveTestProject("Project Name", "Project Description");
-        final var entry = BaseUT.createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), new Date());
+        final var entry = createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), new Date());
         return entryRepository.saveAndFlush(entry);
     }
 
@@ -364,17 +364,17 @@ class TimeSheetEntryControllerIntegrationTest {
     }
 
     private Category saveTestCategory(String categoryName) {
-        final var category = BaseUT.createTestCategory(categoryName);
+        final var category = createTestCategory(categoryName);
         return categoryRepository.saveAndFlush(category);
     }
 
     private Client saveTestClient(String clientName) {
-        final var client = BaseUT.createTestClient(clientName);
+        final var client = createTestClient(clientName);
         return clientRepository.saveAndFlush(client);
     }
 
     private Project saveTestProject(String projectName, String projectDescription) {
-        final var project = BaseUT.createTestProject(projectName, projectDescription);
+        final var project = createTestProject(projectName, projectDescription);
         return projectRepository.saveAndFlush(project);
     }
 

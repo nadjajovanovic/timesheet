@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class CountryControllerIntegrationTest {
+class CountryControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -55,8 +55,8 @@ class CountryControllerIntegrationTest {
         //Arrange
         final var firstCountryName = "Romania";
         final var secondCountryName = "Spain";
-        createTestCountry(firstCountryName);
-        createTestCountry(secondCountryName);
+        saveTestCountry(firstCountryName);
+        saveTestCountry(secondCountryName);
 
         //Act
         final var response = mvc.perform(get("/country")
@@ -75,7 +75,7 @@ class CountryControllerIntegrationTest {
     void getOneCountry() throws Exception {
         //Arrange
         final var countryName = "Romania";
-        final var inserted = createTestCountry(countryName);
+        final var inserted = saveTestCountry(countryName);
 
         //Act
         final var response = mvc.perform(get("/country/{id}", inserted.getCountryid())
@@ -176,7 +176,7 @@ class CountryControllerIntegrationTest {
     void testUpdateCountry() throws Exception {
         //Arrange
         final var countryName = "Itly";
-        final var insertedCountry = createTestCountry(countryName);
+        final var insertedCountry = saveTestCountry(countryName);
         final var updatedName = "Italy";
         insertedCountry.setCountryname(updatedName);
 
@@ -198,7 +198,7 @@ class CountryControllerIntegrationTest {
     void testUpdateCountryBadRequest() throws Exception {
         //Arange
         final var countryName = "nameForInsert";
-        final var insertedCountry = createTestCountry(countryName);
+        final var insertedCountry = saveTestCountry(countryName);
         final var updatedName = "   ";
         insertedCountry.setCountryname(updatedName);
 
@@ -216,7 +216,7 @@ class CountryControllerIntegrationTest {
     void deleteCountry() throws Exception {
         //Arrange
         final var countryName = "Italy";
-        final var insertedCountry = createTestCountry(countryName);
+        final var insertedCountry = saveTestCountry(countryName);
 
         //Act
         final var response = mvc.perform(delete("/country/{id}", insertedCountry.getCountryid()))
@@ -238,8 +238,8 @@ class CountryControllerIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
-    private Country createTestCountry(String countryName) {
-        final var country = BaseUT.createTestCountry(countryName);
+    private Country saveTestCountry(String countryName) {
+        final var country = createTestCountry(countryName);
         return repository.saveAndFlush(country);
     }
 

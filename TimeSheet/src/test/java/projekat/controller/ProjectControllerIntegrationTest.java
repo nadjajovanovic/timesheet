@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class ProjectControllerIntegrationTest {
+class ProjectControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -305,7 +305,7 @@ class ProjectControllerIntegrationTest {
     }
 
     private Project saveTestProject(String projectName, String projectDescription) {
-        final var project = BaseUT.createTestProject(projectName, projectDescription);
+        final var project = createTestProject(projectName, projectDescription);
         return repository.saveAndFlush(project);
     }
 

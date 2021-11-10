@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class ClientControllerIntegrationTest {
+class ClientControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -308,7 +308,7 @@ class ClientControllerIntegrationTest {
     }
 
     private Client saveTestClient(String clientName) {
-        final var client = BaseUT.createTestClient(clientName);
+        final var client = createTestClient(clientName);
         return repository.saveAndFlush(client);
     }
 

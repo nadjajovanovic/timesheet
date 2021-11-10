@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class CategoryControllerIntegrationTest {
+class CategoryControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -280,7 +280,7 @@ class CategoryControllerIntegrationTest {
     }
 
     private Category saveTestCategory(String categoryName) {
-        final var category = BaseUT.createTestCategory(categoryName);
+        final var category = createTestCategory(categoryName);
         return repository.saveAndFlush(category);
     }
 

@@ -25,7 +25,7 @@ import java.util.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class ReportControllerIntegrationTest {
+class ReportControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -63,7 +63,7 @@ class ReportControllerIntegrationTest {
         //Arange
         final var client = saveTestClient("Nadja");
         final var category = saveTestCategory("Frontend");
-        final var project = createTestProject("Music App", "App for music");
+        final var project = saveTestProject("Music App", "App for music");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
@@ -96,7 +96,7 @@ class ReportControllerIntegrationTest {
         //Arange
         final var client = saveTestClient("Nadja");
         final var category = saveTestCategory("Frontend");
-        final var project = createTestProject("Music App", "App for music");
+        final var project = saveTestProject("Music App", "App for music");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
@@ -131,7 +131,7 @@ class ReportControllerIntegrationTest {
         final var client1 = saveTestClient("Nadja");
         final var client2 = saveTestClient("Bojana");
         final var category = saveTestCategory("Frontend");
-        final var project = createTestProject("Music App", "App for music");
+        final var project = saveTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
         final var entry1 = saveTestEntry(client1.getClientid(), category.getCategoryid(), project.getProjectid(), date);
@@ -163,7 +163,7 @@ class ReportControllerIntegrationTest {
         final var client = saveTestClient("Nadja");
         final var category1 = saveTestCategory("Frontend");
         final var category2 = saveTestCategory("Backend");
-        final var project = createTestProject("Music App", "App for music");
+        final var project = saveTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
         final var entry1 = saveTestEntry(client.getClientid(), category1.getCategoryid(), project.getProjectid(), date);
@@ -192,8 +192,8 @@ class ReportControllerIntegrationTest {
         //Arange
         final var client = saveTestClient("Nadja");
         final var category= saveTestCategory("Backend");
-        final var project1 = createTestProject("Cooking App", "App for cooking");
-        final var project2 = createTestProject("Music App", "App for music");
+        final var project1 = saveTestProject("Cooking App", "App for cooking");
+        final var project2 = saveTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
         saveTestEntry(client.getClientid(), category.getCategoryid(), project1.getProjectid(), date);
@@ -223,8 +223,8 @@ class ReportControllerIntegrationTest {
         final var client = saveTestClient("Nadja");
         final var category1= saveTestCategory("Frontend");
         final var category2 = saveTestCategory("Backend");
-        final var project1 = createTestProject("Cooking App", "App for cooking");
-        final var project2 = createTestProject("Music App", "App for music");
+        final var project1 = saveTestProject("Cooking App", "App for cooking");
+        final var project2 = saveTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.SEPTEMBER, 5).getTime();
 
@@ -252,22 +252,22 @@ class ReportControllerIntegrationTest {
     }
 
     private TimeSheetEntry saveTestEntry(Integer clientid, Integer categoryid, Integer projectid, Date entryDate) {
-        final var entry = BaseUT.createTestEntry("Description", categoryid, clientid, projectid, entryDate);
+        final var entry = createTestEntry("Description", categoryid, clientid, projectid, entryDate);
         return timeSheetEntryRepository.saveAndFlush(entry);
     }
 
     private Category saveTestCategory(String categoryName) {
-        final var category = BaseUT.createTestCategory(categoryName);
+        final var category = createTestCategory(categoryName);
         return categoryRepository.saveAndFlush(category);
     }
 
     private Client saveTestClient(String clientName) {
-        final var client = BaseUT.createTestClient(clientName);
+        final var client = createTestClient(clientName);
         return clientRepository.saveAndFlush(client);
     }
 
-    private Project createTestProject(String projectName, String projectDescription) {
-        final var project = BaseUT.createTestProject(projectName, projectDescription);
+    private Project saveTestProject(String projectName, String projectDescription) {
+        final var project = createTestProject(projectName, projectDescription);
         return projectRepository.saveAndFlush(project);
     }
 
