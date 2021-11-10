@@ -1,7 +1,11 @@
 package projekat.controller;
 
+
+import java.util.Collection;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import projekat.api.api.TeammembersApi;
 import projekat.api.model.TeamMemberDTO;
+
 import projekat.models.Teammember;
 import projekat.services.TeamMemberService;
 
@@ -60,7 +65,7 @@ public class TeamMemberController implements TeammembersApi {
 			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		final var inserted = teamMemberService.insert(teamMember);
-		return new ResponseEntity<Teammember>(inserted, HttpStatus.CREATED);
+		return new ResponseEntity<>(inserted, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin

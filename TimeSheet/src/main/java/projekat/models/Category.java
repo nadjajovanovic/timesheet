@@ -3,14 +3,11 @@ package projekat.models;
 import java.io.Serializable;
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Time;
-import java.util.List;
 
 
 /**
@@ -30,8 +27,4 @@ public class Category implements Serializable {
 
 	private String categoryname;
 
-	//bi-directional many-to-one association to Report
-	@JsonIgnore
-	@OneToMany(mappedBy="category")
-	private List<Report> reports;
 }

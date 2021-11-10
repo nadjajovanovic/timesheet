@@ -7,7 +7,6 @@ import projekat.repository.ClientRepository;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -53,7 +52,7 @@ public class ClientService {
                                                 .filter(e -> e.getClientname()
                                                         .toLowerCase()
                                                         .startsWith(keyword.toLowerCase()))
-                                                .collect(Collectors.toList());
+                                                .toList();
 
         return filteredClients;
     }

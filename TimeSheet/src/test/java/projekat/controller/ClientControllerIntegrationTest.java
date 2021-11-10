@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
+import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class ClientControllerIntegrationTest {
+class ClientControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -51,7 +52,7 @@ class ClientControllerIntegrationTest {
     void getAllClients() throws Exception {
         //Arrange
         final var firstClientName = "First";
-        createTestClient(firstClientName);
+        saveTestClient(firstClientName);
 
         //Act
         final var response = mvc.perform(get("/client")
@@ -69,7 +70,7 @@ class ClientControllerIntegrationTest {
     void getOneClient() throws Exception {
         //Arrange
         final var clientName = "First";
-        final var inserted = createTestClient(clientName);
+        final var inserted = saveTestClient(clientName);
 
         //Act
         final var response = mvc.perform(get("/client/{clientid}", inserted.getClientid())
@@ -173,7 +174,7 @@ class ClientControllerIntegrationTest {
     void testUpdateClient() throws Exception {
         //Arange
         final var clientName = "nameForInsert";
-        final var inserted = createTestClient(clientName);
+        final var inserted = saveTestClient(clientName);
         final var updateName = "nameForUpdate";
         inserted.setClientname(updateName);
 
@@ -194,7 +195,7 @@ class ClientControllerIntegrationTest {
     void testUpdateClientBadRequest() throws Exception {
         //Arange
         final var clientName = "nameForInsert";
-        final var inserted = createTestClient(clientName);
+        final var inserted = saveTestClient(clientName);
         final var updateName = "";
         inserted.setClientname(updateName);
 
@@ -230,7 +231,7 @@ class ClientControllerIntegrationTest {
     void deleteClient() throws Exception {
         //Arange
         final var clientName = "Delete Me";
-        final var inserted = createTestClient(clientName);
+        final var inserted = saveTestClient(clientName);
 
         //Act
         final var response = mvc.perform(delete("/client/{clientid}", inserted.getClientid())
@@ -262,10 +263,10 @@ class ClientControllerIntegrationTest {
         final var secondClientName = "Nikola";
         final var thirdClientName = "Nikolina";
         final var fourthClientName = "Bojana";
-        createTestClient(firstClientName);
-        createTestClient(secondClientName);
-        createTestClient(thirdClientName);
-        createTestClient(fourthClientName);
+        saveTestClient(firstClientName);
+        saveTestClient(secondClientName);
+        saveTestClient(thirdClientName);
+        saveTestClient(fourthClientName);
         final var paramName = "keyword";
         final var paramValue = "n";
 
@@ -289,8 +290,8 @@ class ClientControllerIntegrationTest {
         // Arrange
         final var firstClientName = "Bojana";
         final var secondClientName = "Tijana";
-        createTestClient(firstClientName);
-        createTestClient(secondClientName);
+        saveTestClient(firstClientName);
+        saveTestClient(secondClientName);
         final var paramName = "keyword";
         final var paramValue = "Nadja";
 
@@ -306,9 +307,8 @@ class ClientControllerIntegrationTest {
         assertEquals(0, filteredClients.size());
     }
 
-    private Client createTestClient(String clientName) {
-        final var client = new Client();
-        client.setClientname(clientName);
+    private Client saveTestClient(String clientName) {
+        final var client = createTestClient(clientName);
         return repository.saveAndFlush(client);
     }
 

@@ -20,6 +20,7 @@ import projekat.repository.CategoryRepository;
 import projekat.repository.ClientRepository;
 import projekat.repository.ProjectRepository;
 import projekat.repository.TimeSheetEntryRepository;
+import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
 import java.util.Arrays;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class TimeSheetEntryControllerIntegrationTest {
+class TimeSheetEntryControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private MockMvc mvc;
@@ -122,12 +123,12 @@ class TimeSheetEntryControllerIntegrationTest {
         //Arrange
         final var entry = new TimeSheetEntry();
         final var categoryName = "test category";
-        final var category = createTestCategory(categoryName);
+        final var category = saveTestCategory(categoryName);
         final var clientName = "Steve";
-        final var client = createTestClient(clientName);
+        final var client = saveTestClient(clientName);
         final var projectName = "Weather App";
         final var projectDescription = "This is Project Description";
-        final var project = createTestProject(projectName, projectDescription);
+        final var project = saveTestProject(projectName, projectDescription);
         entry.setCategoryid(category.getCategoryid());
         entry.setClientid(client.getClientid());
         entry.setProjectid(project.getProjectid());
@@ -157,8 +158,8 @@ class TimeSheetEntryControllerIntegrationTest {
     void testCreateEntryBadRequestNoProject() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        final var category = createTestCategory("test category");
-        final var client = createTestClient("Steve");
+        final var category = saveTestCategory("test category");
+        final var client = saveTestClient("Steve");
         entry.setCategoryid(category.getCategoryid());
         entry.setClientid(client.getClientid());
         entry.setProjectid(null);
@@ -179,8 +180,8 @@ class TimeSheetEntryControllerIntegrationTest {
     void testCreateEntryBadRequestNoClient() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        final var category = createTestCategory("test category");
-        final var project = createTestProject("Test project", "test description");
+        final var category = saveTestCategory("test category");
+        final var project = saveTestProject("Test project", "test description");
         entry.setCategoryid(category.getCategoryid());
         entry.setClientid(null);
         entry.setProjectid(project.getProjectid());
@@ -201,8 +202,8 @@ class TimeSheetEntryControllerIntegrationTest {
     void testCreateEntryBadRequestNoCategory() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        final var client = createTestClient("test client");
-        final var project = createTestProject("Test project", "test description");
+        final var client = saveTestClient("test client");
+        final var project = saveTestProject("Test project", "test description");
         entry.setCategoryid(null);
         entry.setClientid(client.getClientid());
         entry.setProjectid(project.getProjectid());
@@ -223,8 +224,8 @@ class TimeSheetEntryControllerIntegrationTest {
     void testCreateEntryBadRequestCategoryNotFound() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        final var client = createTestClient("test client");
-        final var project = createTestProject("Test project", "test description");
+        final var client = saveTestClient("test client");
+        final var project = saveTestProject("Test project", "test description");
         entry.setCategoryid(456);
         entry.setClientid(client.getClientid());
         entry.setProjectid(project.getProjectid());
@@ -245,9 +246,9 @@ class TimeSheetEntryControllerIntegrationTest {
     void testCreateEntryBadRequestTimeLessThatZero() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntry();
-        final var category = createTestCategory("test category");
-        final var client = createTestClient("test client");
-        final var project = createTestProject("Test project", "test description");
+        final var category = saveTestCategory("test category");
+        final var client = saveTestClient("test client");
+        final var project = saveTestProject("Test project", "test description");
         entry.setCategoryid(category.getCategoryid());
         entry.setClientid(client.getClientid());
         entry.setProjectid(project.getProjectid());
@@ -350,16 +351,10 @@ class TimeSheetEntryControllerIntegrationTest {
     }
 
     private TimeSheetEntry createTestEntry(String description) {
-        final var entry = new TimeSheetEntry();
-        entry.setDescription(description);
-        final var category = categoryRepository.saveAndFlush(new Category());
-        entry.setCategoryid(category.getCategoryid());
-        final var client = clientRepository.saveAndFlush(new Client());
-        entry.setClientid(client.getClientid());
-        final var project = projectRepository.saveAndFlush(new Project());
-        entry.setProjectid(project.getProjectid());
-        entry.setTime(3.5);
-        entry.setEntryDate(new Date());
+        final var category = saveTestCategory("Test category");
+        final var client = saveTestClient("Test client");
+        final var project = saveTestProject("Project Name", "Project Description");
+        final var entry = createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), new Date());
         return entryRepository.saveAndFlush(entry);
     }
 
@@ -368,22 +363,18 @@ class TimeSheetEntryControllerIntegrationTest {
         return entry;
     }
 
-    private Category createTestCategory(String categoryName) {
-        final var category = new Category();
-        category.setCategoryname(categoryName);
+    private Category saveTestCategory(String categoryName) {
+        final var category = createTestCategory(categoryName);
         return categoryRepository.saveAndFlush(category);
     }
 
-    private Client createTestClient(String clientName) {
-        final var client = new Client();
-        client.setClientname(clientName);
+    private Client saveTestClient(String clientName) {
+        final var client = createTestClient(clientName);
         return clientRepository.saveAndFlush(client);
     }
 
-    private Project createTestProject(String projectName, String projectDescription) {
-        final var project = new Project();
-        project.setProjectname(projectName);
-        project.setProjectdescription(projectDescription);
+    private Project saveTestProject(String projectName, String projectDescription) {
+        final var project = createTestProject(projectName, projectDescription);
         return projectRepository.saveAndFlush(project);
     }
 
