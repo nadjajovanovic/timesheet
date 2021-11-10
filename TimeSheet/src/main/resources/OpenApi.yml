@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: Sample API
+  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+  version: 0.1.9
+
+tags:
+  - name: "TimeSheet"
+  - name: "TeamMember"
+
+paths:
+  /teammembers:
+    get:
+      summary: This gets all teammembers
+      description: This method return list of TeamMembers
+      tags:
+        - "TeamMember"
+      operationId: getTeamMembers
+      responses:
+        "200":
+          description: Success
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamMember'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+
+components:
+  schemas:
+
+    TeamMember:
+      description: This is the TeamMember object.
+      type: object
+      properties:
+        id:
+          description: The id of TeamMember
+          type: integer
+        name:
+          description: The name of TeamMember
+          type: string
+        username:
+          description: The username of TeamMember
+          type: string
+        email:
+          description: The email of TeamMember
+          type: string
+        status:
+          description: The status of TeamMember
+          type: boolean
+        hoursPerWeek:
+          description: The hours per week of TeamMember
+          type: number

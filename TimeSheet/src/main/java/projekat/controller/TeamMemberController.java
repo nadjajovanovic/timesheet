@@ -1,7 +1,13 @@
 package projekat.controller;
 
+
 import java.util.Collection;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,25 +20,34 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import projekat.api.api.TeammembersApi;
+import projekat.api.model.TeamMemberDTO;
+
 import projekat.models.Teammember;
 import projekat.services.TeamMemberService;
 
 @RestController
-public class TeamMemberController {
+public class TeamMemberController implements TeammembersApi {
 	
 	@Autowired
 	private TeamMemberService teamMemberService;
+
+	@Autowired
+	private ModelMapper modelMapper;
 	
 	public TeamMemberController(TeamMemberService teamMemberService) {
 		this.teamMemberService = teamMemberService;
 	}
-	
-	@GetMapping("teammember")
-	public ResponseEntity<Collection<Teammember>> getTeamMembers() {
-		final var teammembers = teamMemberService.getAll();
-		return new ResponseEntity<>(teammembers, HttpStatus.OK);
+
+	@Override
+	public ResponseEntity<List<TeamMemberDTO>> getTeamMembers() {
+		final var teammembers = teamMemberService.getAll()
+				.stream()
+				.map(this::convertToDTO)
+				.collect(Collectors.toList());
+		return new ResponseEntity(teammembers, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/teammember/{teammemberid}")
 	public ResponseEntity<Teammember> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
@@ -76,5 +91,7 @@ public class TeamMemberController {
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
+	private TeamMemberDTO convertToDTO(Teammember teammember){
+		return modelMapper.map(teammember, TeamMemberDTO.class);
+	}
 }

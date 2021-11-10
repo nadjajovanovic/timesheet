@@ -2,6 +2,7 @@ package projekat;
 
 import java.util.Arrays;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,7 +23,12 @@ public class TimeSheetApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TimeSheetApplication.class, args);
 	}
-	
+
+	@Bean
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
+	}
+
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx){
 		return args -> {
