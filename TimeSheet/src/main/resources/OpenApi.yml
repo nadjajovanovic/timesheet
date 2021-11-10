@@ -24,7 +24,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TeamMember'
+                  $ref: '#/components/schemas/TeamMemberDTO'
         "400":
           description: BAD REQUEST
         "401":
@@ -33,7 +33,7 @@ paths:
 components:
   schemas:
 
-    TeamMember:
+    TeamMemberDTO:
       description: This is the TeamMember object.
       type: object
       properties:
