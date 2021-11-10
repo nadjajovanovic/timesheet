@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
+import projekat.api.model.ReportFilterDTO;
+import projekat.api.model.TimeSheetEntryDTO;
 import projekat.models.*;
 import projekat.repository.*;
 import projekat.util.BaseUT;
@@ -68,26 +70,26 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        final var entry1 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
-        final var entry2 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
-        final var entry3 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
+        final var entry1 = saveTestEntry(client, category, project, date1);
+        final var entry2 = saveTestEntry(client, category, project, date2);
+        final var entry3 = saveTestEntry(client, category, project, date3);
 
-        final var report = new Report();
+        final var report = new ReportFilterDTO();
 
         //Act
-        final var response = mvc.perform(get("/report")
+        final var response = mvc.perform(post("/report")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(report))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
 
         //assert
         assertEquals(3, reportResponse.size());
-        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
-        assertEquals(entry2.getEntryId(), reportResponse.get(1).getEntryId());
-        assertEquals(entry3.getEntryId(), reportResponse.get(2).getEntryId());
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getId());
+        assertEquals(entry2.getEntryId(), reportResponse.get(1).getId());
+        assertEquals(entry3.getEntryId(), reportResponse.get(2).getId());
     }
 
     @Test
@@ -101,27 +103,27 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        final var entry1 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date1);
-        saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date2);
-        final var entry3 = saveTestEntry(client.getClientid(), category.getCategoryid(), project.getProjectid(), date3);
+        final var entry1 = saveTestEntry(client, category, project, date1);
+        saveTestEntry(client, category, project, date2);
+        final var entry3 = saveTestEntry(client, category, project, date3);
 
-        final var report = new Report();
-        report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
-        report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
+        final var report = new ReportFilterDTO();
+        report.setStartDate("2021-11-08");
+        report.setEndDate("2021-11-30");
 
         //Act
-        final var response = mvc.perform(get("/report")
+        final var response = mvc.perform(post("/report")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(report))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
 
         //assert
         assertEquals(2, reportResponse.size());
-        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
-        assertEquals(entry3.getEntryId(), reportResponse.get(1).getEntryId());
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getId());
+        assertEquals(entry3.getEntryId(), reportResponse.get(1).getId());
     }
 
     @Test
@@ -134,26 +136,26 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var project = saveTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        final var entry1 = saveTestEntry(client1.getClientid(), category.getCategoryid(), project.getProjectid(), date);
-        saveTestEntry(client2.getClientid(), category.getCategoryid(), project.getProjectid(), date);
+        final var entry1 = saveTestEntry(client1, category, project, date);
+        saveTestEntry(client2, category, project, date);
 
-        final var report = new Report();
-        report.setStartdate(new GregorianCalendar(2021, Calendar.NOVEMBER, 1).getTime());
-        report.setEnddate(new GregorianCalendar(2021, Calendar.NOVEMBER, 30).getTime());
-        report.setClientid(client1.getClientid());
+        final var report = new ReportFilterDTO();
+        report.setStartDate("2021-11-1");
+        report.setEndDate("2021-11-30");
+        report.setClientId(client1.getClientid());
 
         //Act
-        final var response = mvc.perform(get("/report")
+        final var response = mvc.perform(post("/report")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(report))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
 
         //assert
         assertEquals(1, reportResponse.size());
-        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getId());
     }
 
     @Test
@@ -166,24 +168,24 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var project = saveTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        final var entry1 = saveTestEntry(client.getClientid(), category1.getCategoryid(), project.getProjectid(), date);
-        saveTestEntry(client.getClientid(), category2.getCategoryid(), project.getProjectid(), date);
+        final var entry1 = saveTestEntry(client, category1, project, date);
+        saveTestEntry(client, category2, project, date);
 
-        final var report = new Report();
-        report.setCategoryid(category1.getCategoryid());
+        final var report = new ReportFilterDTO();
+        report.setCategoryId(category1.getCategoryid());
 
         //Act
-        final var response = mvc.perform(get("/report")
+        final var response = mvc.perform(post("/report")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(report))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
 
         //assert
         assertEquals(1, reportResponse.size());
-        assertEquals(entry1.getEntryId(), reportResponse.get(0).getEntryId());
+        assertEquals(entry1.getEntryId(), reportResponse.get(0).getId());
     }
 
     @Test
@@ -196,24 +198,24 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var project2 = saveTestProject("Music App", "App for music");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        saveTestEntry(client.getClientid(), category.getCategoryid(), project1.getProjectid(), date);
-        final var entry2 = saveTestEntry(client.getClientid(), category.getCategoryid(), project2.getProjectid(), date);
+        saveTestEntry(client, category, project1, date);
+        final var entry2 = saveTestEntry(client, category, project2, date);
 
-        final var report = new Report();
-        report.setProjectid(project2.getProjectid());
+        final var report = new ReportFilterDTO();
+        report.setProjectId(project2.getProjectid());
 
         //Act
-        final var response = mvc.perform(get("/report")
+        final var response = mvc.perform(post("/report")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(report))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
 
         //assert
         assertEquals(1, reportResponse.size());
-        assertEquals(entry2.getEntryId(), reportResponse.get(0).getEntryId());
+        assertEquals(entry2.getEntryId(), reportResponse.get(0).getId());
     }
 
     @Test
@@ -228,31 +230,32 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var date = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.SEPTEMBER, 5).getTime();
 
-        saveTestEntry(client.getClientid(), category1.getCategoryid(), project1.getProjectid(), date);
-        saveTestEntry(client.getClientid(), category1.getCategoryid(), project2.getProjectid(), date2);
-        saveTestEntry(client.getClientid(), category2.getCategoryid(), project2.getProjectid(), date);
+        saveTestEntry(client, category1, project1, date);
+        saveTestEntry(client, category1, project2, date2);
+        saveTestEntry(client, category2, project2, date);
 
-        final var report = new Report();
-        report.setProjectid(project2.getProjectid());
-        report.setCategoryid(category1.getCategoryid());
-        report.setStartdate(new GregorianCalendar(2021, Calendar.OCTOBER, 1).getTime());
-        report.setEnddate(new GregorianCalendar(2021, Calendar.OCTOBER, 31).getTime());
+        final var report = new ReportFilterDTO();
+        report.setProjectId(project2.getProjectid());
+        report.setCategoryId(category1.getCategoryid());
+        report.setStartDate("2021-10-01");
+        report.setEndDate("2021-10-31");
 
         //Act
-        final var response = mvc.perform(get("/report")
+        final var response = mvc.perform(post("/report")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(report))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
 
         //assert
         assertEquals(0, reportResponse.size());
     }
 
-    private TimeSheetEntry saveTestEntry(Integer clientid, Integer categoryid, Integer projectid, Date entryDate) {
-        final var entry = createTestEntry("Description", categoryid, clientid, projectid, entryDate);
+
+    private TimeSheetEntry saveTestEntry(Client client, Category category, Project project, Date entryDate) {
+        final var entry = createTestEntryWithObjects("Description", category, client, project, entryDate);
         return timeSheetEntryRepository.saveAndFlush(entry);
     }
 
