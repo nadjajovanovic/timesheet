@@ -131,4 +131,3 @@ components:
         clientId:
           description: The client for whom the time was spent
           type: integer
-
