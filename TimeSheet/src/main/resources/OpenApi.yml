@@ -9,7 +9,7 @@ tags:
   - name: "TeamMember"
 
 paths:
-  /teammembers:
+  /teammember:
     get:
       summary: This gets all teammembers
       description: This method return list of TeamMembers
@@ -29,6 +29,105 @@ paths:
           description: BAD REQUEST
         "401":
           description: UNAUTH
+
+    post:
+      summary: This method create Teammember
+      tags:
+        - "TeamMember"
+      operationId: insertTeamMember
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamMemberDTO'
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMemberDTO'
+        "400":
+          description: BAD REQUEST
+        "403":
+          description: FORBIDDEN
+
+    put:
+      summary: This method update exist Teammember
+      tags:
+        - "TeamMember"
+      operationId: updateTeamMember
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamMemberDTO'
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMemberDTO'
+        "400":
+          description: BAD REQUEST
+        "403":
+          description: FORBIDDEN
+        "404":
+          description: NOT FOUND
+
+
+  /teammember/{teammemberid}:
+    get:
+      parameters:
+        - in: path
+          name: teammemberid
+          required: true
+          schema:
+            type: integer
+      summary: This method return one Teammember by id if exist
+      tags:
+        - "TeamMember"
+      operationId: getTeamMember
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMemberDTO'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+        "404":
+          description: NOT FOUND
+
+    delete:
+      parameters:
+        - in: path
+          name: teammemberid
+          required: true
+          schema:
+            type: integer
+      summary: This method delete one Teammember by id if exist
+      tags:
+        - "TeamMember"
+      operationId: deleteTeamMember
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMemberDTO'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+        "404":
+          description: NOT FOUND
+
 
 components:
   schemas:
