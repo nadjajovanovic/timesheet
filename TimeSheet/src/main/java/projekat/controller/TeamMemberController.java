@@ -1,8 +1,12 @@
 package projekat.controller;
 
+
+import java.util.Collection;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +30,9 @@ public class TeamMemberController implements TeammembersApi {
 	
 	@Autowired
 	private TeamMemberService teamMemberService;
+
+	@Autowired
+	private ModelMapper modelMapper;
 	
 	public TeamMemberController(TeamMemberService teamMemberService) {
 		this.teamMemberService = teamMemberService;
@@ -39,7 +46,7 @@ public class TeamMemberController implements TeammembersApi {
 				.collect(Collectors.toList());
 		return new ResponseEntity(teammembers, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/teammember/{teammemberid}")
 	public ResponseEntity<Teammember> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
@@ -57,7 +64,7 @@ public class TeamMemberController implements TeammembersApi {
 			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		final var inserted = teamMemberService.insert(teamMember);
-		return new ResponseEntity<Teammember>(inserted, HttpStatus.CREATED);
+		return new ResponseEntity<>(inserted, HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
