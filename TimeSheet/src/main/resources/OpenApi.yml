@@ -7,11 +7,9 @@ info:
 tags:
   - name: "TimeSheet"
   - name: "TeamMember"
-  - name: "Report"
-  - name: "Project"
 
 paths:
-  /teammember:
+  /teammembers:
     get:
       summary: This gets all teammembers
       description: This method return list of TeamMembers
