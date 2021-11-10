@@ -259,7 +259,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
     }
 
-    private Teammember createTeamMember(String teammemberName) {
+    private Teammember saveTeamMember(String teammemberName) {
         final var teammember = new Teammember();
         teammember.setTeammembername(teammemberName);
         teammember.setHoursperweek(2.3);
