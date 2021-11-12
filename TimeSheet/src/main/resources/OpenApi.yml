@@ -11,7 +11,7 @@ tags:
   - name: "Project"
 
 paths:
-  /teammember:
+  /teammembers:
     get:
       summary: This gets all teammembers
       description: This method return list of TeamMembers
@@ -377,56 +377,3 @@ components:
         clientId:
           description: The client for whom the time was spent
           type: integer
-
-    TimeSheetEntryReportDTO:
-      description: This is an object that represents one user entry
-      type: object
-      properties:
-        id:
-          description: The id of the entry
-          type: integer
-        date:
-          description: The date of user entry
-          type: string
-        description:
-          description: The description of user entry
-          type: string
-        totalTimeSpent:
-          description: Total time user entered, including overtime
-          type: number
-        projectName:
-          description: Name of the project on which time is spent
-          type: string
-        categoryName:
-          description: Name of the category where time is spent
-          type: string
-        teamMemberName:
-          description: Name of team member that made the entry
-          type: string
-
-    ProjectDTO:
-      description: This is an object that represents one user entry
-      type: object
-      properties:
-        id:
-          description: The id of the project
-          type: integer
-        name:
-          description: The name of the project
-          type: string
-          pattern: ^(?!\s*$).+
-        description:
-          description: The description of the project
-          type: string
-        clientId:
-          description: The id of the client
-          type: integer
-        teamMemberId:
-          description: The id of the the team member
-          type: integer
-        status:
-          description: The status of the project
-          type: string
-      required:
-        - name
-        - status
