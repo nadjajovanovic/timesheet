@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
+import projekat.api.model.ProjectDTO;
+import projekat.mapper.ProjectMapper;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
 import projekat.util.BaseUT;
@@ -64,14 +66,14 @@ class ProjectControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var projects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
+        final var projects = Arrays.asList(ResponseReader.readResponse(response, ProjectDTO[].class));
 
         //Assert
         assertEquals(2, projects.size());
-        assertEquals(firstProjectName, projects.get(0).getProjectname());
-        assertEquals(firstProjectDescription, projects.get(0).getProjectdescription());
-        assertEquals(secondProjectName, projects.get(1).getProjectname());
-        assertEquals(secondProjectDescription, projects.get(1).getProjectdescription());
+        assertEquals(firstProjectName, projects.get(0).getName());
+        assertEquals(firstProjectDescription, projects.get(0).getDescription());
+        assertEquals(secondProjectName, projects.get(1).getName());
+        assertEquals(secondProjectDescription, projects.get(1).getDescription());
     }
 
     @Test
@@ -86,12 +88,12 @@ class ProjectControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var project = ResponseReader.readResponse(response, Project.class);
+        final var project = ResponseReader.readResponse(response, ProjectDTO.class);
 
         //Assert
-        assertEquals(insertedProject.getProjectid(), project.getProjectid());
-        assertEquals(projectName, project.getProjectname());
-        assertEquals(projectDescription, project.getProjectdescription());
+        assertEquals(insertedProject.getProjectid(), project.getId());
+        assertEquals(projectName, project.getName());
+        assertEquals(projectDescription, project.getDescription());
     }
 
     @Test
@@ -112,9 +114,10 @@ class ProjectControllerIntegrationTest extends BaseUT{
         //Arrange
         final var projectName = "Cinema App";
         final var projectDescription = "Make App for ticket reservation";
-        final var project = new Project();
-        project.setProjectname(projectName);
-        project.setProjectdescription(projectDescription);
+        final var project = new ProjectDTO();
+        project.setName(projectName);
+        project.setDescription(projectDescription);
+        project.setStatus("Active");
 
         // Act
         final var response = mvc.perform(post("/project")
@@ -123,19 +126,19 @@ class ProjectControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final var responseProject = ResponseReader.readResponse(response, Project.class);
+        final var responseProject = ResponseReader.readResponse(response, ProjectDTO.class);
 
         // Assert
-        assertNotNull(responseProject.getProjectid());
-        assertEquals(projectName, responseProject.getProjectname());
-        assertEquals(projectDescription, responseProject.getProjectdescription());
+        assertNotNull(responseProject.getId());
+        assertEquals(projectName, responseProject.getName());
+        assertEquals(projectDescription, responseProject.getDescription());
     }
 
     @Test
     void testCreateProjectBadRequest() throws Exception {
         //Arrange
-        final var project = new Project();
-        project.setProjectname("  ");
+        final var project = new ProjectDTO();
+        project.setName("  ");
 
         // Act
         final var response = mvc.perform(post("/project")
@@ -150,8 +153,8 @@ class ProjectControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateProjectNameNotExist() throws Exception {
         //Arrange
-        final var project = new Project();
-
+        final var project = new ProjectDTO();
+        project.setStatus("Active");
         // Act
         final var response = mvc.perform(post("/project")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -167,10 +170,10 @@ class ProjectControllerIntegrationTest extends BaseUT{
         //Arrange
         final var projectName = "Weather App";
         final var projectDescription = "Make app for weather forecast";
-        final var project = new Project();
-        project.setProjectid(5);
-        project.setProjectname(projectName);
-        project.setProjectdescription(projectDescription);
+        final var project = new ProjectDTO();
+        project.setId(5);
+        project.setName(projectName);
+        project.setDescription(projectDescription);
 
         // Act
         final var response = mvc.perform(post("/project")
@@ -189,21 +192,22 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var projectDescription = "Project Description";
         final var insertedProject = saveTestProject(projectName, projectDescription);
         final var updatedName = "Booking App";
-        insertedProject.setProjectname(updatedName);
+        final var dto = ProjectMapper.toProjectDTO(insertedProject);
+        dto.setName(updatedName);
 
         // Act
         final var response = mvc.perform(put("/project")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(insertedProject))
+                        .content(objectMapper.writeValueAsString(dto))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var responseProject = ResponseReader.readResponse(response, Project.class);
+        final var responseProject = ResponseReader.readResponse(response, ProjectDTO.class);
 
         // Assert
-        assertNotNull(responseProject.getProjectid());
-        assertEquals(updatedName, responseProject.getProjectname());
-        assertEquals(projectDescription, responseProject.getProjectdescription());
+        assertNotNull(responseProject.getId());
+        assertEquals(updatedName, responseProject.getName());
+        assertEquals(projectDescription, responseProject.getDescription());
     }
 
     @Test
@@ -214,11 +218,11 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var inserted = saveTestProject(projectName, projectDescription);
         final var updatedName = "   ";
         inserted.setProjectname(updatedName);
-
+        final var dto = ProjectMapper.toProjectDTO(inserted);
         // Act
         final var response = mvc.perform(put("/project")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inserted)))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andReturn();
 
         // Assert
@@ -226,7 +230,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
     }
 
     @Test
-    void deleteCProjectTest() throws Exception {
+    void deleteProjectTest() throws Exception {
         //Arrange
         final var projectName = "TimeSheet App";
         final var projectDescription = "Application for time tracking";
@@ -273,13 +277,13 @@ class ProjectControllerIntegrationTest extends BaseUT{
                         .queryParam(paramName, paramValue))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
+        final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, ProjectDTO[].class));
 
         // Assert
         assertEquals(3, filteredProjects.size());
-        assertEquals(firstProjectName, filteredProjects.get(0).getProjectname());
-        assertEquals(thirdProjectName, filteredProjects.get(1).getProjectname());
-        assertEquals(fourthProjectName, filteredProjects.get(2).getProjectname());
+        assertEquals(firstProjectName, filteredProjects.get(0).getName());
+        assertEquals(thirdProjectName, filteredProjects.get(1).getName());
+        assertEquals(fourthProjectName, filteredProjects.get(2).getName());
     }
 
     @Test
@@ -298,7 +302,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
                         .queryParam(paramName, paramValue))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, Project[].class));
+        final var filteredProjects = Arrays.asList(ResponseReader.readResponse(response, ProjectDTO[].class));
 
         // Assert
         assertEquals(0, filteredProjects.size());

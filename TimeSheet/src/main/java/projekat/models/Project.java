@@ -32,18 +32,24 @@ public class Project implements Serializable {
 
 	private String projectname;
 
+	@Column(name = "clientid")
+	private Integer clientid;
+
+	@Column(name = "teammemberid")
+	private Integer teammemberid;
+
 	//bi-directional many-to-one association to Client
 	@ManyToOne
-	@JoinColumn(name="clientid")
+	@JoinColumn(name="client")
 	private Client client;
 
 	//bi-directional many-to-one association to Teammember
 	@ManyToOne
-	@JoinColumn(name="teammemberid")
+	@JoinColumn(name="teammember")
 	private Teammember teammember;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 10)
+	@Column(length = 10, nullable = false)
 	private ProjectStatus status;
 
 	@JsonIgnore
