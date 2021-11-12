@@ -2,15 +2,18 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.api.model.TimeSheetEntryDTO;
 import projekat.models.Category;
 import projekat.models.Client;
 import projekat.models.Project;
 import projekat.models.TimeSheetEntry;
+import projekat.mapper.TimeSheetEntryMapper;
 import projekat.repository.CategoryRepository;
 import projekat.repository.ClientRepository;
 import projekat.repository.ProjectRepository;
 import projekat.repository.TimeSheetEntryRepository;
 
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -47,13 +50,15 @@ public class TimeSheetEntryService {
         return entry;
     }
 
-    public TimeSheetEntry create(TimeSheetEntry entry) {
+    public TimeSheetEntry create(TimeSheetEntryDTO dto) throws ParseException {
 
-        if (!categoryRepository.existsById(entry.getCategoryid())
-                || !clientRepository.existsById(entry.getClientid())
-                || !projectRepository.existsById(entry.getProjectid())){
+        if (!categoryRepository.existsById(dto.getCategoryId())
+                || !clientRepository.existsById(dto.getClientId())
+                || !projectRepository.existsById(dto.getProjectId())){
             return null;
         }
+
+        final var entry = TimeSheetEntryMapper.fromEntryDTO(dto);
 
         final var emptyCategory = createEmptyCategory(entry.getCategoryid());
         entry.setCategory(emptyCategory);
