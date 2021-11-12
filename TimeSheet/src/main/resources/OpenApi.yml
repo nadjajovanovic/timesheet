@@ -8,6 +8,7 @@ tags:
   - name: "TimeSheet"
   - name: "TeamMember"
   - name: "Report"
+  - name: "Country"
 
 paths:
   /teammembers:
@@ -56,6 +57,111 @@ paths:
           description: BAD REQUEST
         "401":
           description: UNAUTH
+
+  /country:
+    get:
+      summary: This gets all countries
+      description: This method return list of countries
+      tags:
+        - "Country"
+      operationId: getCountries
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+    post:
+      summary: This method creates Country
+      tags:
+        - "Country"
+      operationId: insertCountry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryDTO'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+    put:
+      summary: This method update exist Country
+      tags:
+        - "Country"
+      operationId: updateCountry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryDTO'
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+
+  /country/{countryid}:
+    get:
+      parameters:
+        - in: path
+          name: countryid
+          required: true
+          schema:
+            type: integer
+      summary: Returns Country if exist
+      tags:
+        - "Country"
+      operationId: getCountry
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+    delete:
+      parameters:
+        - in: path
+          name: countryid
+          required: true
+          schema:
+            type: integer
+      summary: Delete country if exist
+      tags:
+        - "Country"
+      operationId: deleteCountry
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
 
 components:
   schemas:
@@ -131,3 +237,14 @@ components:
         clientId:
           description: The client for whom the time was spent
           type: integer
+
+    CountryDTO:
+      description: This object represents parameters for country
+      type: object
+      properties:
+        countryid:
+          description: id of country
+          type: integer
+        name:
+          description: name of country
+          type: string
