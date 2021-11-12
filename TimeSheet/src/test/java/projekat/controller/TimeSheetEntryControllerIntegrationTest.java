@@ -12,10 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
+import projekat.api.model.TimeSheetEntryDTO;
 import projekat.models.Category;
 import projekat.models.Client;
 import projekat.models.Project;
 import projekat.models.TimeSheetEntry;
+import projekat.mapper.TimeSheetEntryMapper;
 import projekat.repository.CategoryRepository;
 import projekat.repository.ClientRepository;
 import projekat.repository.ProjectRepository;
@@ -23,6 +25,7 @@ import projekat.repository.TimeSheetEntryRepository;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -78,7 +81,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var entries = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntry[].class));
+        final var entries = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
 
         //Assert
         assertEquals(2, entries.size());
@@ -97,11 +100,11 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var entry = ResponseReader.readResponse(response, TimeSheetEntry.class);
+        final var entry = ResponseReader.readResponse(response, TimeSheetEntryDTO.class);
 
         //Assert
         assertEquals(entryDescription, entry.getDescription());
-        assertEquals(inserted.getEntryId(), entry.getEntryId());
+        assertEquals(inserted.getEntryId(), entry.getId());
     }
 
     @Test
@@ -121,7 +124,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateEntry() throws Exception {
         //Arrange
-        final var entry = new TimeSheetEntry();
+        final var entry = new TimeSheetEntryDTO();
         final var categoryName = "test category";
         final var category = saveTestCategory(categoryName);
         final var clientName = "Steve";
@@ -129,11 +132,11 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         final var projectName = "Weather App";
         final var projectDescription = "This is Project Description";
         final var project = saveTestProject(projectName, projectDescription);
-        entry.setCategoryid(category.getCategoryid());
-        entry.setClientid(client.getClientid());
-        entry.setProjectid(project.getProjectid());
-        entry.setTime(4.5);
-        entry.setEntryDate(new Date());
+        entry.setCategoryId(category.getCategoryid());
+        entry.setClientId(client.getClientid());
+        entry.setProjectId(project.getProjectid());
+        entry.setTimeSpent(BigDecimal.valueOf(4.5));
+        entry.setDate("2021-11-10");
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -142,29 +145,29 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final var responseEntry = ResponseReader.readResponse(response, TimeSheetEntry.class);
-        final var fetchedEntry = fetchEntry(responseEntry.getEntryId());
+        final var responseEntry = ResponseReader.readResponse(response, TimeSheetEntryDTO.class);
+        final var fetchedEntry = fetchEntry(responseEntry.getId());
 
         // Assert
-        assertNotNull(responseEntry.getEntryId());
-        assertEquals(category.getCategoryid(), responseEntry.getCategory().getCategoryid());
+        assertNotNull(responseEntry.getId());
+        assertEquals(category.getCategoryid(), responseEntry.getCategoryId());
         assertEquals(categoryName, fetchedEntry.get().getCategory().getCategoryname());
-        assertEquals(client.getClientid(), responseEntry.getClient().getClientid());
+        assertEquals(client.getClientid(), responseEntry.getClientId());
         assertEquals(client.getClientname(), fetchedEntry.get().getClient().getClientname());
-        assertEquals(project.getProjectid(), responseEntry.getProject().getProjectid());
+        assertEquals(project.getProjectid(), responseEntry.getProjectId());
     }
 
     @Test
     void testCreateEntryBadRequestNoProject() throws Exception {
         //Arrange
-        final var entry = new TimeSheetEntry();
+        final var entry = new TimeSheetEntryDTO();
         final var category = saveTestCategory("test category");
         final var client = saveTestClient("Steve");
-        entry.setCategoryid(category.getCategoryid());
-        entry.setClientid(client.getClientid());
-        entry.setProjectid(null);
-        entry.setTime(4.5);
-        entry.setEntryDate(new Date());
+        entry.setCategoryId(category.getCategoryid());
+        entry.setClientId(client.getClientid());
+        entry.setProjectId(null);
+        entry.setTimeSpent(BigDecimal.valueOf(4.5));
+        entry.setDate("2021-11-11");
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -179,14 +182,14 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateEntryBadRequestNoClient() throws Exception {
         //Arrange
-        final var entry = new TimeSheetEntry();
+        final var entry = new TimeSheetEntryDTO();
         final var category = saveTestCategory("test category");
         final var project = saveTestProject("Test project", "test description");
-        entry.setCategoryid(category.getCategoryid());
-        entry.setClientid(null);
-        entry.setProjectid(project.getProjectid());
-        entry.setTime(4.5);
-        entry.setEntryDate(new Date());
+        entry.setCategoryId(category.getCategoryid());
+        entry.setClientId(null);
+        entry.setProjectId(project.getProjectid());
+        entry.setTimeSpent(BigDecimal.valueOf(4.5));
+        entry.setDate("2021-10-10");
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -223,14 +226,14 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateEntryBadRequestCategoryNotFound() throws Exception {
         //Arrange
-        final var entry = new TimeSheetEntry();
+        final var entry = new TimeSheetEntryDTO();
         final var client = saveTestClient("test client");
         final var project = saveTestProject("Test project", "test description");
-        entry.setCategoryid(456);
-        entry.setClientid(client.getClientid());
-        entry.setProjectid(project.getProjectid());
-        entry.setTime(4.5);
-        entry.setEntryDate(new Date());
+        entry.setCategoryId(456);
+        entry.setClientId(client.getClientid());
+        entry.setProjectId(project.getProjectid());
+        entry.setTimeSpent(BigDecimal.valueOf(4.5));
+        entry.setDate("2021-11-10");
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -245,15 +248,15 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateEntryBadRequestTimeLessThatZero() throws Exception {
         //Arrange
-        final var entry = new TimeSheetEntry();
+        final var entry = new TimeSheetEntryDTO();
         final var category = saveTestCategory("test category");
         final var client = saveTestClient("test client");
         final var project = saveTestProject("Test project", "test description");
-        entry.setCategoryid(category.getCategoryid());
-        entry.setClientid(client.getClientid());
-        entry.setProjectid(project.getProjectid());
-        entry.setEntryDate(new Date());
-        entry.setTime(-2.3);
+        entry.setCategoryId(category.getCategoryid());
+        entry.setClientId(client.getClientid());
+        entry.setProjectId(project.getProjectid());
+        entry.setDate("2021-11-04");
+        entry.setTimeSpent(BigDecimal.valueOf(-2.3));
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -270,13 +273,14 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var description = "5h total";
         final var entry = createTestEntry(description);
+        final var dto = TimeSheetEntryMapper.toEntryDTO(entry);
         final var updatedDescription = "7.5h total";
-        entry.setDescription(updatedDescription);
+        dto.setDescription(updatedDescription);
 
         // Act
         final var response = mvc.perform(put("/entry")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(entry))
+                        .content(objectMapper.writeValueAsString(dto))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -292,12 +296,13 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var description = "Work day";
         final var entry = createTestEntry(description);
-        entry.setTime(25.5);
+        final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
+        entryDTO.setTimeSpent(BigDecimal.valueOf(25.5));
 
         // Act
         final var response = mvc.perform(put("/entry")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(entry)))
+                        .content(objectMapper.writeValueAsString(entryDTO)))
                 .andReturn();
 
         // Assert
@@ -309,12 +314,13 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var description = "Demo project";
         final var entry = createTestEntry(description);
-        entry.setEntryId(2345);
+        final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
+        entryDTO.setId(2345);
 
         // Act
         final var response = mvc.perform(put("/entry")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(entry)))
+                        .content(objectMapper.writeValueAsString(entryDTO)))
                 .andReturn();
 
         // Assert

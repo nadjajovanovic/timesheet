@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import projekat.api.api.ReportApi;
 import projekat.api.model.ReportFilterDTO;
-import projekat.api.model.TimeSheetEntryDTO;
 
+import projekat.api.model.TimeSheetEntryReportDTO;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.services.ReportService;
 
@@ -27,11 +27,11 @@ public class ReportController implements ReportApi {
 
 
 	@Override
-	public ResponseEntity<List<TimeSheetEntryDTO>> getRequiredReports(@RequestBody ReportFilterDTO report) {
+	public ResponseEntity<List<TimeSheetEntryReportDTO>> getRequiredReports(@RequestBody ReportFilterDTO report) {
 		final var generatedReports = reportService.generateReport(report);
 		final var filtered = generatedReports
 				.stream()
-				.map(TimeSheetEntryMapper::toEntryDTO)
+				.map(TimeSheetEntryMapper::toEntryForReportDTO)
 				.toList();
 		return new ResponseEntity<>(filtered, HttpStatus.OK);
 	}

@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ReportFilterDTO;
-import projekat.api.model.TimeSheetEntryDTO;
+import projekat.api.model.TimeSheetEntryReportDTO;
 import projekat.models.*;
 import projekat.repository.*;
 import projekat.util.BaseUT;
@@ -83,7 +83,7 @@ class ReportControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryReportDTO[].class));
 
         //assert
         assertEquals(3, reportResponse.size());
@@ -118,7 +118,7 @@ class ReportControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryReportDTO[].class));
 
         //assert
         assertEquals(2, reportResponse.size());
@@ -151,7 +151,7 @@ class ReportControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryReportDTO[].class));
 
         //assert
         assertEquals(1, reportResponse.size());
@@ -181,7 +181,7 @@ class ReportControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryReportDTO[].class));
 
         //assert
         assertEquals(1, reportResponse.size());
@@ -211,7 +211,7 @@ class ReportControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryReportDTO[].class));
 
         //assert
         assertEquals(1, reportResponse.size());
@@ -247,7 +247,7 @@ class ReportControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryDTO[].class));
+        final var reportResponse = Arrays.asList(ResponseReader.readResponse(response, TimeSheetEntryReportDTO[].class));
 
         //assert
         assertEquals(0, reportResponse.size());
