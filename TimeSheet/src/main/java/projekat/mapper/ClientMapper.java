@@ -12,7 +12,18 @@ public class ClientMapper {
         clientDTO.setAddress(client.getClientaddress());
         clientDTO.setCity(client.getClientcity());
         clientDTO.setZipCode(client.getClientzipcode());
-        clientDTO.setCountryid(client.getCountry().getCountryid());
+        clientDTO.setCountryid(client.getCountryid());
         return clientDTO;
+    }
+
+    public static Client toClient(ClientDTO clientDTO) {
+        final var client = new Client();
+        client.setClientid(clientDTO.getId());
+        client.setClientname(clientDTO.getName());
+        client.setClientaddress(clientDTO.getAddress());
+        client.setClientcity(clientDTO.getCity());
+        client.setClientzipcode(clientDTO.getZipCode());
+        client.setCountryid(clientDTO.getCountryid());
+        return client;
     }
 }
