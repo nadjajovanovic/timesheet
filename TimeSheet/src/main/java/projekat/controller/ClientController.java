@@ -49,32 +49,32 @@ public class ClientController implements ClientApi {
 		if (oneClient.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return  new ResponseEntity(oneClient.get(), HttpStatus.OK);
+		return  new ResponseEntity(ClientMapper.toClientDTO(oneClient.get()), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
-	@PostMapping("client")
-	public ResponseEntity<Client> insertClient(@RequestBody Client client) {
-		if (client.getClientname() == null || client.getClientname().trim().equals("")
-				|| client.getClientid() != null) {
+	@Override
+	public ResponseEntity<ClientDTO> insertClient(@RequestBody ClientDTO client) {
+		if (client.getName() == null || client.getName().trim().equals("")
+				|| client.getId() != null) {
 			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		final var inserted = clientService.insert(client);
-		return new ResponseEntity<>(inserted, HttpStatus.CREATED);
+		final var inserted = clientService.insert(ClientMapper.toClient(client));
+		return new ResponseEntity(ClientMapper.toClientDTO(inserted), HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
-	@PutMapping("client")
-	public ResponseEntity<Client> updateClient (@RequestBody Client client) {
-		if (client.getClientname() == null || client.getClientname().trim().equals("")
-				|| client.getClientid() == null) {
+	@Override
+	public ResponseEntity<ClientDTO> updateClient (@RequestBody ClientDTO client) {
+		if (client.getName() == null || client.getName().trim().equals("")
+				|| client.getId() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		final var updated = clientService.update(client);
+		final var updated = clientService.update(ClientMapper.toClient(client));
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(updated, HttpStatus.OK);
+		return new ResponseEntity(updated, HttpStatus.OK);
 
 	}
 	

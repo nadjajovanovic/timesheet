@@ -35,10 +35,8 @@ public class Client implements Serializable {
 	
 	private String clientzipcode;
 
-	//bi-directional many-to-one association to Country
-	@ManyToOne
-	@JoinColumn(name="countryid")
-	private Country country;
+	@Column(name="countryid")
+	private Integer countryid;
 
 	//bi-directional many-to-one association to Project
 	@JsonIgnore
