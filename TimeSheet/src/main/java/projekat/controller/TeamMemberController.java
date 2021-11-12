@@ -10,22 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import projekat.api.api.TeammembersApi;
+import projekat.api.api.TeammemberApi;
 import projekat.api.model.TeamMemberDTO;
-import projekat.models.Teammember;
-import projekat.services.TeamMemberService;
 import projekat.mapper.TeamMemberMapper;
+import projekat.services.TeamMemberService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-public class TeamMemberController implements TeammembersApi {
+public class TeamMemberController implements TeammemberApi {
 	
 	@Autowired
 	private TeamMemberService teamMemberService;
@@ -43,43 +40,44 @@ public class TeamMemberController implements TeammembersApi {
 		return new ResponseEntity(teammembers, HttpStatus.OK);
 	}
 
-	@GetMapping("/teammember/{teammemberid}")
-	public ResponseEntity<Teammember> getTeamMember(@PathVariable Integer teammemberid) {
+	@Override
+	public ResponseEntity<TeamMemberDTO> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
 		if (oneTeammember.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(oneTeammember.get(), HttpStatus.OK);
+		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
-	@PostMapping("teammember")
-	public ResponseEntity<Teammember> insertClient(@RequestBody Teammember teamMember) {
-		if (teamMember.getTeammembername() == null || teamMember.getTeammembername().trim().equals("")
-				|| teamMember.getTeammemberid() != null) {
+	@Override
+	public ResponseEntity<TeamMemberDTO> insertTeamMember(@RequestBody TeamMemberDTO teamMember) {
+		if (teamMember.getName() == null || teamMember.getName().trim().equals("")
+				|| teamMember.getId() != null) {
 			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		final var inserted = teamMemberService.insert(teamMember);
-		return new ResponseEntity<>(inserted, HttpStatus.CREATED);
+
+		final var inserted = teamMemberService.insert(TeamMemberMapper.toTeamMember(teamMember));
+		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(inserted), HttpStatus.CREATED);
 	}
 	
 	@CrossOrigin
-	@PutMapping("teammember")
-	public ResponseEntity<Teammember> updateClient (@RequestBody Teammember teamMember) {
-		if (teamMember.getTeammembername() == null || teamMember.getTeammembername().trim().equals("")
-				|| teamMember.getTeammemberid() == null) {
+	@Override
+	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
+		if (teamMember.getName() == null || teamMember.getName().trim().equals("")
+				|| teamMember.getId() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		final var updated = teamMemberService.update(teamMember);
+		final var updated = teamMemberService.update(TeamMemberMapper.toTeamMember(teamMember));
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(updated, HttpStatus.OK);
+		return new ResponseEntity(updated, HttpStatus.OK);
 	}
 	
 	@CrossOrigin
-	@DeleteMapping("teammember/{teammemberid}")
-	public ResponseEntity<Teammember> deleteClient(@PathVariable Integer teammemberid) {
+	@Override
+	public ResponseEntity<TeamMemberDTO> deleteTeamMember(@PathVariable Integer teammemberid) {
 		final var deleted = teamMemberService.delete(teammemberid);
 		if (!deleted) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

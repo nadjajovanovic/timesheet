@@ -18,6 +18,7 @@ import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +58,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         saveTeamMember(teamMemberName);
 
         //act
-        final var response = mvc.perform(get("/teammembers")
+        final var response = mvc.perform(get("/teammember")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -79,11 +80,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var teamMember = ResponseReader.readResponse(response, Teammember.class);
+        final var teamMember = ResponseReader.readResponse(response, TeamMemberDTO.class);
 
         //Assert
-        assertEquals(teamMemberName, teamMember.getTeammembername());
-        assertEquals(inserted.getTeammemberid(), teamMember.getTeammemberid());
+        assertEquals(teamMemberName, teamMember.getName());
+        assertEquals(inserted.getTeammemberid(), teamMember.getId());
     }
 
     @Test
@@ -104,9 +105,10 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void testCreateTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "Please insert me";
-        final var teamMember = new Teammember();
-        teamMember.setTeammembername(teamMemberName);
-
+        final var teamMemberHours = 3;
+        final var teamMember = new TeamMemberDTO();
+        teamMember.setName(teamMemberName);
+        teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,11 +116,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final var responseTeamMember = ResponseReader.readResponse(response, Teammember.class);
+        final var responseTeamMember = ResponseReader.readResponse(response, TeamMemberDTO.class);
 
         //Assert
-        assertNotNull(responseTeamMember.getTeammemberid());
-        assertEquals(teamMemberName, responseTeamMember.getTeammembername());
+        assertNotNull(responseTeamMember.getId());
+        assertEquals(teamMemberName, responseTeamMember.getName());
     }
 
     @Test
@@ -178,12 +180,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var teamMemberName = "nameForInsert";
         final var inserted = saveTeamMember(teamMemberName);
         final var updatedName = "nameForUpdate";
-        inserted.setTeammembername(updatedName);
 
         //Act
         final var response = mvc.perform(put("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inserted))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(inserted,updatedName)))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -264,6 +265,14 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teammember.setTeammembername(teammemberName);
         teammember.setHoursperweek(2.3);
         return repository.saveAndFlush(teammember);
+    }
+
+    private TeamMemberDTO saveTeamMemberDTO(Teammember t,String teammemberName) {
+        final var teammember = new TeamMemberDTO();
+        teammember.setId(t.getTeammemberid());
+        teammember.setName(teammemberName);
+        teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
+        return teammember;
     }
 
     private void cleanDataBase() {

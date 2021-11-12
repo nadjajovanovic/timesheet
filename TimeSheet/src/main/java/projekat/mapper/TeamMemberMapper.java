@@ -16,4 +16,15 @@ public class TeamMemberMapper {
         teammemberDTO.setHoursPerWeek(BigDecimal.valueOf(teamMember.getHoursperweek()));
         return teammemberDTO;
     }
+
+    public static Teammember toTeamMember(TeamMemberDTO teamMemberDTO) {
+        final var teammember = new Teammember();
+        teammember.setTeammemberid(teamMemberDTO.getId());
+        teammember.setTeammembername(teamMemberDTO.getName());
+        teammember.setUsername(teamMemberDTO.getUsername());
+        teammember.setEmail(teamMemberDTO.getUsername());
+        teammember.setStatus(teamMemberDTO.getStatus());
+        teammember.setHoursperweek(teamMemberDTO.getHoursPerWeek().doubleValue());
+        return teammember;
+    }
 }
