@@ -28,10 +28,5 @@ public class Country implements Serializable {
 	private Integer countryid;
 	
 	private String countryname;
-
-	//bi-directional many-to-one association to Client
-	@JsonIgnore
-	@OneToMany(mappedBy="country")
-	private List<Client> clients;
 	
 }

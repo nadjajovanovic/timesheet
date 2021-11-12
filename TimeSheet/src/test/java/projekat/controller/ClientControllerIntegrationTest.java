@@ -53,14 +53,10 @@ class ClientControllerIntegrationTest extends BaseUT{
     void getAllClients() throws Exception {
         //Arrange
         final var firstClientName = "First";
-        final var allClients = saveTestClient(firstClientName);
-
-        final var client = new ClientDTO();
+        saveTestClient(firstClientName);
 
         //Act
         final var response = mvc.perform(get("/client")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -68,13 +64,13 @@ class ClientControllerIntegrationTest extends BaseUT{
 
         //Assert
         assertEquals(1, clients.size());
-        assertEquals(allClients.getClientname(), clients.get(0).getName());
+        assertEquals(firstClientName, clients.get(0).getName());
     }
 
     @Test
     void getOneClient() throws Exception {
         //Arrange
-        final var clientName = "First";
+        final var clientName = "Nadja";
         final var inserted = saveTestClient(clientName);
 
         //Act
@@ -82,11 +78,11 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var client = ResponseReader.readResponse(response, Client.class);
+        final var client = ResponseReader.readResponse(response, ClientDTO.class);
 
         //Assert
-        assertEquals(clientName, client.getClientname());
-        assertEquals(inserted.getClientid(), client.getClientid());
+        assertEquals(clientName, client.getName());
+        assertEquals(inserted.getClientid(), client.getId());
     }
 
     @Test
@@ -105,9 +101,9 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateClient() throws Exception {
         //Arrange
-        final var clientName = "Please insert me";
-        final var client = new Client();
-        client.setClientname(clientName);
+        final var clientName = "Nadja";
+        final var client = new ClientDTO();
+        client.setName(clientName);
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -116,18 +112,18 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final var responseClient = ResponseReader.readResponse(response, Client.class);
+        final var responseClient = ResponseReader.readResponse(response, ClientDTO.class);
 
         //Assert
-        assertNotNull(responseClient.getClientid());
-        assertEquals(clientName, responseClient.getClientname());
+        assertNotNull(responseClient.getId());
+        assertEquals(clientName, responseClient.getName());
     }
 
     @Test
     void testCreateClientBadRequest() throws Exception {
         //Arange
-        final var client = new Client();
-        client.setClientname("");
+        final var client = new ClientDTO();
+        client.setName("");
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -143,7 +139,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateClientNameNotExist() throws Exception {
         //Arange
-        final var client = new Client();
+        final var client = new ClientDTO();
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -159,10 +155,10 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateClientIdExists() throws Exception {
         //Arange
-        final var clientName = "Please insert me";
-        final var client = new Client();
-        client.setClientname(clientName);
-        client.setClientid(5);
+        final var clientName = "Nadja";
+        final var client = new ClientDTO();
+        client.setName(clientName);
+        client.setId(5);
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -178,15 +174,14 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateClient() throws Exception {
         //Arange
-        final var clientName = "nameForInsert";
+        final var clientName = "Jovana Jovanovic";
         final var inserted = saveTestClient(clientName);
-        final var updateName = "nameForUpdate";
-        inserted.setClientname(updateName);
+        final var updateName = "Jovana Jovanovic Petrovic";
 
         //Act
         final var response = mvc.perform(put("/client")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inserted))
+                        .content(objectMapper.writeValueAsString(saveTestClientDTO(inserted, updateName)))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -219,7 +214,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     void testUpdateClientNoId() throws Exception {
         //Arange
         final var client = new Client();
-        client.setClientname("Not important");
+        client.setClientname("Nadja");
 
         //Act
         final var response = mvc.perform(put("/client")
@@ -235,7 +230,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Test
     void deleteClient() throws Exception {
         //Arange
-        final var clientName = "Delete Me";
+        final var clientName = "Nadja";
         final var inserted = saveTestClient(clientName);
 
         //Act
@@ -315,6 +310,13 @@ class ClientControllerIntegrationTest extends BaseUT{
     private Client saveTestClient(String clientName) {
         final var client = createTestClient(clientName);
         return repository.saveAndFlush(client);
+    }
+
+    private ClientDTO saveTestClientDTO(Client c, String clientName) {
+        final var client = new ClientDTO();
+        client.setId(c.getClientid());
+        client.setName(clientName);
+        return client;
     }
 
     private void cleanDataBase() {
