@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,10 +62,6 @@ public class ProjectController implements ProjectApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO projectDTO) {
-		if (projectDTO.getName() == null || projectDTO.getName().trim().equals("")
-				|| projectDTO.getId() == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 		final var project = ProjectMapper.fromProjectDTO(projectDTO);
 		final var updatedProject = projectService.update(project);
 		if(updatedProject == null) {
