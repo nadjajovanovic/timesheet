@@ -12,7 +12,6 @@ import projekat.api.api.TeammemberApi;
 import projekat.api.model.TeamMemberDTO;
 import projekat.mapper.TeamMemberMapper;
 import projekat.services.TeamMemberService;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
