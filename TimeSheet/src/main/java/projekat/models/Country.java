@@ -28,6 +28,5 @@ public class Country implements Serializable {
 	private Integer countryid;
 	
 	private String countryname;
-
 	
 }
