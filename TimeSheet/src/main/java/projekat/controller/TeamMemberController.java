@@ -1,11 +1,6 @@
 package projekat.controller;
 
 
-import java.util.Collection;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +18,10 @@ import java.util.stream.Collectors;
 
 @RestController
 public class TeamMemberController implements TeammemberApi {
-	
+
 	@Autowired
 	private TeamMemberService teamMemberService;
-	
+
 	public TeamMemberController(TeamMemberService teamMemberService) {
 		this.teamMemberService = teamMemberService;
 	}
@@ -43,19 +38,16 @@ public class TeamMemberController implements TeammemberApi {
 	@Override
 	public ResponseEntity<TeamMemberDTO> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
-		if (oneTeammember.isEmpty()) {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> insertTeamMember(@RequestBody TeamMemberDTO teamMember) {
 		final var inserted = teamMemberService.insert(TeamMemberMapper.toTeamMember(teamMember));
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(inserted), HttpStatus.CREATED);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
@@ -65,7 +57,7 @@ public class TeamMemberController implements TeammemberApi {
 		}
 		return new ResponseEntity(updated, HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> deleteTeamMember(@PathVariable Integer teammemberid) {

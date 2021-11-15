@@ -1,20 +1,20 @@
 package projekat.mapper;
 
+import org.springframework.expression.ParseException;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
 import projekat.models.TimeSheetEntry;
 import projekat.util.DateFormatter;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 
 public class TimeSheetEntryMapper {
 
 
-    public static TimeSheetEntryReportDTO toEntryForReportDTO(TimeSheetEntry entry){
+    public static TimeSheetEntryReportDTO toEntryForReportDTO(TimeSheetEntry entry) {
         final var dto = new TimeSheetEntryReportDTO();
-        final var totalTime = (entry.getOvertime() == null || entry.getOvertime() < 0 || entry.getOvertime() > 24)?
-                BigDecimal.valueOf(entry.getTime()):
+        final var totalTime = (entry.getOvertime() == null || entry.getOvertime() < 0 || entry.getOvertime() > 24) ?
+                BigDecimal.valueOf(entry.getTime()) :
                 BigDecimal.valueOf(entry.getTime()).add(BigDecimal.valueOf(entry.getOvertime()));
         dto.setId(entry.getEntryId());
         dto.setDescription(entry.getDescription());
@@ -27,7 +27,7 @@ public class TimeSheetEntryMapper {
         return dto;
     }
 
-    public static TimeSheetEntryDTO toEntryDTO(TimeSheetEntry entry){
+    public static TimeSheetEntryDTO toEntryDTO(TimeSheetEntry entry) {
         final var dto = new TimeSheetEntryDTO();
         dto.setId(entry.getEntryId());
         dto.setDescription(entry.getDescription());
@@ -40,7 +40,7 @@ public class TimeSheetEntryMapper {
         return dto;
     }
 
-    public static TimeSheetEntry fromEntryDTO(TimeSheetEntryDTO dto) throws ParseException {
+    public static TimeSheetEntry fromEntryDTO(TimeSheetEntryDTO dto) throws ParseException, java.text.ParseException {
         final var entry = new TimeSheetEntry();
         entry.setEntryId(dto.getId());
         entry.setDescription(dto.getDescription());
@@ -52,5 +52,5 @@ public class TimeSheetEntryMapper {
         entry.setClientid(dto.getClientId());
         return entry;
     }
-
 }
+
