@@ -328,6 +328,10 @@ components:
         hoursPerWeek:
           description: The hours per week of TeamMember
           type: number
+      required:
+        - name
+        - username
+        - email
 
     TimeSheetEntryDTO:
       description: This is an object that represents one user entry

@@ -52,11 +52,6 @@ public class TeamMemberController implements TeammemberApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> insertTeamMember(@RequestBody TeamMemberDTO teamMember) {
-		if (teamMember.getName() == null || teamMember.getName().trim().equals("")
-				|| teamMember.getId() != null) {
-			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-
 		final var inserted = teamMemberService.insert(TeamMemberMapper.toTeamMember(teamMember));
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(inserted), HttpStatus.CREATED);
 	}
@@ -64,10 +59,6 @@ public class TeamMemberController implements TeammemberApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
-		if (teamMember.getName() == null || teamMember.getName().trim().equals("")
-				|| teamMember.getId() == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 		final var updated = teamMemberService.update(TeamMemberMapper.toTeamMember(teamMember));
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
