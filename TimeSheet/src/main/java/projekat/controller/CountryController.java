@@ -46,10 +46,6 @@ public class CountryController implements CountryApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<CountryDTO> insertCountry (@RequestBody CountryDTO country) {
-		if (country.getName() == null || country.getName().trim().equals("")
-				|| country.getCountryid() != null){
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 		final var inserted = countryService.create(CountryMapper.toCountry(country));
 		return new ResponseEntity(CountryMapper.toCountryDTO(inserted), HttpStatus.CREATED);
 	}
@@ -57,10 +53,6 @@ public class CountryController implements CountryApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<CountryDTO> updateCountry(@RequestBody CountryDTO country) {
-		if (country.getName() == null || country.getName().trim().equals("")
-				|| country.getCountryid() == null){
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 		final var updated = countryService.update(CountryMapper.toCountry(country));
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
