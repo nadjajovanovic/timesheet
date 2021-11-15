@@ -316,12 +316,15 @@ components:
         name:
           description: The name of TeamMember
           type: string
+          pattern: ^(?!\s*$).+
         username:
           description: The username of TeamMember
           type: string
+          pattern: ^(?!\s*$).+
         email:
           description: The email of TeamMember
           type: string
+          pattern: ^[A-Za-z0-9+_.-]+@(.+)$
         status:
           description: The status of TeamMember
           type: boolean

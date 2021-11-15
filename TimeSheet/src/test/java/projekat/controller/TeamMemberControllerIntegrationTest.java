@@ -109,7 +109,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var teamMember = new TeamMemberDTO();
         teamMember.setName(teamMemberName);
         teamMember.setUsername("username");
-        teamMember.setEmail("email");
+        teamMember.setEmail("email@gmail.com");
         teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
         //Act
         final var response = mvc.perform(post("/teammember")
@@ -274,7 +274,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teammember.setId(t.getTeammemberid());
         teammember.setName(teammemberName);
         teammember.setUsername("username");
-        teammember.setEmail("email");
+        teammember.setEmail("email@g");
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         return teammember;
     }
