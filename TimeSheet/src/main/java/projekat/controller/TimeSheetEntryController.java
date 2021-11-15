@@ -10,7 +10,6 @@ import projekat.models.TimeSheetEntry;
 import projekat.services.TimeSheetEntryService;
 import projekat.mapper.TimeSheetEntryMapper;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 
@@ -47,12 +46,6 @@ public class TimeSheetEntryController implements EntryApi{
     @CrossOrigin
     @Override
     public ResponseEntity<TimeSheetEntryDTO> insertEntry(@RequestBody TimeSheetEntryDTO entry){
-        if (entry.getId() != null || entry.getCategoryId() == null || entry.getDate() == null
-                || entry.getProjectId() == null || entry.getClientId() == null
-                || entry.getTimeSpent() == null || entry.getTimeSpent().compareTo(BigDecimal.ZERO) < 0 || entry.getTimeSpent().compareTo(BigDecimal.valueOf(24)) > 0){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
         TimeSheetEntry insertedEntry = null;
         try {
             insertedEntry = timeSheetEntryService.create(entry);
@@ -71,12 +64,6 @@ public class TimeSheetEntryController implements EntryApi{
     @CrossOrigin
     @Override
     public ResponseEntity<TimeSheetEntryDTO> updateEntry(@RequestBody TimeSheetEntryDTO entryDTO) {
-        if (entryDTO.getId() == null || entryDTO.getCategoryId() == null || entryDTO.getDate() == null
-                || entryDTO.getProjectId() == null || entryDTO.getClientId() == null
-                || entryDTO.getTimeSpent() == null || entryDTO.getTimeSpent().compareTo(BigDecimal.ZERO) < 0 || entryDTO.getTimeSpent().compareTo(BigDecimal.valueOf(24)) > 0){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
         TimeSheetEntry entry = null;
         try {
             entry = TimeSheetEntryMapper.fromEntryDTO(entryDTO);
