@@ -7,6 +7,7 @@ info:
 tags:
   - name: "TimeSheet"
   - name: "TeamMember"
+  - name: "Client"
   - name: "Report"
   - name: "Country"
 
@@ -27,53 +28,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TeamMemberDTO'
-        "400":
-          description: BAD REQUEST
-        "401":
-          description: UNAUTH
-
-  /report:
-    post:
-      summary: This method generates requested reports
-      description: This method return list of reports that fits given paramenthers
-      tags:
-        - "Report"
-      operationId: getRequiredReports
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReportFilterDTO'
-      responses:
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TimeSheetEntryReportDTO'
-        "400":
-          description: BAD REQUEST
-        "401":
-          description: UNAUTH
-
-  /entry:
-    get:
-      summary: This gets all time sheet entries
-      description: This method return list of TimeSheetEntries
-      tags:
-        - "TimeSheetEntry"
-      operationId: getAllEntries
-      responses:
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TimeSheetEntryDTO'
         "400":
           description: BAD REQUEST
         "401":
@@ -278,10 +232,113 @@ paths:
           description: BAD REQUEST
         "404":
           description: NOT FOUND
+  /client:
+    get:
+      summary: This gets all teammembers
+      description: This method return list of TeamMembers
+      tags:
+        - "Client"
+      operationId: getClients
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientDTO'
+        "400":
+          description: BAD REQUEST
+    post:
+      summary: This method creates Client
+      tags:
+        - "Client"
+      operationId: insertClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientDTO'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDTO'
+        "400":
+          description: BAD REQUEST
+    put:
+      summary: This method update exist Client
+      tags:
+        - "Client"
+      operationId: updateClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientDTO'
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+  /client/{clientid}:
+    get:
+      parameters:
+        - in: path
+          name: clientid
+          required: true
+          schema:
+            type: integer
+      summary: Returns Client if exist
+      tags:
+        - "Client"
+      operationId: getClient
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+    delete:
+      parameters:
+        - in: path
+          name: clientid
+          required: true
+          schema:
+            type: integer
+      summary: Delete client if exist
+      tags:
+        - "Client"
+      operationId: deleteClient
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+
 
 components:
   schemas:
-
     TeamMemberDTO:
       description: This is the TeamMember object.
       type: object
@@ -311,48 +368,6 @@ components:
         - name
         - username
         - email
-
-
-
-    TimeSheetEntryDTO:
-      description: This is an object that represents one user entry
-      type: object
-      properties:
-        id:
-          description: The id of the entry
-          type: integer
-        date:
-          description: The date of user entry
-          type: string
-          pattern: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$
-        description:
-          description: The description of user entry
-          type: string
-        timeSpent:
-          description: Time user spent
-          type: number
-          minimum: 0
-          maximum: 24
-        overtimeSpent:
-          description: Additional time user spent
-          type: number
-          minimum: 0
-          maximum: 24
-        projectId:
-          description: Id of the project on which user was working
-          type: integer
-        categoryId:
-          description: Id of the category where time is spent
-          type: integer
-        clientId:
-          description: Name of the client user worked for
-          type: integer
-      required:
-        - timeSpent
-        - date
-        - projectId
-        - categoryId
-        - clientId
 
     ReportFilterDTO:
       description: This object represents parameters for entry filter
@@ -387,3 +402,30 @@ components:
         name:
           description: name of country
           type: string
+        
+    ClientDTO:
+      description: This is the Client object.
+      type: object
+      properties:
+        id:
+          description: Id of client
+          type: integer
+        name:
+          description: Name of client
+          type: string
+          pattern: ^(?!\s*$).+
+        address:
+          description: Address of client
+          type: string
+        city:
+          description: City where client lives
+          type: string
+        zipCode:
+          description: Zip code of city where client lives
+          type: string
+        countryid:
+          description: Country id
+          type: integer
+      required:
+        - name
+
