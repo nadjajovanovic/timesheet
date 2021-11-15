@@ -62,7 +62,7 @@ class CountryControllerIntegrationTest extends BaseUT{
 
         //Act
         final var response = mvc.perform(get("/country")
-                .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         final var countries = Arrays.asList(ResponseReader.readResponse(response, CountryDTO[].class));
@@ -215,7 +215,7 @@ class CountryControllerIntegrationTest extends BaseUT{
 
     @Test
     void testUpdateCountryNoId() throws Exception {
-       //Arange
+        //Arange
         final var country = new Country();
         country.setCountryname("United States of America");
 
