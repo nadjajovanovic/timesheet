@@ -28,7 +28,7 @@ public class ClientController implements ClientApi {
 
 	@Autowired
 	private ClientService clientService;
-	
+
 	public ClientController(ClientService clientService) {
 		this.clientService = clientService;
 	}
@@ -51,14 +51,14 @@ public class ClientController implements ClientApi {
 		}
 		return  new ResponseEntity(ClientMapper.toClientDTO(oneClient.get()), HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ClientDTO> insertClient(@RequestBody ClientDTO client) {
 		final var inserted = clientService.insert(ClientMapper.toClient(client));
 		return new ResponseEntity(ClientMapper.toClientDTO(inserted), HttpStatus.CREATED);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ClientDTO> updateClient (@RequestBody ClientDTO client) {
@@ -69,7 +69,7 @@ public class ClientController implements ClientApi {
 		return new ResponseEntity(updated, HttpStatus.OK);
 
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ClientDTO> deleteClient(@PathVariable Integer clientid) {
