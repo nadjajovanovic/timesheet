@@ -35,9 +35,4 @@ public class ReportController implements ReportApi {
 				.toList();
 		return new ResponseEntity<>(filtered, HttpStatus.OK);
 	}
-	
-
-	
-
-
 }
