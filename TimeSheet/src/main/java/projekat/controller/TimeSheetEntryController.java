@@ -4,13 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import projekat.api.api.EntryApi;
+import projekat.api.model.TimeSheetEntryDTO;
 import projekat.models.TimeSheetEntry;
 import projekat.services.TimeSheetEntryService;
+import projekat.mapper.TimeSheetEntryMapper;
 
-import java.util.Collection;
+import java.text.ParseException;
+import java.util.List;
 
 @RestController
-public class TimeSheetEntryController {
+public class TimeSheetEntryController implements EntryApi{
 
     @Autowired
     private final TimeSheetEntryService timeSheetEntryService;
@@ -19,56 +23,65 @@ public class TimeSheetEntryController {
         this.timeSheetEntryService = timeSheetEntryService;
     }
 
-    @GetMapping("/entry")
-    public ResponseEntity<Collection<TimeSheetEntry>> getAllEntries(){
+    @Override
+    public ResponseEntity<List<TimeSheetEntryDTO>> getAllEntries(){
         final var entries = timeSheetEntryService.getAll();
-        return new ResponseEntity<>(entries, HttpStatus.OK);
+        final var dtoEntries =
+                entries.stream()
+                        .map(TimeSheetEntryMapper::toEntryDTO)
+                        .toList();
+        return new ResponseEntity<>(dtoEntries, HttpStatus.OK);
     }
 
-    @GetMapping("/entry/{id}")
-    public ResponseEntity<TimeSheetEntry> getOne(@PathVariable("id") Integer id){
+    @Override
+    public ResponseEntity<TimeSheetEntryDTO> getEntry(@PathVariable("id") Integer id){
         final var optionalEntry = timeSheetEntryService.getOne(id);
         if (optionalEntry.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(optionalEntry.get(), HttpStatus.OK);
+        final var entryDTO = TimeSheetEntryMapper.toEntryDTO(optionalEntry.get());
+        return new ResponseEntity<>(entryDTO, HttpStatus.OK);
     }
 
     @CrossOrigin
-    @PostMapping("/entry")
-    public ResponseEntity<TimeSheetEntry> insertEntry(@RequestBody TimeSheetEntry entry){
-
-        if (entry.getEntryId() != null || entry.getCategoryid() == null || entry.getEntryDate() == null
-                || entry.getProjectid() == null || entry.getClientid() == null
-                || entry.getTime() == null || entry.getTime() < 0 || entry.getTime() > 24){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @Override
+    public ResponseEntity<TimeSheetEntryDTO> insertEntry(@RequestBody TimeSheetEntryDTO entry){
+        TimeSheetEntry insertedEntry = null;
+        try {
+            insertedEntry = timeSheetEntryService.create(entry);
+        } catch (ParseException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        final var insertedEntry = timeSheetEntryService.create(entry);
         if (insertedEntry == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(insertedEntry, HttpStatus.CREATED);
+
+        final var entryDTO = TimeSheetEntryMapper.toEntryDTO(insertedEntry);
+        return new ResponseEntity<>(entryDTO, HttpStatus.CREATED);
     }
 
     @CrossOrigin
-    @PutMapping("/entry")
-    public ResponseEntity<TimeSheetEntry> updateEntry(@RequestBody TimeSheetEntry entry) {
-        if (entry.getEntryId() == null || entry.getCategoryid() == null || entry.getEntryDate() == null
-                || entry.getProjectid() == null || entry.getClientid() == null
-                || entry.getTime() == null || entry.getTime() < 0 || entry.getTime() > 24){
+    @Override
+    public ResponseEntity<TimeSheetEntryDTO> updateEntry(@RequestBody TimeSheetEntryDTO entryDTO) {
+        TimeSheetEntry entry = null;
+        try {
+            entry = TimeSheetEntryMapper.fromEntryDTO(entryDTO);
+        } catch (ParseException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         final var updatedEntry = timeSheetEntryService.update(entry);
         if (updatedEntry == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(updatedEntry, HttpStatus.OK);
+        final var updatedDTO = TimeSheetEntryMapper.toEntryDTO(updatedEntry);
+        return new ResponseEntity<>(updatedDTO, HttpStatus.OK);
     }
 
     @CrossOrigin
-    @DeleteMapping("/entry/{id}")
-    public ResponseEntity<TimeSheetEntry> deleteEntry(@PathVariable("id") Integer id){
+    @Override
+    public ResponseEntity deleteEntry(@PathVariable("id") Integer id){
         final var deleted = timeSheetEntryService.delete(id);
         if (!deleted){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
