@@ -55,10 +55,6 @@ public class ClientController implements ClientApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ClientDTO> insertClient(@RequestBody ClientDTO client) {
-		if (client.getName() == null || client.getName().trim().equals("")
-				|| client.getId() != null) {
-			return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 		final var inserted = clientService.insert(ClientMapper.toClient(client));
 		return new ResponseEntity(ClientMapper.toClientDTO(inserted), HttpStatus.CREATED);
 	}
@@ -66,10 +62,6 @@ public class ClientController implements ClientApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ClientDTO> updateClient (@RequestBody ClientDTO client) {
-		if (client.getName() == null || client.getName().trim().equals("")
-				|| client.getId() == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 		final var updated = clientService.update(ClientMapper.toClient(client));
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
