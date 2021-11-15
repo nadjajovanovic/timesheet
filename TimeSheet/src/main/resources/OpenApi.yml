@@ -513,7 +513,7 @@ components:
       required:
         - name
         - status
-        - 
+        -
     ClientDTO:
       description: This is the Client object.
       type: object
