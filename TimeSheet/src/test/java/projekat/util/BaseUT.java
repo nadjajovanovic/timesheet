@@ -1,5 +1,6 @@
 package projekat.util;
 
+import projekat.enums.ProjectStatus;
 import projekat.models.*;
 
 import java.util.Date;
@@ -29,6 +30,7 @@ public class BaseUT {
         final var project = new Project();
         project.setProjectname(projectName);
         project.setProjectdescription(projectDescription);
+        project.setStatus(ProjectStatus.Active);
         return project;
     }
 
