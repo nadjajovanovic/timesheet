@@ -445,31 +445,7 @@ components:
           description: The hours per week of TeamMember
           type: number
 
-    TimeSheetEntryReportDTO:
-      description: This is an object that represents one user entry
-      type: object
-      properties:
-        id:
-          description: The id of the entry
-          type: integer
-        date:
-          description: The date of user entry
-          type: string
-        description:
-          description: The description of user entry
-          type: string
-        totalTimeSpent:
-          description: Total time user entered, including overtime
-          type: number
-        projectName:
-          description: Name of the project on which time is spent
-          type: string
-        categoryName:
-          description: Name of the category where time is spent
-          type: string
-        teamMemberName:
-          description: Name of team member that made the entry
-          type: string
+
 
     TimeSheetEntryDTO:
       description: This is an object that represents one user entry
