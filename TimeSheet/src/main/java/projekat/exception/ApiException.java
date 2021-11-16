@@ -21,4 +21,8 @@ public class ApiException {
         this.httpStatus = httpStatus;
         this.timestamp = timestamp;
     }
+
+    public ApiException(HttpStatus httpStatus) {
+        this.httpStatus = httpStatus;
+    }
 }

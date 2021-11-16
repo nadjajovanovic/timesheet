@@ -40,12 +40,10 @@ public class TeamMemberController implements TeammemberApi {
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
 	}
 
-	@CrossOrigin
+	//@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> insertTeamMember(@RequestBody TeamMemberDTO teamMember) {
 		final var inserted = teamMemberService.insert(TeamMemberMapper.toTeamMember(teamMember));
-		if(inserted.getTeammembername() == null || inserted.getTeammembername().trim().equals(""))
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(inserted), HttpStatus.CREATED);
 	}
 
@@ -53,19 +51,13 @@ public class TeamMemberController implements TeammemberApi {
 	@Override
 	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
 		final var updated = teamMemberService.update(TeamMemberMapper.toTeamMember(teamMember));
-		if (updated == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(updated, HttpStatus.OK);
 	}
 
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> deleteTeamMember(@PathVariable Integer teammemberid) {
-		final var deleted = teamMemberService.delete(teammemberid);
-		if (!deleted) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		teamMemberService.delete(teammemberid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

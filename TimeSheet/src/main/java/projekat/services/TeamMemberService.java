@@ -2,6 +2,7 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.exception.ObjectNotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
@@ -35,14 +36,14 @@ public class TeamMemberService {
 
     public Teammember update(Teammember teammember) {
         if (!teamMemberRepository.existsById(teammember.getTeammemberid()))
-            return null;
+            throw new ObjectNotFoundException(String.format("No exist object with %d id in DB",teammember.getTeammemberid()));
         final var updated = teamMemberRepository.save(teammember);
         return updated;
     }
 
     public boolean delete(Integer id) {
         if (!teamMemberRepository.existsById(id))
-            return false;
+            throw new ObjectNotFoundException(String.format("No exist object with %d id in DB",id));
         teamMemberRepository.deleteById(id);
         return true;
     }

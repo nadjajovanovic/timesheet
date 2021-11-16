@@ -146,11 +146,13 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void testCreateTeamMemberNameNotExist() throws Exception {
         //Arange
         final var teamMember = new Teammember();
-
+        teamMember.setTeammembername("Jhon");
+        teamMember.setUsername("jhon");
+        teamMember.setEmail("jhon@gmail.com");
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,null)))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -271,7 +273,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teammember.setId(t.getTeammemberid());
         teammember.setName(teammemberName);
         teammember.setUsername("username");
-        teammember.setEmail("email@g");
+        teammember.setEmail("email@gmail.com");
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         return teammember;
     }
