@@ -37,9 +37,6 @@ public class TeamMemberController implements TeammemberApi {
 	@Override
 	public ResponseEntity<TeamMemberDTO> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
-		if (oneTeammember.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
 	}
 
