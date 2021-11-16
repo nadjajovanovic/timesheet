@@ -7,12 +7,13 @@ info:
 tags:
   - name: "TimeSheet"
   - name: "TeamMember"
-  - name: "Client"
   - name: "Report"
+  - name: "Project"
+  - name: "Client"
   - name: "Country"
 
 paths:
-  /teammembers:
+  /teammember:
     get:
       summary: This gets all teammembers
       description: This method return list of TeamMembers
@@ -32,48 +33,47 @@ paths:
           description: BAD REQUEST
         "401":
           description: UNAUTH
+
+
     post:
-      summary: This method creates time sheet entry
+      summary: This method create Teammember
       tags:
-        - "TimeSheetEntry"
-      operationId: insertEntry
+        - "TeamMember"
+      operationId: insertTeamMember
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TimeSheetEntryDTO'
+              $ref: '#/components/schemas/TeamMemberDTO'
       responses:
         "201":
           description: CREATED
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSheetEntryDTO'
+                $ref: '#/components/schemas/TeamMemberDTO'
         "400":
           description: BAD REQUEST
         "403":
           description: FORBIDDEN
-        "404":
-          description: NOT FOUND
+
     put:
-      summary: This method changes given time sheet entry
+      summary: This method update exist Teammember
       tags:
-        - "TimeSheetEntry"
-      operationId: updateEntry
+        - "TeamMember"
+      operationId: updateTeamMember
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TimeSheetEntryDTO'
+              $ref: '#/components/schemas/TeamMemberDTO'
       responses:
         "200":
-          description: OK
+          description: SUCCESS
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSheetEntryDTO'
+                $ref: '#/components/schemas/TeamMemberDTO'
         "400":
           description: BAD REQUEST
         "403":
@@ -81,25 +81,26 @@ paths:
         "404":
           description: NOT FOUND
 
-  /entry/{id}:
+
+  /teammember/{teammemberid}:
     get:
       parameters:
         - in: path
-          name: id
+          name: teammemberid
           required: true
           schema:
             type: integer
-      summary: This method return one TimeSheetEntry by id if exist
+      summary: This method return one Teammember by id if exist
       tags:
-        - "TimeSheetEntry"
-      operationId: getEntry
+        - "TeamMember"
+      operationId: getTeamMember
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeSheetEntryDTO'
+                $ref: '#/components/schemas/TeamMemberDTO'
         "400":
           description: BAD REQUEST
         "401":
@@ -110,31 +111,39 @@ paths:
     delete:
       parameters:
         - in: path
-          name: id
+          name: teammemberid
           required: true
           schema:
             type: integer
-      summary: This method delete one Entry by id if exist
+      summary: This method delete one Teammember by id if exist
       tags:
-        - "TimeSheetEntry"
-      operationId: deleteEntry
+        - "TeamMember"
+      operationId: deleteTeamMember
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMemberDTO'
         "400":
           description: BAD REQUEST
         "401":
           description: UNAUTH
         "404":
           description: NOT FOUND
-
-  /country:
-    get:
-      summary: This gets all countries
-      description: This method return list of countries
+  /report:
+    post:
+      summary: This method generates requested reports
+      description: This method return list of reports that fits given paramenthers
       tags:
-        - "Country"
-      operationId: getCountries
+        - "Report"
+      operationId: getRequiredReports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportFilterDTO'
       responses:
         "200":
           description: Success
@@ -143,93 +152,156 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CountryDTO'
+                  $ref: '#/components/schemas/TimeSheetEntryDTO'
         "400":
           description: BAD REQUEST
-    post:
-      summary: This method creates Country
+        "401":
+          description: UNAUTH
+
+  /project:
+    get:
+      summary: This gets all projects
+      description: This method return list of Projects
       tags:
-        - "Country"
-      operationId: insertCountry
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CountryDTO'
+        - "Project"
+      operationId: getAllProjects
       responses:
-        "201":
-          description: Created
+        "200":
+          description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CountryDTO'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDTO'
         "400":
           description: BAD REQUEST
-    put:
-      summary: This method update exist Country
+        "401":
+          description: UNAUTH
+
+
+    post:
+      summary: This method create Project
       tags:
-        - "Country"
-      operationId: updateCountry
+        - "Project"
+      operationId: insertProject
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CountryDTO'
+              $ref: '#/components/schemas/ProjectDTO'
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDTO'
+        "400":
+          description: BAD REQUEST
+        "403":
+          description: FORBIDDEN
+
+    put:
+      summary: This method update exist Project
+      tags:
+        - "Project"
+      operationId: updateProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectDTO'
       responses:
         "200":
           description: SUCCESS
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CountryDTO'
+                $ref: '#/components/schemas/ProjectDTO'
         "400":
           description: BAD REQUEST
+        "403":
+          description: FORBIDDEN
         "404":
           description: NOT FOUND
 
-  /country/{countryid}:
+  /project/filter:
+    get:
+      summary: This method filters projects by name
+      description: This method return list of Projects
+      tags:
+        - "Project"
+      operationId: filterProjectsByName
+      parameters:
+        - in: query
+          name: keyword
+          schema:
+            type: string
+          description: Beginning of the name for filter
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDTO'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+
+
+  /project/{projectid}:
     get:
       parameters:
         - in: path
-          name: countryid
+          name: projectid
           required: true
           schema:
             type: integer
-      summary: Returns Country if exist
+      summary: This method return one Project by id if exist
       tags:
-        - "Country"
-      operationId: getCountry
+        - "Project"
+      operationId: getProject
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CountryDTO'
+                $ref: '#/components/schemas/ProjectDTO'
         "400":
           description: BAD REQUEST
+        "401":
+          description: UNAUTH
         "404":
           description: NOT FOUND
+
     delete:
       parameters:
         - in: path
-          name: countryid
+          name: projectid
           required: true
           schema:
             type: integer
-      summary: Delete country if exist
+      summary: This method delete one Project by id if exist
       tags:
-        - "Country"
-      operationId: deleteCountry
+        - "Project"
+      operationId: deleteProject
       responses:
         "200":
           description: Success
           content:
             application/json:
               schema:
-                 $ref: '#/components/schemas/CountryDTO'
+                $ref: '#/components/schemas/ProjectDTO'
         "400":
           description: BAD REQUEST
+        "401":
+          description: UNAUTH
         "404":
           description: NOT FOUND
   /client:
@@ -335,10 +407,229 @@ paths:
           description: BAD REQUEST
         "404":
           description: NOT FOUND
+  /country:
+    get:
+      summary: This gets all countries
+      description: This method return list of countries
+      tags:
+        - "Country"
+      operationId: getCountries
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+    post:
+      summary: This method creates Country
+      tags:
+        - "Country"
+      operationId: insertCountry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryDTO'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+    put:
+      summary: This method update exist Country
+      tags:
+        - "Country"
+      operationId: updateCountry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryDTO'
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
 
+  /country/{countryid}:
+    get:
+      parameters:
+        - in: path
+          name: countryid
+          required: true
+          schema:
+            type: integer
+      summary: Returns Country if exist
+      tags:
+        - "Country"
+      operationId: getCountry
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+    delete:
+      parameters:
+        - in: path
+          name: countryid
+          required: true
+          schema:
+            type: integer
+      summary: Delete country if exist
+      tags:
+        - "Country"
+      operationId: deleteCountry
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+  /entry:
+    get:
+      summary: This gets all time sheet entries
+      description: This method return list of TimeSheetEntries
+      tags:
+        - "TimeSheetEntry"
+      operationId: getAllEntries
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeSheetEntryDTO'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+    post:
+      summary: This method creates time sheet entry
+      tags:
+        - "TimeSheetEntry"
+      operationId: insertEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSheetEntryDTO'
+      responses:
+        "201":
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSheetEntryDTO'
+        "400":
+          description: BAD REQUEST
+        "403":
+          description: FORBIDDEN
+        "404":
+          description: NOT FOUND
+    put:
+      summary: This method changes given time sheet entry
+      tags:
+        - "TimeSheetEntry"
+      operationId: updateEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSheetEntryDTO'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSheetEntryDTO'
+        "400":
+          description: BAD REQUEST
+        "403":
+          description: FORBIDDEN
+        "404":
+          description: NOT FOUND
+
+  /entry/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      summary: This method return one TimeSheetEntry by id if exist
+      tags:
+        - "TimeSheetEntry"
+      operationId: getEntry
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSheetEntryDTO'
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+        "404":
+          description: NOT FOUND
+
+    delete:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      summary: This method delete one Entry by id if exist
+      tags:
+        - "TimeSheetEntry"
+      operationId: deleteEntry
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+        "404":
+          description: NOT FOUND
 
 components:
   schemas:
+
     TeamMemberDTO:
       description: This is the TeamMember object.
       type: object
@@ -369,6 +660,46 @@ components:
         - username
         - email
 
+    TimeSheetEntryDTO:
+      description: This is an object that represents one user entry
+      type: object
+      properties:
+        id:
+          description: The id of the entry
+          type: integer
+        date:
+          description: The date of user entry
+          type: string
+          pattern: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$
+        description:
+          description: The description of user entry
+          type: string
+        timeSpent:
+          description: Time user spent
+          type: number
+          minimum: 0
+          maximum: 24
+        overtimeSpent:
+          description: Additional time user spent
+          type: number
+          minimum: 0
+          maximum: 24
+        projectId:
+          description: Id of the project on which user was working
+          type: integer
+        categoryId:
+          description: Id of the category where time is spent
+          type: integer
+        clientId:
+          description: Name of the client user worked for
+          type: integer
+      required:
+        - timeSpent
+        - date
+        - projectId
+        - categoryId
+        - clientId
+
     ReportFilterDTO:
       description: This object represents parameters for entry filter
       type: object
@@ -392,17 +723,58 @@ components:
           description: The client for whom the time was spent
           type: integer
 
-    CountryDTO:
-      description: This object represents parameters for country
+    TimeSheetEntryReportDTO:
+      description: This is an object that represents one user entry
       type: object
       properties:
-        countryid:
-          description: id of country
+        id:
+          description: The id of the entry
+          type: integer
+        date:
+          description: The date of user entry
+          type: string
+        description:
+          description: The description of user entry
+          type: string
+        totalTimeSpent:
+          description: Total time user entered, including overtime
+          type: number
+        projectName:
+          description: Name of the project on which time is spent
+          type: string
+        categoryName:
+          description: Name of the category where time is spent
+          type: string
+        teamMemberName:
+          description: Name of team member that made the entry
+          type: string
+
+    ProjectDTO:
+      description: This is an object that represents one user entry
+      type: object
+      properties:
+        id:
+          description: The id of the project
           type: integer
         name:
-          description: name of country
+          description: The name of the project
           type: string
-        
+          pattern: ^(?!\s*$).+
+        description:
+          description: The description of the project
+          type: string
+        clientId:
+          description: The id of the client
+          type: integer
+        teamMemberId:
+          description: The id of the the team member
+          type: integer
+        status:
+          description: The status of the project
+          type: string
+      required:
+        - name
+        - status
     ClientDTO:
       description: This is the Client object.
       type: object
@@ -428,4 +800,16 @@ components:
           type: integer
       required:
         - name
-
+    CountryDTO:
+      description: This object represents parameters for country
+      type: object
+      properties:
+        countryid:
+          description: id of country
+          type: integer
+        name:
+          description: name of country
+          type: string
+          pattern: ^(?!\s*$).+
+      required:
+        - name

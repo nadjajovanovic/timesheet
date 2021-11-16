@@ -129,12 +129,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void testCreateTeamMemberBadRequest() throws Exception {
         //Arange
         final var teamMember = new Teammember();
-        teamMember.setTeammembername("");
+        teamMember.setHoursperweek(2.3);
 
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(teamMember))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -150,7 +150,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(teamMember))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,null)))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -160,15 +160,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateTeamMemberIdExists() throws Exception {
         //Arange
-        final var teamMemberName = "Please insert me";
         final var teamMember = new Teammember();
-        teamMember.setTeammembername(teamMemberName);
         teamMember.setTeammemberid(5);
-
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(teamMember))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 

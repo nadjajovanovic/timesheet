@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 @RestController
 public class TeamMemberController implements TeammemberApi {
-	
+
 	@Autowired
 	private TeamMemberService teamMemberService;
-	
+
 	public TeamMemberController(TeamMemberService teamMemberService) {
 		this.teamMemberService = teamMemberService;
 	}
@@ -39,18 +39,20 @@ public class TeamMemberController implements TeammemberApi {
 	public ResponseEntity<TeamMemberDTO> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
 		if (oneTeammember.isEmpty()) {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> insertTeamMember(@RequestBody TeamMemberDTO teamMember) {
 		final var inserted = teamMemberService.insert(TeamMemberMapper.toTeamMember(teamMember));
+		if(inserted.getTeammembername() == null || inserted.getTeammembername().trim().equals(""))
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(inserted), HttpStatus.CREATED);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
@@ -60,7 +62,7 @@ public class TeamMemberController implements TeammemberApi {
 		}
 		return new ResponseEntity(updated, HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> deleteTeamMember(@PathVariable Integer teammemberid) {

@@ -24,7 +24,7 @@ public class ProjectController implements ProjectApi {
 	public ProjectController(ProjectService projectService) {
 		this.projectService = projectService;
 	}
-	
+
 	@Override
 	public ResponseEntity<List<ProjectDTO>> getAllProjects() {
 		final var projects = projectService.getAll();
@@ -34,7 +34,7 @@ public class ProjectController implements ProjectApi {
 				.toList();
 		return new ResponseEntity<>(dtos, HttpStatus.OK);
 	}
-	
+
 	@Override
 	public ResponseEntity<ProjectDTO> getProject(@PathVariable Integer projectid) {
 		final var optionalProject = projectService.getOne(projectid);
@@ -44,7 +44,7 @@ public class ProjectController implements ProjectApi {
 		final var projectDTO = ProjectMapper.toProjectDTO(optionalProject.get());
 		return new ResponseEntity<>(projectDTO, HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ProjectDTO> insertProject(@RequestBody ProjectDTO projectDTO) {
@@ -53,7 +53,7 @@ public class ProjectController implements ProjectApi {
 		final var insertedProjectDTO = ProjectMapper.toProjectDTO(insertedProject);
 		return new ResponseEntity<>(insertedProjectDTO, HttpStatus.CREATED);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO projectDTO) {
@@ -65,7 +65,7 @@ public class ProjectController implements ProjectApi {
 		final var updatedDTO = ProjectMapper.toProjectDTO(updatedProject);
 		return new ResponseEntity<>(updatedDTO, HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ProjectDTO> deleteProject(@PathVariable Integer projectid) {
@@ -82,6 +82,6 @@ public class ProjectController implements ProjectApi {
 				.stream()
 				.map(ProjectMapper::toProjectDTO)
 				.toList();
-		return new ResponseEntity<>(dtos, HttpStatus.OK);
+		return new ResponseEntity(dtos, HttpStatus.OK);
 	}
 }
