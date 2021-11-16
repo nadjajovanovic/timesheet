@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import projekat.api.api.ReportApi;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryDTO;
-import projekat.api.model.TimeSheetEntryReportDTO;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.services.ReportService;
 
