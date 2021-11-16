@@ -12,7 +12,6 @@ import projekat.api.api.TeammemberApi;
 import projekat.api.model.TeamMemberDTO;
 import projekat.mapper.TeamMemberMapper;
 import projekat.services.TeamMemberService;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +37,6 @@ public class TeamMemberController implements TeammemberApi {
 	@Override
 	public ResponseEntity<TeamMemberDTO> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
-		if (oneTeammember.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
 	}
 
