@@ -11,6 +11,7 @@ tags:
   - name: "Project"
   - name: "Client"
   - name: "Country"
+  - name: "Category"
 
 paths:
   /teammember:
@@ -626,6 +627,110 @@ paths:
           description: UNAUTH
         "404":
           description: NOT FOUND
+  /category:
+    get:
+      summary: This gets all categories
+      description: This method return list of categories
+      tags:
+        - "Category"
+      operationId: getAllCategories
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryDTO'
+        "400":
+          description: BAD REQUEST
+    post:
+      summary: This method creates Category
+      tags:
+        - "Category"
+      operationId: insertCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDTO'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDTO'
+        "400":
+          description: BAD REQUEST
+    put:
+      summary: This method update exist Category
+      tags:
+        - "Category"
+      operationId: updateCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDTO'
+      responses:
+        "200":
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+
+  /category/{categoryid}:
+    get:
+      parameters:
+        - in: path
+          name: categoryid
+          required: true
+          schema:
+            type: integer
+      summary: Returns Category if exist
+      tags:
+        - "Category"
+      operationId: getCategory
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
+    delete:
+      parameters:
+        - in: path
+          name: categoryid
+          required: true
+          schema:
+            type: integer
+      summary: Delete category if exist
+      tags:
+        - "Category"
+      operationId: deleteCategory
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDTO'
+        "400":
+          description: BAD REQUEST
+        "404":
+          description: NOT FOUND
 
 components:
   schemas:
@@ -809,6 +914,20 @@ components:
           type: integer
         name:
           description: name of country
+          type: string
+          pattern: ^(?!\s*$).+
+      required:
+        - name
+
+    CategoryDTO:
+      description: This object represents parameters for category
+      type: object
+      properties:
+        id:
+          description: id of category
+          type: integer
+        name:
+          description: name of category
           type: string
           pattern: ^(?!\s*$).+
       required:

@@ -66,7 +66,7 @@ public class ClientController implements ClientApi {
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity(updated, HttpStatus.OK);
+		return new ResponseEntity(ClientMapper.toClientDTO(updated), HttpStatus.OK);
 
 	}
 

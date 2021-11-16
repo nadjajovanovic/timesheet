@@ -56,7 +56,7 @@ public class CountryController implements CountryApi {
 		if (updated == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity(updated, HttpStatus.OK);
+		return new ResponseEntity(CountryMapper.toCountryDTO(updated), HttpStatus.OK);
 	}
 
 	@CrossOrigin

@@ -186,10 +186,10 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var reponseClient = ResponseReader.readResponse(response, Client.class);
+        final var reponseClient = ResponseReader.readResponse(response, ClientDTO.class);
 
-        assertNotNull(reponseClient.getClientid());
-        assertEquals(updateName, reponseClient.getClientname());
+        assertNotNull(reponseClient.getId());
+        assertEquals(updateName, reponseClient.getName());
     }
 
     @Test
