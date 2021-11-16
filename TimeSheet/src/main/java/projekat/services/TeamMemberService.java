@@ -2,7 +2,6 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import projekat.exception.EmptyInputException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
@@ -31,8 +30,6 @@ public class TeamMemberService {
 
     public Teammember insert(Teammember teammember) {
         final var inserted = teamMemberRepository.save(teammember);
-        if(teammember.getTeammembername() == null || teammember.getTeammembername().trim().equals(""))
-            throw new EmptyInputException("The name is empty");
         return inserted;
     }
 

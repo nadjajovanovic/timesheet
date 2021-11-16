@@ -629,6 +629,7 @@ paths:
 
 components:
   schemas:
+
     TeamMemberDTO:
       description: This is the TeamMember object.
       type: object
