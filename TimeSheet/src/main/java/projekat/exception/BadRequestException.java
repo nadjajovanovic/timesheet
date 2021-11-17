@@ -9,10 +9,8 @@ import projekat.enums.ErrorCode;
 @Setter
 public class BadRequestException extends ApiException {
 
-    private HttpStatus httpStatus;
-
-    public BadRequestException(String message, ErrorCode e) {
-        super(message,e);
-        this.httpStatus = HttpStatus.BAD_REQUEST;
+    public BadRequestException(String message, HttpStatus s) {
+        super(message,s);
+        this.errorCode = ErrorCode.BAD_REQUEST;
     }
 }

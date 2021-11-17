@@ -9,10 +9,8 @@ import projekat.enums.ErrorCode;
 @Setter
 public class NotFoundException extends ApiException {
 
-    private HttpStatus httpStatus;
-
-    public NotFoundException(String message, ErrorCode errorCode) {
-        super(message, errorCode);
-        this.httpStatus = HttpStatus.NOT_FOUND;
+    public NotFoundException(String message,HttpStatus s) {
+        super(message,s);
+        this.errorCode = ErrorCode.NOT_FOUND;
     }
 }

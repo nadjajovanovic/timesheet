@@ -1,6 +1,7 @@
 package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
@@ -28,7 +29,7 @@ public class ProjectService {
 
     public Optional<Project> getOne(Integer id){
         if (!projectRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Project with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         }
         final var project = projectRepository.findById(id);
         return project;
@@ -36,7 +37,7 @@ public class ProjectService {
 
     public Project create(Project project){
         if (project.getProjectid() != null) {
-            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+            throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
         }
         final var insertedProject = projectRepository.save(project);
         return insertedProject;
@@ -44,10 +45,10 @@ public class ProjectService {
 
     public Project update(Project project){
         if (project.getProjectid() == null) {
-            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+            throw new InputFieldException("Id is not present in request", HttpStatus.BAD_REQUEST);
         }
         if(!projectRepository.existsById(project.getProjectid())) {
-            throw new NotFoundException(String.format("Project with id %d does not exist in database", project.getProjectid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", project.getProjectid()),HttpStatus.NOT_FOUND);
         }
         final var updatedProject = projectRepository.save(project);
         return updatedProject;
@@ -55,7 +56,7 @@ public class ProjectService {
 
     public boolean delete(Integer id) {
         if(!projectRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Project with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", id),HttpStatus.NOT_FOUND);
         }
         projectRepository.deleteById(id);
         return true;

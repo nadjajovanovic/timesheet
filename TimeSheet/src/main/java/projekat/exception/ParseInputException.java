@@ -11,8 +11,8 @@ public class ParseInputException extends ApiException {
 
     private HttpStatus httpStatus;
 
-    public ParseInputException(String message, ErrorCode e) {
-        super(message, e);
-        this.httpStatus = HttpStatus.BAD_REQUEST;
+    public ParseInputException(String message,HttpStatus s) {
+        super(message, s);
+        this.errorCode = ErrorCode.INVALID_DATE_FORMAT;
     }
 }

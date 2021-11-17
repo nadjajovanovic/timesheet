@@ -1,6 +1,7 @@
 package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
@@ -28,14 +29,14 @@ public class CategoryService {
 
     public Optional<Category> getOne(Integer id){
         if (!categoryRepository.existsById(id))
-            throw new NotFoundException(String.format("Category with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         final var category = categoryRepository.findById(id);
         return category;
     }
 
     public Category create(Category category) {
         if (category.getCategoryid() != null) {
-            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+            throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
         }
         final var insertedCategory = categoryRepository.save(category);
         return insertedCategory;
@@ -43,10 +44,10 @@ public class CategoryService {
 
     public Category update(Category category) {
         if (category.getCategoryid() == null) {
-            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+            throw new InputFieldException("Id is not present in request", HttpStatus.NOT_FOUND);
         }
         if(!categoryRepository.existsById(category.getCategoryid())){
-            throw new NotFoundException(String.format("Category with id %d does not exist in database", category.getCategoryid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", category.getCategoryid()), HttpStatus.NOT_FOUND);
         }
         final var updatedCategory = categoryRepository.save(category);
         return updatedCategory;
@@ -54,7 +55,7 @@ public class CategoryService {
 
     public boolean delete(Integer id){
         if (!categoryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Category with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", id),HttpStatus.NOT_FOUND);
         }
         categoryRepository.deleteById(id);
         return true;

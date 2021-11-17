@@ -1,6 +1,7 @@
 package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
@@ -28,7 +29,7 @@ public class CountryService {
 
     public Optional<Country> getOne(Integer id) {
         if (!countryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Country with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Country with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         }
         final var country = countryRepository.findById(id);
         return country;
@@ -36,7 +37,7 @@ public class CountryService {
 
     public Country create(Country country) {
         if (country.getCountryid() != null) {
-            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+            throw new InputFieldException("Id is present in request", HttpStatus.NOT_FOUND);
         }
         final var insertedCountry = countryRepository.save(country);
         return insertedCountry;
@@ -44,10 +45,10 @@ public class CountryService {
 
     public Country update(Country country){
         if (country.getCountryid() == null) {
-            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+            throw new InputFieldException("Id is not present in request", HttpStatus.NOT_FOUND);
         }
         if (!countryRepository.existsById(country.getCountryid())){
-            throw new NotFoundException(String.format("Country with id %d does not exist in database", country.getCountryid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Country with id %d does not exist in database", country.getCountryid()), HttpStatus.NOT_FOUND);
         }
         final var updatedCountry = countryRepository.save(country);
         return updatedCountry;
@@ -55,7 +56,7 @@ public class CountryService {
 
     public boolean delete(Integer id) {
         if (!countryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Country with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Country with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         }
         countryRepository.deleteById(id);
         return true;

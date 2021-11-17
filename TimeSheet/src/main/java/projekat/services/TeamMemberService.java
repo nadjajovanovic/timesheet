@@ -1,6 +1,7 @@
 package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
@@ -29,7 +30,7 @@ public class TeamMemberService {
 
     public Optional<Teammember> getOne(Integer id) {
         if (!teamMemberRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         }
         final var oneTeamMember = teamMemberRepository.findById(id);
         return oneTeamMember;
@@ -37,7 +38,7 @@ public class TeamMemberService {
 
     public Teammember insert(Teammember teammember) {
         if (teammember.getTeammemberid() != null) {
-            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+            throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
         }
         final var inserted = teamMemberRepository.save(teammember);
         return inserted;
@@ -45,10 +46,10 @@ public class TeamMemberService {
 
     public Teammember update(Teammember teammember) {
         if (teammember.getTeammemberid() == null) {
-            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+            throw new InputFieldException("Id is not present in request", HttpStatus.BAD_REQUEST);
         }
         if (!teamMemberRepository.existsById(teammember.getTeammemberid())) {
-            throw new NotFoundException(String.format("Team member with id %d does not exist in database", teammember.getTeammemberid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Team member with id %d does not exist in database", teammember.getTeammemberid()), HttpStatus.NOT_FOUND);
         }
         final var updated = teamMemberRepository.save(teammember);
         return updated;
@@ -56,7 +57,7 @@ public class TeamMemberService {
 
     public boolean delete(Integer id) {
         if (!teamMemberRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         }
         teamMemberRepository.deleteById(id);
         return true;

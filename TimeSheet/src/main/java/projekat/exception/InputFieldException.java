@@ -9,10 +9,8 @@ import projekat.enums.ErrorCode;
 @Setter
 public class InputFieldException extends ApiException {
 
-        private HttpStatus httpStatus;
-
-        public InputFieldException(String message, ErrorCode e) {
-                super(message, e);
-                this.httpStatus = HttpStatus.BAD_REQUEST;
+        public InputFieldException(String message, HttpStatus s) {
+                super(message, s);
+                this.errorCode = ErrorCode.NOT_FOUND;
         }
 }

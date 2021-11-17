@@ -28,7 +28,7 @@ public class ControllersAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(ApiException e) {
-        final var error = new ApiException(e.getMessage(),e.getCause(),ErrorCode.INTERNAL_SERVER_ERROR);
+        final var error = new ApiException(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR,e.getCause());
         return handleApiException(error);
     }
 }

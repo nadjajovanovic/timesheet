@@ -188,7 +188,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
-        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -276,7 +276,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
-        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test

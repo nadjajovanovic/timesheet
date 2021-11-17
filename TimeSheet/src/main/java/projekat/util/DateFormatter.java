@@ -2,6 +2,7 @@ package projekat.util;
 
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import org.springframework.http.HttpStatus;
 import projekat.enums.ErrorCode;
 import projekat.exception.ParseInputException;
 
@@ -24,7 +25,7 @@ public class DateFormatter {
         try {
             parsedDate = formatter.parse(dateAsString);
         } catch (ParseException e) {
-            throw new ParseInputException("Invalid date", ErrorCode.INVALID_DATE_FORMAT);
+            throw new ParseInputException("Invalid date", HttpStatus.BAD_REQUEST);
         }
         return parsedDate;
     }

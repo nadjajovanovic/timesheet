@@ -1,6 +1,7 @@
 package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
@@ -27,7 +28,7 @@ public class ClientService {
 
     public Optional<Client> getOne(Integer id) {
         if (!clientRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Client with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Client with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         }
         final var oneClient = clientRepository.findById(id);
         return oneClient;
@@ -35,7 +36,7 @@ public class ClientService {
 
     public Client insert(Client client) {
         if (client.getClientid() != null) {
-            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+            throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
         }
         final var inserted = clientRepository.save(client);
         return inserted;
@@ -44,10 +45,10 @@ public class ClientService {
     public Client update(Client client) {
 
         if (client.getClientid() == null) {
-            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+            throw new InputFieldException("Id is not present in request", HttpStatus.NOT_FOUND);
         }
         if(!clientRepository.existsById(client.getClientid())) {
-            throw new NotFoundException(String.format("Client with id %d does not exist in database", client.getClientid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Client with id %d does not exist in database", client.getClientid()),HttpStatus.NOT_FOUND);
         }
         final var updated = clientRepository.save(client);
         return updated;
@@ -55,7 +56,7 @@ public class ClientService {
 
     public boolean delete(Integer id) {
         if (!clientRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Client with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Client with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
         }
         clientRepository.deleteById(id);
         return true;
