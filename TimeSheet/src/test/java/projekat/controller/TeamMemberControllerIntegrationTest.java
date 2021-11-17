@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TeamMemberDTO;
+import projekat.exception.ApiException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
@@ -251,7 +252,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void deleteTeamMemberNotFound() throws Exception {
         //Arange
         final var teamMemberId = "100";
-
+        //final var apiException = throw new ApiException("No exist object with 100 id in DB");
         //act
         final var response = mvc.perform(delete("/teammember/{teammemberid}", teamMemberId)
                         .accept(MediaType.APPLICATION_JSON))
