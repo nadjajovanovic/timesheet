@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ClientDTO;
+import projekat.enums.ErrorCode;
+import projekat.exception.ErrorResponse;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
 import projekat.util.BaseUT;
@@ -153,7 +155,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
-    @Test @Disabled
+    @Test
     void testCreateClientIdExists() throws Exception {
         //Arange
         final var clientName = "Jane Doe";
@@ -168,8 +170,10 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -214,8 +218,8 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateClientNoId() throws Exception {
         //Arange
-        final var client = new Client();
-        client.setClientname("Jane Doe");
+        final var client = new ClientDTO();
+        client.setName("Jane Doe");
 
         //Act
         final var response = mvc.perform(put("/client")
@@ -224,8 +228,11 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test

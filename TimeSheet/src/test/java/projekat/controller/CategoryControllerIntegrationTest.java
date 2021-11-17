@@ -3,6 +3,8 @@ import org.junit.jupiter.api.Disabled;
 import org.springframework.http.HttpStatus;
 import projekat.TimeSheetApplication;
 import projekat.api.model.CategoryDTO;
+import projekat.enums.ErrorCode;
+import projekat.exception.ErrorResponse;
 import projekat.mapper.CategoryMapper;
 import projekat.models.Category;
 import projekat.util.BaseUT;
@@ -158,7 +160,7 @@ class CategoryControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
-    @Test @Disabled
+    @Test
     void testCreateCategoryIdExists() throws Exception {
         //Arrange
         final var categoryName = "Backend";
@@ -171,10 +173,13 @@ class CategoryControllerIntegrationTest extends BaseUT{
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(category))
                         .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
                 .andReturn();
 
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -221,8 +226,8 @@ class CategoryControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateCategoryNoId() throws Exception {
         //Arrange
-        final var category = new Category();
-        category.setCategoryname("Backend");
+        final var category = new CategoryDTO();
+        category.setName("Backend");
 
         // Act
         final var response = mvc.perform(put("/category")
@@ -231,8 +236,11 @@ class CategoryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test

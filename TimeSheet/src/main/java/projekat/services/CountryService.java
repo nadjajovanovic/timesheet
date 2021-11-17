@@ -2,6 +2,8 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.enums.ErrorCode;
+import projekat.exception.InputFieldException;
 import projekat.models.Country;
 import projekat.repository.CountryRepository;
 
@@ -29,11 +31,17 @@ public class CountryService {
     }
 
     public Country create(Country country) {
+        if (country.getCountryid() != null) {
+            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+        }
         final var insertedCountry = countryRepository.save(country);
         return insertedCountry;
     }
 
     public Country update(Country country){
+        if (country.getCountryid() == null) {
+            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+        }
         if (!countryRepository.existsById(country.getCountryid())){
             return null;
         }

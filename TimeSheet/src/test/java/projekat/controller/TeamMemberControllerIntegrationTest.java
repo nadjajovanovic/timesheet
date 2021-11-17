@@ -13,7 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TeamMemberDTO;
+import projekat.enums.ErrorCode;
 import projekat.exception.ApiException;
+import projekat.exception.ErrorResponse;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
@@ -165,15 +167,19 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         //Arange
         final var teamMember = new Teammember();
         teamMember.setTeammemberid(5);
+
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"")))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"John Doe")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -229,8 +235,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
+
     }
 
     @Test

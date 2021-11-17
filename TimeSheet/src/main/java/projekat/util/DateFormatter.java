@@ -1,6 +1,9 @@
 package projekat.util;
 
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import projekat.enums.ErrorCode;
+import projekat.exception.ParseInputException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,8 +19,13 @@ public class DateFormatter {
         return formattedDate;
     }
 
-    public Date stringToDate(String dateAsString) throws ParseException {
-        final var parsedDate = formatter.parse(dateAsString);
+    public Date stringToDate(String dateAsString){
+        Date parsedDate = null;
+        try {
+            parsedDate = formatter.parse(dateAsString);
+        } catch (ParseException e) {
+            throw new ParseInputException("Invalid date", ErrorCode.INVALID_DATE_FORMAT);
+        }
         return parsedDate;
     }
 }

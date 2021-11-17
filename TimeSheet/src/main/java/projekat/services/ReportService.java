@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 import projekat.api.model.ReportFilterDTO;
 import projekat.models.TimeSheetEntry;
 import projekat.repository.TimeSheetEntryRepository;
+import projekat.util.DateFormatter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -23,19 +22,15 @@ public class ReportService {
 
     public List<TimeSheetEntry> generateReport(ReportFilterDTO report) {
         final var allEntries = timeSheetEntryRepository.findAll();
-        final var formatter = new SimpleDateFormat("yyyy-MM-dd");
 
         Date date1 = null;
         Date date2 = null;
 
-        try {
-            if (report.getStartDate() != null){
-                date1 = formatter.parse(report.getStartDate());
-            }
-            if (report.getEndDate() != null){
-                date2 = formatter.parse(report.getEndDate());
-            }
-        } catch (ParseException e) {
+        if (report.getStartDate() != null){
+            date1 = DateFormatter.stringToDate(report.getStartDate());
+        }
+        if (report.getEndDate() != null){
+            date2 = DateFormatter.stringToDate(report.getEndDate());
         }
 
         final var finalDate1 = date1;
