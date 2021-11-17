@@ -12,7 +12,7 @@ import projekat.exception.ErrorResponse;
 
 import java.util.NoSuchElementException;
 
-@ControllerAdvice(assignableTypes = TeamMemberController.class)
+@ControllerAdvice
 public class ControllersAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)

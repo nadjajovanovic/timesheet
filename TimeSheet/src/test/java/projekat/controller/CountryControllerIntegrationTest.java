@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import projekat.TimeSheetApplication;
 import projekat.api.model.CountryDTO;
+import projekat.enums.ErrorCode;
+import projekat.exception.ErrorResponse;
 import projekat.models.Country;
 import projekat.repository.CountryRepository;
 
@@ -100,8 +102,10 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var response = mvc.perform(get("/country/{id}", countryId))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+        //assert
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     @Test
@@ -253,8 +257,11 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var response = mvc.perform(delete("/country/{id}", countryId))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        final var error =  ResponseReader.readResponse(response, ErrorResponse.class);
+
+        //assert
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     private Country saveTestCountry(String countryName) {

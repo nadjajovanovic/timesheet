@@ -1,6 +1,7 @@
 package projekat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.internal.CommonErrors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,18 +14,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TeamMemberDTO;
+import projekat.enums.ErrorCode;
 import projekat.exception.ApiException;
+import projekat.exception.ErrorResponse;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -97,9 +99,10 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var response = mvc.perform(get("/teammember/{teamMemberId}", teamMemberId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
-
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
         //assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     @Test
@@ -129,18 +132,19 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateTeamMemberBadRequest() throws Exception {
         //Arange
-        final var teamMember = new Teammember();
-        teamMember.setHoursperweek(2.3);
+        final var teamMember = new TeamMemberDTO();
+        teamMember.setHoursPerWeek(BigDecimal.valueOf(2.3));
+        teamMember.setName("");
 
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"")))
+                        .content(objectMapper.writeValueAsString(teamMember))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        //assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(),response.getResponse().getStatus());
     }
 
     @Test
@@ -219,18 +223,20 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateTeamMemberNoId() throws Exception {
         //Arange
-        final var teamMember = new Teammember();
-        teamMember.setTeammembername("Not important");
+        final var inserted = saveTeamMember("name");
+        inserted.setTeammemberid(21);
 
         //act
         final var response = mvc.perform(put("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(teamMember))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(inserted,"name")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+        //assert
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     @Test
@@ -257,9 +263,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var response = mvc.perform(delete("/teammember/{teammemberid}", teamMemberId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
+        final var error =  ResponseReader.readResponse(response, ErrorResponse.class);
 
         //assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     private Teammember saveTeamMember(String teammemberName) {

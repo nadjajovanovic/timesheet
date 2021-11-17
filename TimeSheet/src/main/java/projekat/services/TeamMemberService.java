@@ -1,10 +1,8 @@
 package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
-import projekat.exception.BadRequestException;
 import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
