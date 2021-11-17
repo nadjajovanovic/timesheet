@@ -1,27 +1,18 @@
 package projekat.controller;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-
+import org.springframework.web.bind.annotation.*;
 import projekat.api.api.ClientApi;
 import projekat.api.model.ClientDTO;
+import projekat.mapper.ClientMapper;
 import projekat.models.Client;
 import projekat.services.ClientService;
-import projekat.mapper.ClientMapper;
+
+import java.util.Collection;
+import java.util.List;
 
 @RestController
 public class ClientController implements ClientApi {
@@ -46,9 +37,6 @@ public class ClientController implements ClientApi {
 	@GetMapping("/client/{clientid}")
 	public ResponseEntity<ClientDTO> getClient(@PathVariable Integer clientid) {
 		final var oneClient = clientService.getOne(clientid);
-		if (oneClient.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return  new ResponseEntity(ClientMapper.toClientDTO(oneClient.get()), HttpStatus.OK);
 	}
 
@@ -63,9 +51,6 @@ public class ClientController implements ClientApi {
 	@Override
 	public ResponseEntity<ClientDTO> updateClient (@RequestBody ClientDTO client) {
 		final var updated = clientService.update(ClientMapper.toClient(client));
-		if (updated == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(ClientMapper.toClientDTO(updated), HttpStatus.OK);
 
 	}
@@ -73,10 +58,7 @@ public class ClientController implements ClientApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ClientDTO> deleteClient(@PathVariable Integer clientid) {
-		final var deleted = clientService.delete(clientid);
-		if (!deleted) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		clientService.delete(clientid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

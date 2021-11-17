@@ -36,9 +36,6 @@ public class CountryController implements CountryApi {
 	@Override
 	public ResponseEntity<CountryDTO> getCountry(@PathVariable Integer countryid) {
 		final var oneCountry = countryService.getOne(countryid);
-		if (oneCountry.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(CountryMapper.toCountryDTO(oneCountry.get()), HttpStatus.OK);
 	}
 
@@ -53,19 +50,13 @@ public class CountryController implements CountryApi {
 	@Override
 	public ResponseEntity<CountryDTO> updateCountry(@RequestBody CountryDTO country) {
 		final var updated = countryService.update(CountryMapper.toCountry(country));
-		if (updated == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(CountryMapper.toCountryDTO(updated), HttpStatus.OK);
 	}
 
 	@CrossOrigin
 	@Override
 	public ResponseEntity<CountryDTO> deleteCountry (@PathVariable Integer countryid) {
-		final var deleted = countryService.delete(countryid);
-		if (!deleted) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		countryService.delete(countryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

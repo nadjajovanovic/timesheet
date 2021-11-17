@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TimeSheetEntryDTO;
+import projekat.enums.ErrorCode;
+import projekat.exception.ErrorResponse;
 import projekat.models.Category;
 import projekat.models.Client;
 import projekat.models.Project;
@@ -117,8 +119,10 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+        //assert
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     @Test
@@ -241,8 +245,37 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                         .content(objectMapper.writeValueAsString(entry)))
                 .andReturn();
 
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+        //assert
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
+    }
+
+    @Test
+    void testCreateEntryBadRequestIdExists() throws Exception {
+        //Arrange
+        final var entry = new TimeSheetEntryDTO();
+        final var client = saveTestClient("test client");
+        final var project = saveTestProject("Test project", "test description");
+        final var category = saveTestCategory("Backend");
+        entry.setCategoryId(category.getCategoryid());
+        entry.setClientId(client.getClientid());
+        entry.setProjectId(project.getProjectid());
+        entry.setTimeSpent(BigDecimal.valueOf(4.5));
+        entry.setDate("2021-10-10");
+        entry.setId(4);
+
+        // Act
+        final var response = mvc.perform(post("/entry")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(entry)))
+                .andReturn();
+
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
         // Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -310,6 +343,29 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testUpdateEntryBadRequestIdNotExist() throws Exception {
+        //Arrange
+        final var description = "Work day";
+        final var entry = createTestEntry(description);
+        final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
+        entryDTO.setTimeSpent(BigDecimal.valueOf(2.5));
+        entryDTO.setId(null);
+
+        // Act
+        final var response = mvc.perform(put("/entry")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(entryDTO)))
+                .andReturn();
+
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
+    }
+
+
+    @Test
     void testUpdateEntryNotFound() throws Exception {
         //Arrange
         final var description = "Demo project";
@@ -323,8 +379,10 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                         .content(objectMapper.writeValueAsString(entryDTO)))
                 .andReturn();
 
-        // Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+        //assert
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     @Test
@@ -352,8 +410,11 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        final var error =  ResponseReader.readResponse(response, ErrorResponse.class);
+
+        //assert
+        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
     private TimeSheetEntry createTestEntry(String description) {

@@ -43,9 +43,6 @@ public class CategoryController implements CategoryApi {
 	@Override
 	public ResponseEntity<CategoryDTO> getCategory(@PathVariable Integer categoryid) {
 		final var oneCategory = categoryService.getOne(categoryid);
-		if (oneCategory.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity<>(CategoryMapper.toCategoryDTO(oneCategory.get()), HttpStatus.OK);
 	}
 	
@@ -60,19 +57,13 @@ public class CategoryController implements CategoryApi {
 	@Override
 	public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO category) {
 		final var updated = categoryService.update(CategoryMapper.toCategory(category));
-		if (updated == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity<>(CategoryMapper.toCategoryDTO(updated), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@Override
 	public ResponseEntity<CategoryDTO> deleteCategory(@PathVariable Integer categoryid) {
-		final var deleted = categoryService.delete(categoryid);
-		if(!deleted){
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		categoryService.delete(categoryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

@@ -1,6 +1,5 @@
 package projekat.mapper;
 
-import org.springframework.expression.ParseException;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
 import projekat.models.TimeSheetEntry;
@@ -40,7 +39,7 @@ public class TimeSheetEntryMapper {
         return dto;
     }
 
-    public static TimeSheetEntry fromEntryDTO(TimeSheetEntryDTO dto) throws ParseException, java.text.ParseException {
+    public static TimeSheetEntry fromEntryDTO(TimeSheetEntryDTO dto){
         final var entry = new TimeSheetEntry();
         entry.setEntryId(dto.getId());
         entry.setDescription(dto.getDescription());

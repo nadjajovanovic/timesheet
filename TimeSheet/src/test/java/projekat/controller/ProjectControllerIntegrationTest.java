@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ProjectDTO;
+import projekat.enums.ErrorCode;
+import projekat.exception.ErrorResponse;
 import projekat.mapper.ProjectMapper;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
@@ -24,7 +26,6 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -104,9 +105,11 @@ class ProjectControllerIntegrationTest extends BaseUT{
         //Act
         final var response = mvc.perform(get("/project/{id}", projectId))
                 .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
 
-        //Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND.value(), error.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), error.getErrorCode());
     }
 
     @Test
@@ -174,6 +177,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         project.setId(5);
         project.setName(projectName);
         project.setDescription(projectDescription);
+        project.setStatus("Active");
 
         // Act
         final var response = mvc.perform(post("/project")
@@ -181,8 +185,10 @@ class ProjectControllerIntegrationTest extends BaseUT{
                         .content(objectMapper.writeValueAsString(project)))
                 .andReturn();
 
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -230,6 +236,50 @@ class ProjectControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testUpdateProjectWrongId() throws Exception {
+        //Arrange
+        final var projectName = "Cinema App";
+        final var projectDescription = "App for ticket reservation";
+        final var inserted = saveTestProject(projectName, projectDescription);
+        inserted.setProjectid(9999);
+
+        // Act
+        final var response = mvc.perform(put("/category")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ProjectMapper.toProjectDTO(inserted)))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND.value(), error.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), error.getErrorCode());
+    }
+
+    @Test
+    void testUpdateProjectIdNotPresent() throws Exception {
+        //Arrange
+        final var projectName = "Weather App";
+        final var projectDescription = "Make app for weather forecast";
+        final var project = new ProjectDTO();
+        project.setName(projectName);
+        project.setDescription(projectDescription);
+        project.setStatus("Active");
+
+        // Act
+        final var response = mvc.perform(put("/project")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(project)))
+                .andReturn();
+
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
+    }
+
+    @Test
     void deleteProjectTest() throws Exception {
         //Arrange
         final var projectName = "TimeSheet App";
@@ -252,9 +302,11 @@ class ProjectControllerIntegrationTest extends BaseUT{
         //Act
         final var response = mvc.perform(delete("/project/{id}", projectId))
                 .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
 
-        //Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND.value(), error.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), error.getErrorCode());
     }
 
     @Test
