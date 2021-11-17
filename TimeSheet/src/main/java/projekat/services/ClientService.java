@@ -2,6 +2,8 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.enums.ErrorCode;
+import projekat.exception.NotFoundException;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
 
@@ -23,6 +25,9 @@ public class ClientService {
     }
 
     public Optional<Client> getOne(Integer id) {
+        if (!clientRepository.existsById(id)) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+        }
         final var oneClient = clientRepository.findById(id);
         return oneClient;
     }
@@ -33,15 +38,17 @@ public class ClientService {
     }
 
     public Client update(Client client) {
-        if(!clientRepository.existsById(client.getClientid()))
-            return null;
+        if(!clientRepository.existsById(client.getClientid())) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", client.getClientid()), ErrorCode.NOT_FOUND);
+        }
         final var updated = clientRepository.save(client);
         return updated;
     }
 
     public boolean delete(Integer id) {
-        if (!clientRepository.existsById(id))
-            return false;
+        if (!clientRepository.existsById(id)) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+        }
         clientRepository.deleteById(id);
         return true;
     }

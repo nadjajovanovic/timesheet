@@ -46,9 +46,6 @@ public class ClientController implements ClientApi {
 	@GetMapping("/client/{clientid}")
 	public ResponseEntity<ClientDTO> getClient(@PathVariable Integer clientid) {
 		final var oneClient = clientService.getOne(clientid);
-		if (oneClient.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return  new ResponseEntity(ClientMapper.toClientDTO(oneClient.get()), HttpStatus.OK);
 	}
 
@@ -63,9 +60,6 @@ public class ClientController implements ClientApi {
 	@Override
 	public ResponseEntity<ClientDTO> updateClient (@RequestBody ClientDTO client) {
 		final var updated = clientService.update(ClientMapper.toClient(client));
-		if (updated == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		return new ResponseEntity(ClientMapper.toClientDTO(updated), HttpStatus.OK);
 
 	}
@@ -73,10 +67,7 @@ public class ClientController implements ClientApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ClientDTO> deleteClient(@PathVariable Integer clientid) {
-		final var deleted = clientService.delete(clientid);
-		if (!deleted) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		clientService.delete(clientid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

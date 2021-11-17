@@ -38,9 +38,6 @@ public class ProjectController implements ProjectApi {
 	@Override
 	public ResponseEntity<ProjectDTO> getProject(@PathVariable Integer projectid) {
 		final var optionalProject = projectService.getOne(projectid);
-		if (optionalProject.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		final var projectDTO = ProjectMapper.toProjectDTO(optionalProject.get());
 		return new ResponseEntity<>(projectDTO, HttpStatus.OK);
 	}
@@ -59,9 +56,6 @@ public class ProjectController implements ProjectApi {
 	public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO projectDTO) {
 		final var project = ProjectMapper.fromProjectDTO(projectDTO);
 		final var updatedProject = projectService.update(project);
-		if(updatedProject == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 		final var updatedDTO = ProjectMapper.toProjectDTO(updatedProject);
 		return new ResponseEntity<>(updatedDTO, HttpStatus.OK);
 	}
@@ -69,9 +63,7 @@ public class ProjectController implements ProjectApi {
 	@CrossOrigin
 	@Override
 	public ResponseEntity<ProjectDTO> deleteProject(@PathVariable Integer projectid) {
-		final var deleted = projectService.delete(projectid);
-		if(!deleted)
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		projectService.delete(projectid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

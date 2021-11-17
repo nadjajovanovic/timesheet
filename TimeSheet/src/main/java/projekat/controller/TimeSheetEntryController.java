@@ -39,9 +39,6 @@ public class TimeSheetEntryController implements EntryApi {
     @Override
     public ResponseEntity<TimeSheetEntryDTO> getEntry(@PathVariable("id") Integer id) {
         final var optionalEntry = timeSheetEntryService.getOne(id);
-        if (optionalEntry.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(optionalEntry.get());
         return new ResponseEntity<>(entryDTO, HttpStatus.OK);
     }
@@ -55,11 +52,6 @@ public class TimeSheetEntryController implements EntryApi {
         } catch (ParseException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        if (insertedEntry == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(insertedEntry);
         return new ResponseEntity<>(entryDTO, HttpStatus.CREATED);
     }
@@ -75,9 +67,6 @@ public class TimeSheetEntryController implements EntryApi {
         }
 
         final var updatedEntry = timeSheetEntryService.update(entry);
-        if (updatedEntry == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         final var updatedDTO = TimeSheetEntryMapper.toEntryDTO(updatedEntry);
         return new ResponseEntity<>(updatedDTO, HttpStatus.OK);
     }
@@ -85,10 +74,7 @@ public class TimeSheetEntryController implements EntryApi {
     @CrossOrigin
     @Override
     public ResponseEntity deleteEntry(@PathVariable("id") Integer id) {
-        final var deleted = timeSheetEntryService.delete(id);
-        if (!deleted) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        timeSheetEntryService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

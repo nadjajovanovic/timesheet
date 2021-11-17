@@ -2,6 +2,8 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.enums.ErrorCode;
+import projekat.exception.NotFoundException;
 import projekat.models.Country;
 import projekat.repository.CountryRepository;
 
@@ -24,6 +26,9 @@ public class CountryService {
     }
 
     public Optional<Country> getOne(Integer id) {
+        if (!countryRepository.existsById(id)) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+        }
         final var country = countryRepository.findById(id);
         return country;
     }
@@ -35,7 +40,7 @@ public class CountryService {
 
     public Country update(Country country){
         if (!countryRepository.existsById(country.getCountryid())){
-            return null;
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", country.getCountryid()), ErrorCode.NOT_FOUND);
         }
         final var updatedCountry = countryRepository.save(country);
         return updatedCountry;
@@ -43,7 +48,7 @@ public class CountryService {
 
     public boolean delete(Integer id) {
         if (!countryRepository.existsById(id)) {
-            return false;
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         countryRepository.deleteById(id);
         return true;

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.BadRequestException;
+import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
@@ -27,6 +28,9 @@ public class TeamMemberService {
     }
 
     public Optional<Teammember> getOne(Integer id) {
+        if (!teamMemberRepository.existsById(id)) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+        }
         final var oneTeamMember = teamMemberRepository.findById(id);
         return oneTeamMember;
     }
@@ -37,15 +41,17 @@ public class TeamMemberService {
     }
 
     public Teammember update(Teammember teammember) {
-        if (!teamMemberRepository.existsById(teammember.getTeammemberid()))
-            throw new BadRequestException(String.format("No exist object with %d id in DB",teammember.getTeammemberid()), ErrorCode.NOT_FOUND);
+        if (!teamMemberRepository.existsById(teammember.getTeammemberid())) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", teammember.getTeammemberid()), ErrorCode.NOT_FOUND);
+        }
         final var updated = teamMemberRepository.save(teammember);
         return updated;
     }
 
     public boolean delete(Integer id) {
-        if (!teamMemberRepository.existsById(id))
-            throw new BadRequestException(String.format("No exist object with %d id in DB",id),ErrorCode.NOT_FOUND);
+        if (!teamMemberRepository.existsById(id)) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+        }
         teamMemberRepository.deleteById(id);
         return true;
     }

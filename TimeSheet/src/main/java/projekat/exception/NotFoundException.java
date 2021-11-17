@@ -7,12 +7,12 @@ import projekat.enums.ErrorCode;
 
 @Getter
 @Setter
-public class BadRequestException extends ApiException {
+public class NotFoundException extends ApiException {
 
     private HttpStatus httpStatus;
 
-    public BadRequestException(String message, ErrorCode e) {
-        super(message,e);
-        this.httpStatus = HttpStatus.BAD_REQUEST;
+    public NotFoundException(String message, ErrorCode errorCode) {
+        super(message, errorCode);
+        this.httpStatus = HttpStatus.NOT_FOUND;
     }
 }

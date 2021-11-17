@@ -2,6 +2,8 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.enums.ErrorCode;
+import projekat.exception.NotFoundException;
 import projekat.models.Category;
 import projekat.repository.CategoryRepository;
 
@@ -24,6 +26,8 @@ public class CategoryService {
     }
 
     public Optional<Category> getOne(Integer id){
+        if (!categoryRepository.existsById(id))
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         final var category = categoryRepository.findById(id);
         return category;
     }
@@ -35,7 +39,7 @@ public class CategoryService {
 
     public Category update(Category category) {
         if(!categoryRepository.existsById(category.getCategoryid())){
-            return null;
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", category.getCategoryid()), ErrorCode.NOT_FOUND);
         }
         final var updatedCategory = categoryRepository.save(category);
         return updatedCategory;
@@ -43,7 +47,7 @@ public class CategoryService {
 
     public boolean delete(Integer id){
         if (!categoryRepository.existsById(id)) {
-            return false;
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         categoryRepository.deleteById(id);
         return true;

@@ -2,6 +2,8 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import projekat.enums.ErrorCode;
+import projekat.exception.NotFoundException;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
 
@@ -24,6 +26,9 @@ public class ProjectService {
     }
 
     public Optional<Project> getOne(Integer id){
+        if (!projectRepository.existsById(id)) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+        }
         final var project = projectRepository.findById(id);
         return project;
     }
@@ -34,15 +39,17 @@ public class ProjectService {
     }
 
     public Project update(Project project){
-        if(!projectRepository.existsById(project.getProjectid()))
-            return null;
+        if(!projectRepository.existsById(project.getProjectid())) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", project.getProjectid()), ErrorCode.NOT_FOUND);
+        }
         final var updatedProject = projectRepository.save(project);
         return updatedProject;
     }
 
     public boolean delete(Integer id) {
-        if(!projectRepository.existsById(id))
-            return false;
+        if(!projectRepository.existsById(id)) {
+            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+        }
         projectRepository.deleteById(id);
         return true;
     }
