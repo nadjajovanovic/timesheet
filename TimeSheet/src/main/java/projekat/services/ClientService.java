@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
+import projekat.exception.InputFieldException;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
 
@@ -33,11 +34,18 @@ public class ClientService {
     }
 
     public Client insert(Client client) {
+        if (client.getClientid() != null) {
+            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+        }
         final var inserted = clientRepository.save(client);
         return inserted;
     }
 
     public Client update(Client client) {
+
+        if (client.getClientid() == null) {
+            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+        }
         if(!clientRepository.existsById(client.getClientid())) {
             throw new NotFoundException(String.format("Client with id %d does not exist in database", client.getClientid()), ErrorCode.NOT_FOUND);
         }

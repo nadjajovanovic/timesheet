@@ -169,15 +169,19 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         //Arange
         final var teamMember = new Teammember();
         teamMember.setTeammemberid(5);
+
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"")))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"John Doe")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -224,7 +228,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void testUpdateTeamMemberNoId() throws Exception {
         //Arange
         final var inserted = saveTeamMember("name");
-        inserted.setTeammemberid(21);
+        inserted.setTeammemberid(null);
 
         //act
         final var response = mvc.perform(put("/teammember")
@@ -233,10 +237,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
-        //assert
-        assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
-        assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test

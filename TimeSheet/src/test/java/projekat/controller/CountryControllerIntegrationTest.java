@@ -160,7 +160,7 @@ class CountryControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
-    @Test @Disabled
+    @Test
     void testCreateCountryIdExists() throws Exception {
         //Arrange
         final var countryName = "Greece";
@@ -174,8 +174,10 @@ class CountryControllerIntegrationTest extends BaseUT{
                         .content(objectMapper.writeValueAsString(country)))
                 .andReturn();
 
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -220,8 +222,8 @@ class CountryControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateCountryNoId() throws Exception {
         //Arange
-        final var country = new Country();
-        country.setCountryname("United States of America");
+        final var country = new CountryDTO();
+        country.setName("United States of America");
 
         //Act
         final var response = mvc.perform(put("/client")
@@ -230,9 +232,11 @@ class CountryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
 
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test

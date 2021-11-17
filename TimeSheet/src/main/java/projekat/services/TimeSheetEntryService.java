@@ -5,18 +5,17 @@ import org.springframework.stereotype.Service;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
+import projekat.exception.InputFieldException;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.models.Category;
 import projekat.models.Client;
 import projekat.models.Project;
 import projekat.models.TimeSheetEntry;
-//import projekat.mapper.TimeSheetEntryMapper;
 import projekat.repository.CategoryRepository;
 import projekat.repository.ClientRepository;
 import projekat.repository.ProjectRepository;
 import projekat.repository.TimeSheetEntryRepository;
 
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -56,7 +55,11 @@ public class TimeSheetEntryService {
         return entry;
     }
 
-    public TimeSheetEntry create(TimeSheetEntryDTO dto) throws ParseException {
+    public TimeSheetEntry create(TimeSheetEntryDTO dto){
+
+        if (dto.getId() != null) {
+            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+        }
 
         if (!categoryRepository.existsById(dto.getCategoryId())){
             throw new NotFoundException(String.format("Category with id %d does not exist in database", dto.getCategoryId()), ErrorCode.NOT_FOUND);
@@ -84,6 +87,9 @@ public class TimeSheetEntryService {
     }
 
     public TimeSheetEntry update(TimeSheetEntry entry) {
+        if (entry.getEntryId() == null) {
+            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+        }
         if (!timeSheetEntryRepository.existsById(entry.getEntryId())){
             throw new NotFoundException(String.format("Timesheet entry with id %d does not exist in database", entry.getEntryId()), ErrorCode.NOT_FOUND);
         }

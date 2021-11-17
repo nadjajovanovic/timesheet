@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
+import projekat.exception.InputFieldException;
 import projekat.models.Category;
 import projekat.repository.CategoryRepository;
 
@@ -33,11 +34,17 @@ public class CategoryService {
     }
 
     public Category create(Category category) {
+        if (category.getCategoryid() != null) {
+            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+        }
         final var insertedCategory = categoryRepository.save(category);
         return insertedCategory;
     }
 
     public Category update(Category category) {
+        if (category.getCategoryid() == null) {
+            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+        }
         if(!categoryRepository.existsById(category.getCategoryid())){
             throw new NotFoundException(String.format("Category with id %d does not exist in database", category.getCategoryid()), ErrorCode.NOT_FOUND);
         }

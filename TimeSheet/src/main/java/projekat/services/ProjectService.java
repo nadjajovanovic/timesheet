@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
+import projekat.exception.InputFieldException;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
 
@@ -34,11 +35,17 @@ public class ProjectService {
     }
 
     public Project create(Project project){
+        if (project.getProjectid() != null) {
+            throw new InputFieldException("Id is present in request", ErrorCode.ID_EXISTS);
+        }
         final var insertedProject = projectRepository.save(project);
         return insertedProject;
     }
 
     public Project update(Project project){
+        if (project.getProjectid() == null) {
+            throw new InputFieldException("Id is not present in request", ErrorCode.ID_NOT_FOUND);
+        }
         if(!projectRepository.existsById(project.getProjectid())) {
             throw new NotFoundException(String.format("Project with id %d does not exist in database", project.getProjectid()), ErrorCode.NOT_FOUND);
         }

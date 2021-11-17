@@ -252,6 +252,33 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testCreateEntryBadRequestIdExists() throws Exception {
+        //Arrange
+        final var entry = new TimeSheetEntryDTO();
+        final var client = saveTestClient("test client");
+        final var project = saveTestProject("Test project", "test description");
+        final var category = saveTestCategory("Backend");
+        entry.setCategoryId(category.getCategoryid());
+        entry.setClientId(client.getClientid());
+        entry.setProjectId(project.getProjectid());
+        entry.setTimeSpent(BigDecimal.valueOf(4.5));
+        entry.setDate("2021-10-10");
+        entry.setId(4);
+
+        // Act
+        final var response = mvc.perform(post("/entry")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(entry)))
+                .andReturn();
+
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
+    }
+
+    @Test
     void testCreateEntryBadRequestTimeLessThatZero() throws Exception {
         //Arrange
         final var entry = new TimeSheetEntryDTO();
@@ -314,6 +341,29 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
+
+    @Test
+    void testUpdateEntryBadRequestIdNotExist() throws Exception {
+        //Arrange
+        final var description = "Work day";
+        final var entry = createTestEntry(description);
+        final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
+        entryDTO.setTimeSpent(BigDecimal.valueOf(2.5));
+        entryDTO.setId(null);
+
+        // Act
+        final var response = mvc.perform(put("/entry")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(entryDTO)))
+                .andReturn();
+
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
+    }
+
 
     @Test
     void testUpdateEntryNotFound() throws Exception {

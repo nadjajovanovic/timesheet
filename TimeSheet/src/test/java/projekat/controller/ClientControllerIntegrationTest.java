@@ -1,10 +1,9 @@
 package projekat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,7 +16,6 @@ import projekat.TimeSheetApplication;
 import projekat.api.model.ClientDTO;
 import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
-import projekat.mapper.CategoryMapper;
 import projekat.mapper.ClientMapper;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
@@ -160,7 +158,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
     }
 
-    @Test @Disabled
+    @Test
     void testCreateClientIdExists() throws Exception {
         //Arange
         final var clientName = "Jane Doe";
@@ -175,8 +173,10 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_EXISTS.toString(), responseObject.getErrorCode());
     }
 
     @Test
@@ -221,8 +221,8 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateClientNoId() throws Exception {
         //Arange
-        final var client = new Client();
-        client.setClientname("Jane Doe");
+        final var client = new ClientDTO();
+        client.setName("Jane Doe");
 
         //Act
         final var response = mvc.perform(put("/client")
@@ -231,8 +231,11 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        //Assert
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
+        final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
+        assertEquals(ErrorCode.ID_NOT_FOUND.toString(), responseObject.getErrorCode());
     }
 
     @Test

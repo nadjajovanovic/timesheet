@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import projekat.api.api.EntryApi;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.mapper.TimeSheetEntryMapper;
-import projekat.models.TimeSheetEntry;
 import projekat.services.TimeSheetEntryService;
 
-import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -46,12 +44,7 @@ public class TimeSheetEntryController implements EntryApi {
     @CrossOrigin
     @Override
     public ResponseEntity<TimeSheetEntryDTO> insertEntry(@RequestBody TimeSheetEntryDTO entry) {
-        TimeSheetEntry insertedEntry = null;
-        try {
-            insertedEntry = timeSheetEntryService.create(entry);
-        } catch (ParseException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        final var insertedEntry = timeSheetEntryService.create(entry);
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(insertedEntry);
         return new ResponseEntity<>(entryDTO, HttpStatus.CREATED);
     }
@@ -59,13 +52,7 @@ public class TimeSheetEntryController implements EntryApi {
     @CrossOrigin
     @Override
     public ResponseEntity<TimeSheetEntryDTO> updateEntry(@RequestBody TimeSheetEntryDTO entryDTO) {
-        TimeSheetEntry entry = null;
-        try {
-            entry = TimeSheetEntryMapper.fromEntryDTO(entryDTO);
-        } catch (ParseException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
+        final var entry = TimeSheetEntryMapper.fromEntryDTO(entryDTO);
         final var updatedEntry = timeSheetEntryService.update(entry);
         final var updatedDTO = TimeSheetEntryMapper.toEntryDTO(updatedEntry);
         return new ResponseEntity<>(updatedDTO, HttpStatus.OK);
