@@ -188,17 +188,17 @@ class CountryControllerIntegrationTest extends BaseUT{
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        final var responseCountry = ResponseReader.readResponse(response, Country.class);
+        final var responseCountry = ResponseReader.readResponse(response, CountryDTO.class);
 
         // Assert
         assertNotNull(responseCountry.getCountryid());
-        assertEquals(updatedName, responseCountry.getCountryname());
+        assertEquals(updatedName, responseCountry.getName());
     }
 
     @Test
     void testUpdateCountryBadRequest() throws Exception {
         //Arange
-        final var countryName = "nameForInsert";
+        final var countryName = "Serbia";
         final var inserted = saveTestCountry(countryName);
         final var updatedName = "";
         inserted.setCountryname(updatedName);
