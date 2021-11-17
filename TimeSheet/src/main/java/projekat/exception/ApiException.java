@@ -18,16 +18,14 @@ public class ApiException extends RuntimeException {
     private ZonedDateTime timestamp;
     private ErrorCode errorCode;
 
-    public ApiException(String message, Throwable throwable, HttpStatus httpStatus,ErrorCode e) {
+    public ApiException(String message, Throwable throwable,ErrorCode e) {
         this.message = message;
         this.throwable = throwable;
-        this.httpStatus = httpStatus;
         this.timestamp = ZonedDateTime.now(ZoneId.of("Z"));
         this.errorCode = e;
     }
-    public ApiException(String message,  HttpStatus httpStatus,ErrorCode e) {
+    public ApiException(String message,ErrorCode e) {
         this.message = message;
-        this.httpStatus = httpStatus;
         this.timestamp = ZonedDateTime.now(ZoneId.of("Z"));
         this.errorCode = e;
     }

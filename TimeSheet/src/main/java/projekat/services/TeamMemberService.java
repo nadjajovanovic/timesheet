@@ -38,14 +38,14 @@ public class TeamMemberService {
 
     public Teammember update(Teammember teammember) {
         if (!teamMemberRepository.existsById(teammember.getTeammemberid()))
-            throw new BadRequestException(String.format("No exist object with %d id in DB",teammember.getTeammemberid()),HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
+            throw new BadRequestException(String.format("No exist object with %d id in DB",teammember.getTeammemberid()), ErrorCode.NOT_FOUND);
         final var updated = teamMemberRepository.save(teammember);
         return updated;
     }
 
     public boolean delete(Integer id) {
         if (!teamMemberRepository.existsById(id))
-            throw new BadRequestException(String.format("No exist object with %d id in DB",id), HttpStatus.NOT_FOUND,ErrorCode.NOT_FOUND);
+            throw new BadRequestException(String.format("No exist object with %d id in DB",id),ErrorCode.NOT_FOUND);
         teamMemberRepository.deleteById(id);
         return true;
     }
