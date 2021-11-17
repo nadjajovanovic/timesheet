@@ -11,11 +11,11 @@ public class BadRequestException extends ApiException{
     }
 
     public BadRequestException(String message, Throwable throwable, HttpStatus httpStatus, ZonedDateTime timestamp, ErrorCode e) {
-        super(message, throwable, httpStatus, timestamp, e);
+        super(message, throwable, httpStatus, e);
     }
 
-    public BadRequestException(String message, HttpStatus httpStatus, ZonedDateTime timestamp, ErrorCode e) {
-        super(message, httpStatus, timestamp, e);
+    public BadRequestException(String message, HttpStatus httpStatus, ErrorCode e) {
+        super(message, httpStatus, e);
     }
 
     public BadRequestException(String s) {

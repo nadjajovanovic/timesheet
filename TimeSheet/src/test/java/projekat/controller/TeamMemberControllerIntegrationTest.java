@@ -252,7 +252,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void deleteTeamMemberNotFound() throws Exception {
         //Arange
         final var teamMemberId = "100";
-        //final var apiException = throw new ApiException("No exist object with 100 id in DB");
+
         //act
         final var response = mvc.perform(delete("/teammember/{teammemberid}", teamMemberId)
                         .accept(MediaType.APPLICATION_JSON))
@@ -274,7 +274,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teammember.setId(t.getTeammemberid());
         teammember.setName(teammemberName);
         teammember.setUsername("username");
-        teammember.setEmail("email@gmail.com");
+        teammember.setEmail("test@gmail.com");
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         return teammember;
     }

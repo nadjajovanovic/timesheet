@@ -40,7 +40,7 @@ public class TeamMemberController implements TeammemberApi {
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
 	}
 
-	//@CrossOrigin
+	@CrossOrigin
 	@Override
 	public ResponseEntity<TeamMemberDTO> insertTeamMember(@RequestBody TeamMemberDTO teamMember) {
 		final var inserted = teamMemberService.insert(TeamMemberMapper.toTeamMember(teamMember));
