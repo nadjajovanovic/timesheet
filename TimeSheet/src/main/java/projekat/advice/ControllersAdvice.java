@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import projekat.controller.CategoryController;
 import projekat.controller.TeamMemberController;
 import projekat.enums.ErrorCode;
 import projekat.exception.ApiException;
@@ -12,7 +13,7 @@ import projekat.exception.ErrorResponse;
 
 import java.util.NoSuchElementException;
 
-@ControllerAdvice(assignableTypes = TeamMemberController.class)
+@ControllerAdvice
 public class ControllersAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)

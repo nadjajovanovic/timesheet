@@ -50,7 +50,7 @@ public class TimeSheetEntryService {
 
     public Optional<TimeSheetEntry> getOne(Integer id) {
         if (!timeSheetEntryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Timesheet entry with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         final var entry = timeSheetEntryRepository.findById(id);
         return entry;
@@ -59,15 +59,15 @@ public class TimeSheetEntryService {
     public TimeSheetEntry create(TimeSheetEntryDTO dto) throws ParseException {
 
         if (!categoryRepository.existsById(dto.getCategoryId())){
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", dto.getCategoryId()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", dto.getCategoryId()), ErrorCode.NOT_FOUND);
         }
 
         if (!clientRepository.existsById(dto.getClientId())) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", dto.getClientId()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Client with id %d does not exist in database", dto.getClientId()), ErrorCode.NOT_FOUND);
         }
 
         if (!projectRepository.existsById(dto.getProjectId())) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", dto.getProjectId()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", dto.getProjectId()), ErrorCode.NOT_FOUND);
         }
 
 
@@ -85,19 +85,19 @@ public class TimeSheetEntryService {
 
     public TimeSheetEntry update(TimeSheetEntry entry) {
         if (!timeSheetEntryRepository.existsById(entry.getEntryId())){
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", entry.getEntryId()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Timesheet entry with id %d does not exist in database", entry.getEntryId()), ErrorCode.NOT_FOUND);
         }
 
         if (!categoryRepository.existsById(entry.getCategoryid())){
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", entry.getCategoryid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", entry.getCategoryid()), ErrorCode.NOT_FOUND);
         }
 
         if (!clientRepository.existsById(entry.getClientid())) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", entry.getClientid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Client with id %d does not exist in database", entry.getClientid()), ErrorCode.NOT_FOUND);
         }
 
         if (!projectRepository.existsById(entry.getProjectid())) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", entry.getProjectid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", entry.getProjectid()), ErrorCode.NOT_FOUND);
         }
 
         final var emptyCategory = createEmptyCategory(entry.getCategoryid());
@@ -113,7 +113,7 @@ public class TimeSheetEntryService {
 
     public boolean delete (Integer id) {
         if (!timeSheetEntryRepository.existsById(id)){
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Timesheet entry with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         timeSheetEntryRepository.deleteById(id);
         return true;
