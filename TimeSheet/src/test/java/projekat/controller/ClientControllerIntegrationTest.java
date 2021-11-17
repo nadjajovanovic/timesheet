@@ -15,6 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ClientDTO;
+import projekat.enums.ErrorCode;
+import projekat.exception.ErrorResponse;
+import projekat.mapper.CategoryMapper;
+import projekat.mapper.ClientMapper;
 import projekat.models.Client;
 import projekat.repository.ClientRepository;
 import projekat.util.BaseUT;
@@ -95,8 +99,11 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var response = mvc.perform(get("/client/{clientid}", clientId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        //Assert
+        assertEquals(HttpStatus.NOT_FOUND.value(), error.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), error.getErrorCode());
     }
 
     @Test
@@ -229,6 +236,26 @@ class ClientControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testUpdateClientWrongId() throws Exception {
+        //Arrange
+        final var clientName = "Jane Doe";
+        final var inserted = saveTestClient(clientName);
+        inserted.setClientid(9999);
+
+        // Act
+        final var response = mvc.perform(put("/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ClientMapper.toClientDTO(inserted)))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND.value(), error.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), error.getErrorCode());
+    }
+
+    @Test
     void deleteClient() throws Exception {
         //Arange
         final var clientName = "Jane Doe";
@@ -252,9 +279,11 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var response = mvc.perform(delete("/client/{clientid}", clientId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
 
-        //Assert
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getResponse().getStatus());
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND.value(), error.getStatusCode());
+        assertEquals(ErrorCode.NOT_FOUND.toString(), error.getErrorCode());
     }
 
     @Test

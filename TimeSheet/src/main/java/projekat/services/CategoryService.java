@@ -27,7 +27,7 @@ public class CategoryService {
 
     public Optional<Category> getOne(Integer id){
         if (!categoryRepository.existsById(id))
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         final var category = categoryRepository.findById(id);
         return category;
     }
@@ -39,7 +39,7 @@ public class CategoryService {
 
     public Category update(Category category) {
         if(!categoryRepository.existsById(category.getCategoryid())){
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", category.getCategoryid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", category.getCategoryid()), ErrorCode.NOT_FOUND);
         }
         final var updatedCategory = categoryRepository.save(category);
         return updatedCategory;
@@ -47,7 +47,7 @@ public class CategoryService {
 
     public boolean delete(Integer id){
         if (!categoryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Category with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         categoryRepository.deleteById(id);
         return true;

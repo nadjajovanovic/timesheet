@@ -27,7 +27,7 @@ public class ProjectService {
 
     public Optional<Project> getOne(Integer id){
         if (!projectRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         final var project = projectRepository.findById(id);
         return project;
@@ -40,7 +40,7 @@ public class ProjectService {
 
     public Project update(Project project){
         if(!projectRepository.existsById(project.getProjectid())) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", project.getProjectid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", project.getProjectid()), ErrorCode.NOT_FOUND);
         }
         final var updatedProject = projectRepository.save(project);
         return updatedProject;
@@ -48,7 +48,7 @@ public class ProjectService {
 
     public boolean delete(Integer id) {
         if(!projectRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Project with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         projectRepository.deleteById(id);
         return true;

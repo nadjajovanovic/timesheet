@@ -27,7 +27,7 @@ public class CountryService {
 
     public Optional<Country> getOne(Integer id) {
         if (!countryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Country with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         final var country = countryRepository.findById(id);
         return country;
@@ -40,7 +40,7 @@ public class CountryService {
 
     public Country update(Country country){
         if (!countryRepository.existsById(country.getCountryid())){
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", country.getCountryid()), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Country with id %d does not exist in database", country.getCountryid()), ErrorCode.NOT_FOUND);
         }
         final var updatedCountry = countryRepository.save(country);
         return updatedCountry;
@@ -48,7 +48,7 @@ public class CountryService {
 
     public boolean delete(Integer id) {
         if (!countryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Object with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
+            throw new NotFoundException(String.format("Country with id %d does not exist in database", id), ErrorCode.NOT_FOUND);
         }
         countryRepository.deleteById(id);
         return true;
