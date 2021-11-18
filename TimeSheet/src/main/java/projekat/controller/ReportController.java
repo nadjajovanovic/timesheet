@@ -47,7 +47,7 @@ public class ReportController implements ReportApi {
 
 	@PostMapping("report/export/csv")
 	public void exportToCSV(HttpServletResponse response) throws IOException {
-		response.setContentType("text/csv");
+		response.setContentType("application/csv");
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 		String currentDateTime = dateFormat.format(new Date());
 
@@ -63,8 +63,8 @@ public class ReportController implements ReportApi {
 				.toList();
 
 		ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
-		String[] csvHeader = { "Start date", "End date", "Category", "Client", "Project", "Team member" };
-		String[] nameMapping = { "startdate", "enddate", "categoryid", "clientid", "projectid", "teammemberid" };
+		String[] csvHeader = { "Date", "Description", "Time", "Project", "Category", "Team member"};
+		String[] nameMapping = { "date", "description", "totalTimeSpent", "projectName", "categoryName", "teamMemberName"};
 
 		csvWriter.writeHeader(csvHeader);
 
