@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import projekat.api.api.EntryApi;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.mapper.TimeSheetEntryMapper;
-import projekat.models.TimeSheetEntry;
 import projekat.services.TimeSheetEntryService;
 
-import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -39,9 +37,6 @@ public class TimeSheetEntryController implements EntryApi {
     @Override
     public ResponseEntity<TimeSheetEntryDTO> getEntry(@PathVariable("id") Integer id) {
         final var optionalEntry = timeSheetEntryService.getOne(id);
-        if (optionalEntry.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(optionalEntry.get());
         return new ResponseEntity<>(entryDTO, HttpStatus.OK);
     }
@@ -49,17 +44,7 @@ public class TimeSheetEntryController implements EntryApi {
     @CrossOrigin
     @Override
     public ResponseEntity<TimeSheetEntryDTO> insertEntry(@RequestBody TimeSheetEntryDTO entry) {
-        TimeSheetEntry insertedEntry = null;
-        try {
-            insertedEntry = timeSheetEntryService.create(entry);
-        } catch (ParseException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        if (insertedEntry == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
+        final var insertedEntry = timeSheetEntryService.create(entry);
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(insertedEntry);
         return new ResponseEntity<>(entryDTO, HttpStatus.CREATED);
     }
@@ -67,17 +52,8 @@ public class TimeSheetEntryController implements EntryApi {
     @CrossOrigin
     @Override
     public ResponseEntity<TimeSheetEntryDTO> updateEntry(@RequestBody TimeSheetEntryDTO entryDTO) {
-        TimeSheetEntry entry = null;
-        try {
-            entry = TimeSheetEntryMapper.fromEntryDTO(entryDTO);
-        } catch (ParseException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
+        final var entry = TimeSheetEntryMapper.fromEntryDTO(entryDTO);
         final var updatedEntry = timeSheetEntryService.update(entry);
-        if (updatedEntry == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         final var updatedDTO = TimeSheetEntryMapper.toEntryDTO(updatedEntry);
         return new ResponseEntity<>(updatedDTO, HttpStatus.OK);
     }
@@ -85,10 +61,7 @@ public class TimeSheetEntryController implements EntryApi {
     @CrossOrigin
     @Override
     public ResponseEntity deleteEntry(@PathVariable("id") Integer id) {
-        final var deleted = timeSheetEntryService.delete(id);
-        if (!deleted) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        timeSheetEntryService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
