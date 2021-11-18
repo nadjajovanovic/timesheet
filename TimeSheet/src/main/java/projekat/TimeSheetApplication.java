@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EntityScan
 @EnableTransactionManagement
 @ComponentScan(basePackages = "projekat.*")
+@PropertySource("classpath:application-local.properties")
 public class TimeSheetApplication {
 
 	public static void main(String[] args) {
