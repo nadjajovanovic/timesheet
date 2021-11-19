@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
@@ -19,6 +20,7 @@ import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -253,6 +255,53 @@ class ReportControllerIntegrationTest extends BaseUT{
         assertEquals(0, reportResponse.size());
     }
 
+    @Test
+    void generatePdfNoEntities() throws Exception {
+        //Arange
+        final var report = new ReportFilterDTO();
+
+        //Act
+        final var response = mvc.perform(get("/report/getPdf")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_PDF))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+    }
+
+    @Test
+    void generateExcelNoResults() throws Exception {
+        //Arange
+        final var client = saveTestClient("Jhon");
+        final var category = saveTestCategory("Backend");
+        final var project = saveTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        saveTestEntry(client, category, project, date1);
+        saveTestEntry(client, category, project, date2);
+        saveTestEntry(client, category, project, date3);
+
+        final var report = new ReportFilterDTO();
+        report.setCategoryId(12);
+
+        //Act
+        final var response = mvc.perform(get("/report/getPdf")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_PDF))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+    }
 
     private TimeSheetEntry saveTestEntry(Client client, Category category, Project project, Date entryDate) {
         final var entry = createTestEntryWithObjects("Description", category, client, project, entryDate);

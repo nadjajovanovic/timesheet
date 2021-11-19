@@ -9,13 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import projekat.api.api.ReportApi;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryDTO;
+import projekat.exception.BadRequestException;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.services.ReportService;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -43,19 +41,17 @@ public class ReportController implements ReportApi {
 	public ResponseEntity<Resource> getReportsInPdf() {
 		final var report = new ReportFilterDTO();
 
-		byte[] contents = new byte[0];
+		byte[] contents;
 		final var timeSheetEntryReportDTOList = reportService.generateReport(report)
 			   .stream()
 			   .map(TimeSheetEntryMapper::toEntryForReportDTO)
 			   .toList();
 
-		reportService.createDocument(timeSheetEntryReportDTOList);
-		File file = new File(ReportService.fileName);
-		String path = file.getAbsolutePath();
+		final var inputStream=reportService.createDocument(timeSheetEntryReportDTOList);
 		try {
-			contents = Files.readAllBytes(Paths.get(path));
+			 contents = inputStream.readAllBytes();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new BadRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity(contents, HttpStatus.OK);
 	}

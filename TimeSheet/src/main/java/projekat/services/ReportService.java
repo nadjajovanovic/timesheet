@@ -1,24 +1,27 @@
 package projekat.services;
 
 import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
+import projekat.exception.BadRequestException;
 import projekat.models.TimeSheetEntry;
 import projekat.repository.TimeSheetEntryRepository;
 import projekat.util.DateFormatter;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class ReportService {
-
-    public static final String fileName = "timeSheetEntryReport.pdf";
 
     @Autowired
     private TimeSheetEntryRepository timeSheetEntryRepository;
@@ -57,42 +60,57 @@ public class ReportService {
         return filteredReports;
     }
 
-    public Document createDocument(List<TimeSheetEntryReportDTO> timeSheetEntryReportDTOList) {
+    public InputStream createDocument(List<TimeSheetEntryReportDTO> timeSheetEntryReportDTOList) {
 
         final var document = new Document(PageSize.A4);
+        final var out = new ByteArrayOutputStream();
         try {
-            PdfWriter.getInstance(document, new FileOutputStream(fileName));
+            PdfWriter.getInstance(document,  out);
 
             document.open();
+            PdfPTable headerTable=new PdfPTable(7);
+            headerTable.setWidthPercentage(98);
+            PdfPCell cellValue = new PdfPCell(new Paragraph("Report id"));
+            cellValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellValue.setNoWrap(true);
+            headerTable.addCell(cellValue);
+            cellValue = new PdfPCell(new Paragraph("Paragraph date"));
+            headerTable.addCell(cellValue);
+            cellValue = new PdfPCell(new Paragraph("Report description"));
+            headerTable.addCell(cellValue);
+            cellValue = new PdfPCell(new Paragraph("Report total time spent"));
+            headerTable.addCell(cellValue);
+            cellValue = new PdfPCell(new Paragraph("Report project name"));
+            headerTable.addCell(cellValue);
+            cellValue = new PdfPCell(new Paragraph("Report category name"));
+            headerTable.addCell(cellValue);
+            cellValue = new PdfPCell(new Paragraph("Report teammember name"));
+            headerTable.addCell(cellValue);
+            timeSheetEntryReportDTOList.forEach(item -> addReportToPdf(item,headerTable));
+            document.add(headerTable);
 
-            timeSheetEntryReportDTOList.forEach(item -> addReportToPdf(item,document));
             document.close();
 
-        } catch (DocumentException | FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (DocumentException e) {
+            throw new BadRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return document;
+        return new ByteArrayInputStream(out.toByteArray());
     }
 
-    private void addReportToPdf(TimeSheetEntryReportDTO report, Document document){
-        try {
-            final var paragraphId = new Paragraph("Report id: " + report.getId());
-            document.add(paragraphId);
-            final var paragrphDate = new Paragraph("Paragraph date: " + report.getDate());
-            document.add(paragrphDate);
-            final var paragrphDescription = new Paragraph("Report description: " + report.getDescription());
-            document.add(paragrphDescription);
-            final var paragrphTotalTimeSpent = new Paragraph("Report total time spent: " + report.getTotalTimeSpent());
-            document.add(paragrphTotalTimeSpent);
-            final var paragrphProjectName = new Paragraph("Report project name: " + report.getProjectName());
-            document.add(paragrphProjectName);
-            final var paragrphCategoryName = new Paragraph("Report category name: " + report.getCategoryName());
-            document.add(paragrphCategoryName);
-            final var paragrphTeamMemberName = new Paragraph("Report teammember name: " + report.getTeamMemberName());
-            document.add(paragrphTeamMemberName);
-            document.add( Chunk.NEWLINE );
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
+    private void addReportToPdf(TimeSheetEntryReportDTO report, PdfPTable document){
+        final var paragraphId = new Paragraph(report.getId().toString());
+        document.addCell(paragraphId);
+        final var paragrphDate = new Paragraph(report.getDate());
+        document.addCell(paragrphDate);
+        final var paragrphDescription = new Paragraph(report.getDescription());
+        document.addCell(paragrphDescription);
+        final var paragrphTotalTimeSpent = new Paragraph(String.valueOf(report.getTotalTimeSpent()));
+        document.addCell(paragrphTotalTimeSpent);
+        final var paragrphProjectName = new Paragraph( report.getProjectName());
+        document.addCell(paragrphProjectName);
+        final var paragrphCategoryName = new Paragraph( report.getCategoryName());
+        document.addCell(paragrphCategoryName);
+        final var paragrphTeamMemberName = new Paragraph( report.getTeamMemberName());
+        document.addCell(paragrphTeamMemberName);
     }
 }
