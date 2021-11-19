@@ -45,7 +45,10 @@ public class ReportController implements ReportApi {
 	@Override
 	public ResponseEntity<Resource> getReportsInPdf() {
 		final var report = new ReportFilterDTO();
-
+		final var headers = new HttpHeaders();
+		final var headerKey = "Content-Disposition";
+		final var headerValue = "attachment; filename=report.pdf";
+		headers.add(headerKey, headerValue);
 		byte[] contents;
 		final var timeSheetEntryReportDTOList = reportService.generateReport(report)
 			   .stream()
@@ -58,7 +61,7 @@ public class ReportController implements ReportApi {
 		} catch (IOException e) {
 			throw new BadRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity(contents, HttpStatus.OK);
+		return new ResponseEntity(contents,headers ,HttpStatus.OK);
 	}
 
 	@Override

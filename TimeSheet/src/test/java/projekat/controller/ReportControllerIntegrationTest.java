@@ -276,6 +276,7 @@ class ReportControllerIntegrationTest extends BaseUT{
                 .andReturn();
 
         //assert
+        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
         assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
         assertNotNull(response.getResponse().getContentAsByteArray());
     }
@@ -308,6 +309,38 @@ class ReportControllerIntegrationTest extends BaseUT{
         //assert
         assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
         assertNotNull(response.getResponse().getContentAsByteArray());
+        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
+    }
+
+    @Test
+    void generatePdfByCategoryId() throws Exception {
+        //Arange
+        final var client = saveTestClient("Jane");
+        final var category = saveTestCategory("Frontend");
+        final var project = saveTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        saveTestEntry(client, category, project, date1);
+        saveTestEntry(client, category, project, date2);
+        saveTestEntry(client, category, project, date3);
+
+        final var report = new ReportFilterDTO();
+        report.setCategoryId(category.getCategoryid());
+
+        //Act
+        final var response = mvc.perform(post("/report/export/excel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
     }
 
     @Test
