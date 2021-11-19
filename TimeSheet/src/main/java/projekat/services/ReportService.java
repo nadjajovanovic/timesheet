@@ -100,17 +100,17 @@ public class ReportService {
     private void addReportToPdf(TimeSheetEntryReportDTO report, PdfPTable document){
         final var paragraphId = new Paragraph(report.getId().toString());
         document.addCell(paragraphId);
-        final var paragrphDate = new Paragraph(report.getDate());
-        document.addCell(paragrphDate);
-        final var paragrphDescription = new Paragraph(report.getDescription());
-        document.addCell(paragrphDescription);
-        final var paragrphTotalTimeSpent = new Paragraph(String.valueOf(report.getTotalTimeSpent()));
-        document.addCell(paragrphTotalTimeSpent);
-        final var paragrphProjectName = new Paragraph( report.getProjectName());
-        document.addCell(paragrphProjectName);
-        final var paragrphCategoryName = new Paragraph( report.getCategoryName());
-        document.addCell(paragrphCategoryName);
-        final var paragrphTeamMemberName = new Paragraph( report.getTeamMemberName());
-        document.addCell(paragrphTeamMemberName);
+        final var paragraphDate = new Paragraph(report.getDate());
+        document.addCell(paragraphDate);
+        final var paragraphDescription = new Paragraph(report.getDescription());
+        document.addCell(paragraphDescription);
+        final var paragraphTotalTimeSpent = new Paragraph(String.valueOf(report.getTotalTimeSpent()));
+        document.addCell(paragraphTotalTimeSpent);
+        final var paragraphProjectName = new Paragraph( report.getProjectName());
+        document.addCell(paragraphProjectName);
+        final var paragraphCategoryName = new Paragraph( report.getCategoryName());
+        document.addCell(paragraphCategoryName);
+        final var paragraphTeamMemberName = new Paragraph( report.getTeamMemberName());
+        document.addCell(paragraphTeamMemberName);
     }
 }
