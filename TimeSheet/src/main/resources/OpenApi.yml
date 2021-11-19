@@ -205,6 +205,32 @@ paths:
           description: UNAUTH
         "404":
           description: NOT FOUND
+
+  /report/export/csv:
+    post:
+      summary: Generate reports in csv
+      description: This metod returns list of reports
+      tags:
+        - "Report"
+      operationId: exportToCSV
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportFilterDTO'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/csv:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+
   /project:
     get:
       summary: This gets all projects

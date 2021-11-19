@@ -90,4 +90,37 @@ public class ReportController implements ReportApi {
 		return new ResponseEntity(res, headers, HttpStatus.OK);
 	}
 
+	@Override
+	public ResponseEntity<Resource> exportToCSV(ReportFilterDTO reportFilterDTO) {
+		final var resource = new ByteArrayOutputStream();
+		final var headersKey = "Content-Disposition";
+		final var headerValue = "attachment; filename=reports.csv";
+		final var headers = new HttpHeaders();
+		headers.add(headersKey, headerValue);
+
+		final var listOfGeneratedReports = reportService.generateReport(reportFilterDTO);
+		final var filteredReports = listOfGeneratedReports
+				.stream()
+				.map(TimeSheetEntryMapper::toEntryForReportDTO)
+				.toList();
+
+		try {
+			var writer = new OutputStreamWriter(resource, StandardCharsets.UTF_8);
+			try (var csvWriter = new CsvBeanWriter(writer, CsvPreference.STANDARD_PREFERENCE)) {
+				final var csvHeader = new String[]{"Date", "Description", "Time", "Project", "Category", "Team member"};
+				final var nameMapping = new String[]{"date", "description", "totalTimeSpent", "projectName", "categoryName", "teamMemberName"};
+				csvWriter.writeHeader(csvHeader);
+
+				for (var report : filteredReports) {
+					csvWriter.write(report, nameMapping);
+				}
+			}
+		} catch (IOException ex) {
+			throw new BadRequestException(ex.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		final var res = new ByteArrayResource(resource.toByteArray());
+
+		return new ResponseEntity(res, headers, HttpStatus.OK);
+	}
+
 }
