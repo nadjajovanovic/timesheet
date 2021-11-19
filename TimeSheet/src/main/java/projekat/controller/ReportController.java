@@ -21,8 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -50,9 +48,7 @@ public class ReportController implements ReportApi {
 	public ResponseEntity<Resource> exportToCSV(ReportFilterDTO reportFilterDTO) {
 		final var resource = new ByteArrayOutputStream();
 		final var headersKey = "Content-Disposition";
-		final var dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-		final var currentDateTime = dateFormat.format(new Date());
-		final var headerValue = "attachment; filename=reports_" + currentDateTime + ".csv";
+		final var headerValue = "attachment; filename=reports.csv";
 		final var headers = new HttpHeaders();
 		headers.add(headersKey, headerValue);
 
