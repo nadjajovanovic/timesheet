@@ -159,6 +159,31 @@ paths:
         "401":
           description: UNAUTH
 
+  /report/export/excel:
+    post:
+      summary: Generate report in excel
+      description: This method return list of reports that fits given paramenters
+      tags:
+        - "Report"
+      operationId: getExcelReport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportFilterDTO'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+
   /project:
     get:
       summary: This gets all projects

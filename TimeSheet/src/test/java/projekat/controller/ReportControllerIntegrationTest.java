@@ -8,21 +8,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
-import projekat.models.*;
+import projekat.models.Category;
+import projekat.models.Client;
+import projekat.models.Project;
+import projekat.models.TimeSheetEntry;
 import projekat.repository.*;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
-import java.util.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
@@ -252,6 +260,90 @@ class ReportControllerIntegrationTest extends BaseUT{
         //assert
         assertEquals(0, reportResponse.size());
     }
+
+
+    @Test
+    void generateExcelByDateRange() throws Exception {
+        //Arange
+        final var client = saveTestClient("Jane");
+        final var category = saveTestCategory("Frontend");
+        final var project = saveTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        saveTestEntry(client, category, project, date1);
+        saveTestEntry(client, category, project, date2);
+        saveTestEntry(client, category, project, date3);
+
+        final var report = new ReportFilterDTO();
+        report.setStartDate("2021-11-08");
+        report.setEndDate("2021-11-30");
+
+        //Act
+        final var response = mvc.perform(post("/report/export/excel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
+    }
+
+    @Test
+    void generateExcelNoEntities() throws Exception {
+        //Arange
+        final var report = new ReportFilterDTO();
+
+        //Act
+        final var response = mvc.perform(post("/report/export/excel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
+    }
+
+    @Test
+    void generateExcelNoResults() throws Exception {
+        //Arange
+        final var client = saveTestClient("Jane");
+        final var category = saveTestCategory("Frontend");
+        final var project = saveTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        saveTestEntry(client, category, project, date1);
+        saveTestEntry(client, category, project, date2);
+        saveTestEntry(client, category, project, date3);
+
+        final var report = new ReportFilterDTO();
+        report.setCategoryId(1234);
+
+        //Act
+        final var response = mvc.perform(post("/report/export/excel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
+    }
+
 
 
     private TimeSheetEntry saveTestEntry(Client client, Category category, Project project, Date entryDate) {
