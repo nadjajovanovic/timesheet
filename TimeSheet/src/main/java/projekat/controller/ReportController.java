@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 import projekat.api.api.ReportApi;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryDTO;
@@ -19,6 +21,9 @@ import projekat.util.ReportExcelExporter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+
 import java.util.List;
 
 @RestController
@@ -41,46 +46,34 @@ public class ReportController implements ReportApi {
 		return new ResponseEntity(filtered, HttpStatus.OK);
 	}
 
-
 	@Override
-	public ResponseEntity<Resource> getReportsInPdf() {
-		final var report = new ReportFilterDTO();
-		final var headers = new HttpHeaders();
-		final var headerKey = "Content-Disposition";
-		final var headerValue = "attachment; filename=report.pdf";
-		headers.add(headerKey, headerValue);
-		byte[] contents;
-		final var timeSheetEntryReportDTOList = reportService.generateReport(report)
-			   .stream()
-			   .map(TimeSheetEntryMapper::toEntryForReportDTO)
-			   .toList();
-
-		final var inputStream=reportService.createDocument(timeSheetEntryReportDTOList);
-		try {
-			 contents = inputStream.readAllBytes();
-		} catch (IOException e) {
-			throw new BadRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-		return new ResponseEntity(contents,headers ,HttpStatus.OK);
-	}
-
-	@Override
-	public ResponseEntity<Resource> getExcelReport(ReportFilterDTO reportFilterDTO) {
+	public ResponseEntity<Resource> exportToCSV(ReportFilterDTO reportFilterDTO) {
 		final var resource = new ByteArrayOutputStream();
+		final var headersKey = "Content-Disposition";
+		final var headerValue = "attachment; filename=reports.csv";
 		final var headers = new HttpHeaders();
-		final var headerKey = "Content-Disposition";
-		final var headerValue = "attachment; filename=report.xlsx";
-		headers.add(headerKey, headerValue);
-		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.add(headersKey, headerValue);
 
-		final var generatedReports = reportService.generateReport(reportFilterDTO);
-		final var filtered = generatedReports
+		final var listOfGeneratedReports = reportService.generateReport(reportFilterDTO);
+		final var filteredReports = listOfGeneratedReports
 				.stream()
 				.map(TimeSheetEntryMapper::toEntryForReportDTO)
 				.toList();
 
-		final var excelExporter = new ReportExcelExporter(filtered);
-		excelExporter.export(resource);
+		try {
+			var writer = new OutputStreamWriter(resource, StandardCharsets.UTF_8);
+			try (var csvWriter = new CsvBeanWriter(writer, CsvPreference.STANDARD_PREFERENCE)) {
+				final var csvHeader = new String[]{"Date", "Description", "Time", "Project", "Category", "Team member"};
+				final var nameMapping = new String[]{"date", "description", "totalTimeSpent", "projectName", "categoryName", "teamMemberName"};
+				csvWriter.writeHeader(csvHeader);
+
+				for (var report : filteredReports) {
+					csvWriter.write(report, nameMapping);
+				}
+			}
+		} catch (IOException ex) {
+			throw new BadRequestException(ex.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 		final var res = new ByteArrayResource(resource.toByteArray());
 
 		return new ResponseEntity(res, headers, HttpStatus.OK);

@@ -263,91 +263,10 @@ class ReportControllerIntegrationTest extends BaseUT{
     }
 
     @Test
-    void generatePdfNoEntities() throws Exception {
-        //Arange
-        final var report = new ReportFilterDTO();
-
-        //Act
-        final var response = mvc.perform(get("/report/getPdf")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(report))
-                        .accept(MediaType.APPLICATION_PDF))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        //assert
-        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
-        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
-        assertNotNull(response.getResponse().getContentAsByteArray());
-    }
-
-    @Test
-    void generatePdfNoResults() throws Exception {
-        //Arange
-        final var client = saveTestClient("Jhon");
+    void generateCsvFile() throws Exception {
+        //Arrange
+        final var client = saveTestClient("Jane");
         final var category = saveTestCategory("Backend");
-        final var project = saveTestProject("Music App", "App for music");
-        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
-        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
-        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
-
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
-
-        final var report = new ReportFilterDTO();
-        report.setCategoryId(12);
-
-        //Act
-        final var response = mvc.perform(get("/report/getPdf")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(report))
-                        .accept(MediaType.APPLICATION_PDF))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        //assert
-        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
-        assertNotNull(response.getResponse().getContentAsByteArray());
-        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
-    }
-
-    @Test
-    void generatePdfByCategoryId() throws Exception {
-        //Arange
-        final var client = saveTestClient("Jane");
-        final var category = saveTestCategory("Frontend");
-        final var project = saveTestProject("Music App", "App for music");
-        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
-        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
-        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
-
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
-
-        final var report = new ReportFilterDTO();
-        report.setCategoryId(category.getCategoryid());
-
-        //Act
-        final var response = mvc.perform(get("/report/getPdf")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(report))
-                        .accept(MediaType.APPLICATION_PDF))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        //assert
-        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
-        assertNotNull(response.getResponse().getContentAsByteArray());
-        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
-    }
-
-    @Test
-    void generateExcelByDateRange() throws Exception {
-        //Arange
-        final var client = saveTestClient("Jane");
-        final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
@@ -361,41 +280,39 @@ class ReportControllerIntegrationTest extends BaseUT{
         report.setStartDate("2021-11-08");
         report.setEndDate("2021-11-30");
 
-        //Act
-        final var response = mvc.perform(post("/report/export/excel")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(report))
-                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+        //act
+        final var response = mvc.perform(post("/report/export/csv")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(report)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         //assert
-        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertEquals(HttpStatus.OK.value(),response.getResponse().getStatus());
         assertNotNull(response.getResponse().getContentAsByteArray());
-        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
+        assertEquals("attachment; filename=reports.csv", response.getResponse().getHeader("Content-Disposition"));
     }
 
     @Test
-    void generateExcelNoEntities() throws Exception {
-        //Arange
+    void generateCsvNoEntities() throws Exception {
+        //arange
         final var report = new ReportFilterDTO();
 
-        //Act
-        final var response = mvc.perform(post("/report/export/excel")
+        //act
+        final var response = mvc.perform(post("/report/export/csv")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(report))
-                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                        .content(objectMapper.writeValueAsString(report)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         //assert
         assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
         assertNotNull(response.getResponse().getContentAsByteArray());
-        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
+        assertEquals("attachment; filename=reports.csv", response.getResponse().getHeader("Content-Disposition"));
     }
 
     @Test
-    void generateExcelNoResults() throws Exception {
+    void generateCsvNoResults() throws Exception {
         //Arange
         final var client = saveTestClient("Jane");
         final var category = saveTestCategory("Frontend");
@@ -411,20 +328,18 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var report = new ReportFilterDTO();
         report.setCategoryId(1234);
 
-        //Act
-        final var response = mvc.perform(post("/report/export/excel")
+        //act
+        final var response = mvc.perform(post("/report/export/csv")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(report))
-                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                        .content(objectMapper.writeValueAsString(report)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         //assert
         assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
         assertNotNull(response.getResponse().getContentAsByteArray());
-        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
+        assertEquals("attachment; filename=reports.csv", response.getResponse().getHeader("Content-Disposition"));
     }
-
 
 
     private TimeSheetEntry saveTestEntry(Client client, Category category, Project project, Date entryDate) {
