@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-
 import java.util.List;
 
 @RestController
@@ -122,5 +121,4 @@ public class ReportController implements ReportApi {
 
 		return new ResponseEntity(res, headers, HttpStatus.OK);
 	}
-
 }
