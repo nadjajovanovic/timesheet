@@ -29,6 +29,7 @@ import java.util.GregorianCalendar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -261,6 +262,86 @@ class ReportControllerIntegrationTest extends BaseUT{
         assertEquals(0, reportResponse.size());
     }
 
+    @Test
+    void generatePdfNoEntities() throws Exception {
+        //Arange
+        final var report = new ReportFilterDTO();
+
+        //Act
+        final var response = mvc.perform(get("/report/getPdf")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_PDF))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+    }
+
+    @Test
+    void generatePdfNoResults() throws Exception {
+        //Arange
+        final var client = saveTestClient("Jhon");
+        final var category = saveTestCategory("Backend");
+        final var project = saveTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        saveTestEntry(client, category, project, date1);
+        saveTestEntry(client, category, project, date2);
+        saveTestEntry(client, category, project, date3);
+
+        final var report = new ReportFilterDTO();
+        report.setCategoryId(12);
+
+        //Act
+        final var response = mvc.perform(get("/report/getPdf")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_PDF))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
+    }
+
+    @Test
+    void generatePdfByCategoryId() throws Exception {
+        //Arange
+        final var client = saveTestClient("Jane");
+        final var category = saveTestCategory("Frontend");
+        final var project = saveTestProject("Music App", "App for music");
+        final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
+        final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
+        final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
+
+        saveTestEntry(client, category, project, date1);
+        saveTestEntry(client, category, project, date2);
+        saveTestEntry(client, category, project, date3);
+
+        final var report = new ReportFilterDTO();
+        report.setCategoryId(category.getCategoryid());
+
+        //Act
+        final var response = mvc.perform(get("/report/getPdf")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(report))
+                        .accept(MediaType.APPLICATION_PDF))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //assert
+        assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
+        assertNotNull(response.getResponse().getContentAsByteArray());
+        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
+    }
 
     @Test
     void generateExcelByDateRange() throws Exception {
