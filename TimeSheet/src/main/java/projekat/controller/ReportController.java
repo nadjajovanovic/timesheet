@@ -17,8 +17,6 @@ import projekat.services.ReportService;
 import projekat.util.ReportExcelExporter;
 
 import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -47,10 +45,8 @@ public class ReportController implements ReportApi {
 	public ResponseEntity<Resource> getExcelReport(ReportFilterDTO reportFilterDTO) {
 		final var resource = new ByteArrayOutputStream();
 		final var headers = new HttpHeaders();
-		final var dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-		final var currentDateTime = dateFormatter.format(new Date());
 		final var headerKey = "Content-Disposition";
-		final var headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+		final var headerValue = "attachment; filename=report.xlsx";
 		headers.add(headerKey, headerValue);
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
@@ -64,6 +60,6 @@ public class ReportController implements ReportApi {
 		excelExporter.export(resource);
 		final var res = new ByteArrayResource(resource.toByteArray());
 
-		return new ResponseEntity( res, headers, HttpStatus.OK);
+		return new ResponseEntity(res, headers, HttpStatus.OK);
 	}
 }
