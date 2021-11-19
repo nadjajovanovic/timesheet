@@ -114,6 +114,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teamMember.setName(teamMemberName);
         teamMember.setUsername("username");
         teamMember.setEmail("test@example.com");
+        teamMember.setPassword("password");
         teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
         //Act
         final var response = mvc.perform(post("/teammember")
@@ -154,6 +155,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teamMember.setTeammembername("Jhon");
         teamMember.setUsername("jhon");
         teamMember.setEmail("test@example.com");
+        teamMember.setPassword("password");
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -288,6 +290,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teammember.setName(teammemberName);
         teammember.setUsername("username");
         teammember.setEmail("test@example.com");
+        teammember.setPassword("password");
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         return teammember;
     }
