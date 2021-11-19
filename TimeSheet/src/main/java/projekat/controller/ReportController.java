@@ -47,33 +47,44 @@ public class ReportController implements ReportApi {
 	}
 
 	@Override
-	public ResponseEntity<Resource> exportToCSV(ReportFilterDTO reportFilterDTO) {
-		final var resource = new ByteArrayOutputStream();
-		final var headersKey = "Content-Disposition";
-		final var headerValue = "attachment; filename=reports.csv";
+	public ResponseEntity<Resource> getReportsInPdf() {
+		final var report = new ReportFilterDTO();
 		final var headers = new HttpHeaders();
-		headers.add(headersKey, headerValue);
-
-		final var listOfGeneratedReports = reportService.generateReport(reportFilterDTO);
-		final var filteredReports = listOfGeneratedReports
+		final var headerKey = "Content-Disposition";
+		final var headerValue = "attachment; filename=report.pdf";
+		headers.add(headerKey, headerValue);
+		byte[] contents;
+		final var timeSheetEntryReportDTOList = reportService.generateReport(report)
 				.stream()
 				.map(TimeSheetEntryMapper::toEntryForReportDTO)
 				.toList();
 
+		final var inputStream=reportService.createDocument(timeSheetEntryReportDTOList);
 		try {
-			var writer = new OutputStreamWriter(resource, StandardCharsets.UTF_8);
-			try (var csvWriter = new CsvBeanWriter(writer, CsvPreference.STANDARD_PREFERENCE)) {
-				final var csvHeader = new String[]{"Date", "Description", "Time", "Project", "Category", "Team member"};
-				final var nameMapping = new String[]{"date", "description", "totalTimeSpent", "projectName", "categoryName", "teamMemberName"};
-				csvWriter.writeHeader(csvHeader);
-
-				for (var report : filteredReports) {
-					csvWriter.write(report, nameMapping);
-				}
-			}
-		} catch (IOException ex) {
-			throw new BadRequestException(ex.getMessage(), HttpStatus.BAD_REQUEST);
+			contents = inputStream.readAllBytes();
+		} catch (IOException e) {
+			throw new BadRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
+		return new ResponseEntity(contents,headers ,HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<Resource> getExcelReport(ReportFilterDTO reportFilterDTO) {
+		final var resource = new ByteArrayOutputStream();
+		final var headers = new HttpHeaders();
+		final var headerKey = "Content-Disposition";
+		final var headerValue = "attachment; filename=report.xlsx";
+		headers.add(headerKey, headerValue);
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+		final var generatedReports = reportService.generateReport(reportFilterDTO);
+		final var filtered = generatedReports
+				.stream()
+				.map(TimeSheetEntryMapper::toEntryForReportDTO)
+				.toList();
+
+		final var excelExporter = new ReportExcelExporter(filtered);
+		excelExporter.export(resource);
 		final var res = new ByteArrayResource(resource.toByteArray());
 
 		return new ResponseEntity(res, headers, HttpStatus.OK);

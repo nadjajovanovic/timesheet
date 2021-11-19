@@ -179,13 +179,13 @@ paths:
         "404":
           description: NOT FOUND
 
-  /report/export/csv:
+  /report/export/excel:
     post:
-      summary: Generate reports in csv
-      description: This metod returns list of reports in csv file
+      summary: Generate report in excel
+      description: This method return list of reports that fits given paramenters
       tags:
         - "Report"
-      operationId: exportToCSV
+      operationId: getExcelReport
       requestBody:
         content:
           application/json:
@@ -193,9 +193,9 @@ paths:
               $ref: '#/components/schemas/ReportFilterDTO'
       responses:
         "200":
-          description: Succes
+          description: Success
           content:
-            application/csv:
+            application/octet-stream:
               schema:
                 type: string
                 format: binary
@@ -203,7 +203,8 @@ paths:
           description: BAD REQUEST
         "401":
           description: UNAUTH
-
+        "404":
+          description: NOT FOUND
   /project:
     get:
       summary: This gets all projects
