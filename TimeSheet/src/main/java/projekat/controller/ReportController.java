@@ -1,9 +1,11 @@
 package projekat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.supercsv.io.CsvBeanWriter;
@@ -13,13 +15,12 @@ import projekat.api.api.ReportApi;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
+import projekat.exception.BadRequestException;
 import projekat.mapper.TimeSheetEntryMapper;
-import projekat.models.TimeSheetEntry;
 import projekat.services.ReportService;
 
-import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -45,34 +46,39 @@ public class ReportController implements ReportApi {
 		return new ResponseEntity(filtered, HttpStatus.OK);
 	}
 
-	@PostMapping("report/export/csv")
-	public void exportToCSV(HttpServletResponse response) throws IOException {
-		response.setContentType("application/csv");
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-		String currentDateTime = dateFormat.format(new Date());
+	@Override
+	public ResponseEntity<Resource> exportToCSV(ReportFilterDTO reportFilterDTO) {
+		final var resource = new ByteArrayOutputStream();
+		final var headers = new HttpHeaders();
+		final var headersKey = "Content-Disposition";
+		final var dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+		final var currentDateTime = dateFormat.format(new Date());
+		final var headerValue = "attachment; filename=reports_" + currentDateTime + ".csv";
+		headers.add(headersKey, headerValue);
 
-		String headerKey = "Content-Disposition";
-		String headerValue = "attachment; filename=reports_" + currentDateTime + ".csv";
-		response.setHeader(headerKey, headerValue);
-
-		final var reportFilter = new ReportFilterDTO();
-		final var listOfGeneratedReports = reportService.generateReport(reportFilter);
+		final var listOfGeneratedReports = reportService.generateReport(reportFilterDTO);
 		final var filteredReports = listOfGeneratedReports
 				.stream()
 				.map(TimeSheetEntryMapper::toEntryForReportDTO)
 				.toList();
 
-		ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
-		String[] csvHeader = { "Date", "Description", "Time", "Project", "Category", "Team member"};
-		String[] nameMapping = { "date", "description", "totalTimeSpent", "projectName", "categoryName", "teamMemberName"};
 
-		csvWriter.writeHeader(csvHeader);
 
-		for (TimeSheetEntryReportDTO report : filteredReports) {
-			csvWriter.write(report, nameMapping);
+		try (ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE)){
+			final var csvHeader = new String[]{ "Date", "Description", "Time", "Project", "Category", "Team member"};
+			final var nameMapping = new String[]{ "date", "description", "totalTimeSpent", "projectName", "categoryName", "teamMemberName"};
+			csvWriter.writeHeader(csvHeader);
+
+			for (TimeSheetEntryReportDTO report : filteredReports) {
+				csvWriter.write(report, nameMapping);
+			}
+		} catch (IOException ex) {
+			throw new BadRequestException(ex.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 
-		csvWriter.close();
+		final var res = new ByteArrayResource(resource.toByteArray());
+
+		return new ResponseEntity(res, HttpStatus.OK);
 	}
 
 
