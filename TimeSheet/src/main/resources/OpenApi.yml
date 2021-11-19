@@ -978,4 +978,3 @@ components:
           pattern: ^(?!\s*$).+
       required:
         - name
-      
