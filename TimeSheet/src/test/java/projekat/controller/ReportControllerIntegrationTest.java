@@ -330,17 +330,17 @@ class ReportControllerIntegrationTest extends BaseUT{
         report.setCategoryId(category.getCategoryid());
 
         //Act
-        final var response = mvc.perform(post("/report/export/excel")
+        final var response = mvc.perform(get("/report/getPdf")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(report))
-                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                        .accept(MediaType.APPLICATION_PDF))
                 .andExpect(status().isOk())
                 .andReturn();
 
         //assert
         assertEquals(HttpStatus.OK.value(), response.getResponse().getStatus());
         assertNotNull(response.getResponse().getContentAsByteArray());
-        assertEquals("attachment; filename=report.xlsx", response.getResponse().getHeader("Content-Disposition"));
+        assertEquals("attachment; filename=report.pdf", response.getResponse().getHeader("Content-Disposition"));
     }
 
     @Test
