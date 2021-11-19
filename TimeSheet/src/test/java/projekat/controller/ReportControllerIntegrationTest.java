@@ -281,7 +281,7 @@ class ReportControllerIntegrationTest extends BaseUT{
     }
 
     @Test
-    void generateExcelNoResults() throws Exception {
+    void generatePdfNoResults() throws Exception {
         //Arange
         final var client = saveTestClient("Jhon");
         final var category = saveTestCategory("Backend");

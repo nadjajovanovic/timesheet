@@ -164,6 +164,20 @@ paths:
       tags:
         - "Report"
       operationId: getReportsInPdf
+      responses:
+        "200":
+          description: Success
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: BAD REQUEST
+        "401":
+          description: UNAUTH
+        "404":
+          description: NOT FOUND
 
   /report/export/excel:
     post:
@@ -181,7 +195,6 @@ paths:
         "200":
           description: Success
           content:
-            application/pdf:
             application/octet-stream:
               schema:
                 type: string

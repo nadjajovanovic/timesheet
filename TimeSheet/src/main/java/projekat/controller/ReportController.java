@@ -1,7 +1,6 @@
 package projekat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,9 +17,8 @@ import projekat.mapper.TimeSheetEntryMapper;
 import projekat.services.ReportService;
 import projekat.util.ReportExcelExporter;
 
-
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -61,7 +59,9 @@ public class ReportController implements ReportApi {
 			throw new BadRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity(contents, HttpStatus.OK);
-    
+	}
+
+	@Override
 	public ResponseEntity<Resource> getExcelReport(ReportFilterDTO reportFilterDTO) {
 		final var resource = new ByteArrayOutputStream();
 		final var headers = new HttpHeaders();
