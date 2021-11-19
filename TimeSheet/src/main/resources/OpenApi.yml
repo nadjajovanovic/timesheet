@@ -164,11 +164,25 @@ paths:
       tags:
         - "Report"
       operationId: getReportsInPdf
+
+  /report/export/excel:
+    post:
+      summary: Generate report in excel
+      description: This method return list of reports that fits given paramenters
+      tags:
+        - "Report"
+      operationId: getExcelReport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportFilterDTO'
       responses:
         "200":
           description: Success
           content:
             application/pdf:
+            application/octet-stream:
               schema:
                 type: string
                 format: binary
