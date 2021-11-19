@@ -281,6 +281,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         assertNotNull(response.getResponse().getContentAsByteArray());
     }
 
+
     @Test
     void generatePdfNoResults() throws Exception {
         //Arange
