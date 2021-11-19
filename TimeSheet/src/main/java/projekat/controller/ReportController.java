@@ -5,6 +5,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,23 +17,24 @@ import projekat.api.model.TimeSheetEntryDTO;
 import projekat.exception.BadRequestException;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.services.ReportService;
+import projekat.util.ReportExcelExporter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+
 import java.util.List;
 
 @RestController
 public class ReportController implements ReportApi {
 
 	@Autowired
-	private ReportService reportService;
+	private final ReportService reportService;
 
 	public ReportController(ReportService reportService) {
 		this.reportService = reportService;
 	}
-
 
 	@Override
 	public ResponseEntity<List<TimeSheetEntryDTO>> getRequiredReports(@RequestBody ReportFilterDTO report) {
@@ -72,7 +74,6 @@ public class ReportController implements ReportApi {
 		} catch (IOException ex) {
 			throw new BadRequestException(ex.getMessage(), HttpStatus.BAD_REQUEST);
 		}
-
 		final var res = new ByteArrayResource(resource.toByteArray());
 
 		return new ResponseEntity(res, headers, HttpStatus.OK);

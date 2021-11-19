@@ -14,17 +14,24 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
-import projekat.models.*;
+import projekat.models.Category;
+import projekat.models.Client;
+import projekat.models.Project;
+import projekat.models.TimeSheetEntry;
 import projekat.repository.*;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
@@ -333,6 +340,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         assertNotNull(response.getResponse().getContentAsByteArray());
         assertEquals("attachment; filename=reports.csv", response.getResponse().getHeader("Content-Disposition"));
     }
+
 
     private TimeSheetEntry saveTestEntry(Client client, Category category, Project project, Date entryDate) {
         final var entry = createTestEntryWithObjects("Description", category, client, project, entryDate);
