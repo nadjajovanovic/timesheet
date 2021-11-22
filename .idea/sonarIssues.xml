@@ -8,6 +8,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/.gitignore">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/pom.xml">
           <value>
             <set />
@@ -48,6 +53,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/TeamMemberController.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/controller/TimeSheetEntryController.java">
           <value>
             <set />
@@ -63,6 +73,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/filters/JwtRequestFilter.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/mapper/CategoryMapper.java">
           <value>
             <set />
@@ -74,6 +89,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/models/Client.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/security/SecurityConfigurer.java">
           <value>
             <set />
           </value>
@@ -94,6 +114,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/ProjectService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/ReportService.java">
           <value>
             <set />
           </value>
@@ -143,7 +168,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/test/java/projekat/controller/ReportControllerIntegrationTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/target/generated-sources/openapi/src/main/java/projekat/api/api/EntryApi.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/target/generated-sources/openapi/src/main/java/projekat/api/api/ReportApi.java">
           <value>
             <set />
           </value>
