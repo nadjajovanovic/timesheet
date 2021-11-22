@@ -52,9 +52,9 @@ public class Teammember implements Serializable, UserDetails {
 	@OneToMany(mappedBy="teammember")
 	private List<Project> projects;
 
-	public Teammember(String foo, String foo1, ArrayList<Object> objects) {
-		this.username = foo;
-		this.password = foo;
+	public Teammember(String userName, String password, ArrayList<Object> objects) {
+		this.username = userName;
+		this.password = password;
 	}
 
 	@Override

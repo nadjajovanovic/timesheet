@@ -3,6 +3,7 @@ package projekat.services;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,9 @@ import java.util.function.Function;
 
 @Service
 public class JwtUtilService {
+
+    @Value("${key}")
+    private String key;
 
     public String extactUsername(String token){
         return exractClaim(token,Claims::getSubject);
@@ -28,7 +32,7 @@ public class JwtUtilService {
     }
 
     private Claims extarctAllClaims(String token){
-        return Jwts.parser().setSigningKey("Secret_Key").parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
     }
 
     private boolean isTokenExpired(String token){
@@ -43,7 +47,7 @@ public class JwtUtilService {
     private String createToken(Map<String,Object> claims,String username){
         return Jwts.builder().setClaims(claims).setSubject(username).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.HS256,"Secret_Key").compact();
+                .signWith(SignatureAlgorithm.HS256,key).compact();
     }
     public boolean validateToken(String token,UserDetails userDetails){
         final var username = extactUsername(token);
