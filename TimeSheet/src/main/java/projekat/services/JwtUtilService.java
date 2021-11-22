@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtUtilService {
 
-    @Value("${key}")
+    @Value("${jwt.secret.key}")
     private String key;
 
     public String extactUsername(String token){
