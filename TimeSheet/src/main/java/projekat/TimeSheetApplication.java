@@ -2,6 +2,7 @@ package projekat;
 
 import java.util.Arrays;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+@Slf4j
 @SpringBootApplication
 @Configuration
 @EntityScan
@@ -29,12 +31,12 @@ public class TimeSheetApplication {
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx){
 		return args -> {
-			System.out.println("Beans provided by Spring Boot:");
+			log.info("Beans provided by Spring Boot:");
 			
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			Arrays.sort(beanNames);
 			for (String beanName : beanNames) {
-				System.out.println(beanName);
+				log.info(beanName);
 			}
 		};
 	}
