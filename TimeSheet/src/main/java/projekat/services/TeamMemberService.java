@@ -5,15 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import projekat.enums.ErrorCode;
-import projekat.exception.NotFoundException;
-import projekat.exception.BadRequestException;
 import projekat.exception.InputFieldException;
+import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -23,8 +21,12 @@ public class TeamMemberService implements UserDetailsService {
     @Autowired
     private TeamMemberRepository teamMemberRepository;
 
-    public TeamMemberService(TeamMemberRepository teamMemberRepository) {
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
+
+    public TeamMemberService(TeamMemberRepository teamMemberRepository, PasswordEncoder passwordEncoder) {
         this.teamMemberRepository = teamMemberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Collection<Teammember> getAll() {
@@ -44,6 +46,7 @@ public class TeamMemberService implements UserDetailsService {
         if (teammember.getTeammemberid() != null) {
             throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
         }
+        teammember.setPassword(passwordEncoder.encode(teammember.getPassword()));
         final var inserted = teamMemberRepository.save(teammember);
         return inserted;
     }

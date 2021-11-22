@@ -32,6 +32,7 @@ public class Teammember implements Serializable, UserDetails {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="TEAMMEMBER_TEAMMEMBERID_GENERATOR")
 	private Integer teammemberid;
 
+	@Column(nullable = false, unique = true)
 	private String email;
 
 	private Double hoursperweek;
@@ -43,6 +44,7 @@ public class Teammember implements Serializable, UserDetails {
 
 	private String teammembername;
 
+	@Column(nullable = false, unique = true)
 	private String username;
 
 	private String password;
@@ -64,21 +66,21 @@ public class Teammember implements Serializable, UserDetails {
 
 	@Override
 	public boolean isAccountNonExpired() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return false;
+		return status;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return false;
+		return status;
 	}
 }
