@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -56,6 +57,9 @@ class ReportControllerIntegrationTest extends BaseUT{
     @Autowired
     private TeamMemberRepository teamMemberRepository;
 
+    @Autowired
+    private Cache cache;
+
     private static ObjectMapper objectMapper;
 
     @BeforeAll
@@ -66,6 +70,7 @@ class ReportControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void settingUpDatabase() {
         cleanDataBase();
+        cache.clear();
     }
 
     @Test

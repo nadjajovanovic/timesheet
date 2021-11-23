@@ -1,26 +1,34 @@
 package projekat.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import projekat.models.TimeSheetEntry;
 
 import java.time.Duration;
-import java.util.List;
 
 @Configuration
 @EnableCaching
 public class RedisConfig {
 
+    @Value("${spring.cache.key-prefix}")
+    private String redisPrefix;
+
+    @Value("${spring.cache.redis.time-to-live}")
+    private long redisTtl;
+
     @Bean
     @Autowired
-    public RedisTemplate<Integer, List<TimeSheetEntry>> deliveryRedisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<Integer, List<TimeSheetEntry>> template = new RedisTemplate<>();
+    public RedisTemplate<Integer, Object> deliveryRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<Integer, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setEnableTransactionSupport(true);
         template.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
@@ -29,7 +37,23 @@ public class RedisConfig {
 
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
-        return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(1));
+        return RedisCacheConfiguration.defaultCacheConfig();
     }
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        //log.info("Redis Cachemanager");
+        return RedisCacheManager
+                .builder(redisConnectionFactory)
+                .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
+                        .prefixCacheNameWith(redisPrefix)
+                        .entryTtl(Duration.ofMillis(redisTtl)))
+                .build();
+    }
+
+    @Bean("redisTimesheetCache")
+    public Cache redisTimesheetCache(CacheManager cacheManager) {
+        return cacheManager.getCache("Timesheet");
+    }
+
 }

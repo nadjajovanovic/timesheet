@@ -5,7 +5,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.api.model.TimeSheetEntryReportDTO;
@@ -25,6 +24,9 @@ public class ReportService {
     @Autowired
     private TimeSheetEntryRepository timeSheetEntryRepository;
 
+    @Autowired
+    private RedisCacheService redisCacheService;
+
     public ReportService(TimeSheetEntryRepository timeSheetEntryRepository) {
         this.timeSheetEntryRepository = timeSheetEntryRepository;
     }
@@ -34,8 +36,16 @@ public class ReportService {
     }
 
 
-    @Cacheable(value = "reports", key="#report.hashCode()")
     public List<TimeSheetEntry> generateReport(Report report) {
+
+        final var reportKey = report.hashCode();
+        final var array = redisCacheService.getFromCache(reportKey, List.class);
+
+        if (array != null){
+            final var cached = (List<TimeSheetEntry>)array;
+            return cached;
+        }
+
         final var allEntries = timeSheetEntryRepository.findAll();
         final var filteredReports =
                 allEntries.stream()
@@ -45,6 +55,9 @@ public class ReportService {
                         .filter(e -> report.getStartdate() == null || e.getEntryDate().after(report.getStartdate()))
                         .filter(e -> report.getEnddate() == null || e.getEntryDate().before(report.getEnddate()))
                         .toList();
+
+        redisCacheService.storeInCache(reportKey, filteredReports);
+
         return filteredReports;
     }
 
