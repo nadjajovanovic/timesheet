@@ -11,6 +11,7 @@ import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -65,10 +66,10 @@ public class TeamMemberService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        final var teammember = teamMemberRepository.findByUsername(s);
-        if (teammember.isEmpty())
-            throw new NotFoundException(String.format("Team member with username %s does not exist in database", s), HttpStatus.NOT_FOUND);
-        return teammember.get();
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        final var user = teamMemberRepository.findByUsername(username);
+        if (user.isEmpty())
+            throw new NotFoundException(String.format("Team member with username %s does not exist in database", username), HttpStatus.NOT_FOUND);
+        return user.get();
     }
 }

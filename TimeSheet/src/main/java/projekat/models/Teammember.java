@@ -52,8 +52,8 @@ public class Teammember implements Serializable, UserDetails {
 	@OneToMany(mappedBy="teammember")
 	private List<Project> projects;
 
-	public Teammember(String username, String password, ArrayList<Object> objects) {
-		this.username = username;
+	public Teammember(String userName, String password, ArrayList<Object> objects) {
+		this.username = userName;
 		this.password = password;
 	}
 

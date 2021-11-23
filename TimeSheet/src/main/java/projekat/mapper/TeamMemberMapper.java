@@ -25,6 +25,7 @@ public class TeamMemberMapper {
         teammember.setUsername(teamMemberDTO.getUsername());
         teammember.setPassword(teamMemberDTO.getPassword());
         teammember.setEmail(teamMemberDTO.getUsername());
+        teammember.setPassword(teamMemberDTO.getPassword());
         teammember.setStatus(teamMemberDTO.getStatus());
         teammember.setHoursperweek(teamMemberDTO.getHoursPerWeek().doubleValue());
         return teammember;

@@ -291,6 +291,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teammember.setPassword("password");
         teammember.setUsername("username");
         teammember.setEmail("test@example.com");
+        teammember.setPassword("password");
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         return teammember;
     }
