@@ -15,6 +15,7 @@ import projekat.api.api.ReportApi;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.exception.BadRequestException;
+import projekat.mapper.ReportMapper;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.services.ReportService;
 import projekat.util.ReportExcelExporter;
@@ -36,8 +37,10 @@ public class ReportController implements ReportApi {
 	}
 
 	@Override
-	public ResponseEntity<List<TimeSheetEntryDTO>> getRequiredReports(@RequestBody ReportFilterDTO report) {
+	public ResponseEntity<List<TimeSheetEntryDTO>> getRequiredReports(@RequestBody ReportFilterDTO dto) {
+		final var report = ReportMapper.toReport(dto);
 		final var generatedReports = reportService.generateReport(report);
+
 		final var filtered = generatedReports
 				.stream()
 				.map(TimeSheetEntryMapper::toEntryForReportDTO)
@@ -47,12 +50,13 @@ public class ReportController implements ReportApi {
 
 	@Override
 	public ResponseEntity<Resource> getReportsInPdf() {
-		final var report = new ReportFilterDTO();
+		final var reportDTO = new ReportFilterDTO();
 		final var headers = new HttpHeaders();
 		final var headerKey = "Content-Disposition";
 		final var headerValue = "attachment; filename=report.pdf";
 		headers.add(headerKey, headerValue);
 		byte[] contents;
+		final var report = ReportMapper.toReport(reportDTO);
 		final var timeSheetEntryReportDTOList = reportService.generateReport(report)
 				.stream()
 				.map(TimeSheetEntryMapper::toEntryForReportDTO)
@@ -76,7 +80,8 @@ public class ReportController implements ReportApi {
 		headers.add(headerKey, headerValue);
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
-		final var generatedReports = reportService.generateReport(reportFilterDTO);
+		final var report = ReportMapper.toReport(reportFilterDTO);
+		final var generatedReports = reportService.generateReport(report);
 		final var filtered = generatedReports
 				.stream()
 				.map(TimeSheetEntryMapper::toEntryForReportDTO)
@@ -97,7 +102,8 @@ public class ReportController implements ReportApi {
 		final var headers = new HttpHeaders();
 		headers.add(headersKey, headerValue);
 
-		final var listOfGeneratedReports = reportService.generateReport(reportFilterDTO);
+		final var reportObject = ReportMapper.toReport(reportFilterDTO);
+		final var listOfGeneratedReports = reportService.generateReport(reportObject);
 		final var filteredReports = listOfGeneratedReports
 				.stream()
 				.map(TimeSheetEntryMapper::toEntryForReportDTO)

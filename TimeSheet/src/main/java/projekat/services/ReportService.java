@@ -5,19 +5,18 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
 import projekat.exception.BadRequestException;
+import projekat.models.Report;
 import projekat.models.TimeSheetEntry;
 import projekat.repository.TimeSheetEntryRepository;
-import projekat.util.DateFormatter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,29 +33,18 @@ public class ReportService {
         return timeSheetEntryRepository.findAll();
     }
 
-    public List<TimeSheetEntry> generateReport(ReportFilterDTO report) {
+
+    @Cacheable(value = "reports", key="#report.hashCode()")
+    public List<TimeSheetEntry> generateReport(Report report) {
         final var allEntries = timeSheetEntryRepository.findAll();
-
-        Date date1 = null;
-        Date date2 = null;
-
-        if (report.getStartDate() != null){
-            date1 = DateFormatter.stringToDate(report.getStartDate());
-        }
-        if (report.getEndDate() != null){
-            date2 = DateFormatter.stringToDate(report.getEndDate());
-        }
-
-        final var finalDate1 = date1;
-        final var finalDate2 = date2;
         final var filteredReports =
                 allEntries.stream()
-                    .filter(e -> report.getProjectId() == null || e.getProjectid().equals(report.getProjectId()))
-                    .filter(e -> report.getCategoryId() == null || e.getCategoryid().equals(report.getCategoryId()))
-                    .filter(e -> report.getClientId() == null || e.getClientid().equals(report.getClientId()))
-                    .filter(e -> report.getStartDate() == null || finalDate1 == null || e.getEntryDate().after(finalDate1))
-                    .filter(e -> report.getEndDate() == null || finalDate2 == null || e.getEntryDate().before(finalDate2))
-                    .toList();
+                        .filter(e -> report.getProjectid() == null || e.getProjectid().equals(report.getProjectid()))
+                        .filter(e -> report.getCategoryid() == null || e.getCategoryid().equals(report.getCategoryid()))
+                        .filter(e -> report.getClientid() == null || e.getClientid().equals(report.getClientid()))
+                        .filter(e -> report.getStartdate() == null || e.getEntryDate().after(report.getStartdate()))
+                        .filter(e -> report.getEnddate() == null || e.getEntryDate().before(report.getEnddate()))
+                        .toList();
         return filteredReports;
     }
 
