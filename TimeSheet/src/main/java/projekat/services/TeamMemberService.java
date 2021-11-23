@@ -2,6 +2,9 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import projekat.enums.ErrorCode;
 import projekat.exception.NotFoundException;
@@ -10,11 +13,12 @@ import projekat.exception.InputFieldException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
 @Service
-public class TeamMemberService {
+public class TeamMemberService implements UserDetailsService {
 
     @Autowired
     private TeamMemberRepository teamMemberRepository;
@@ -61,5 +65,13 @@ public class TeamMemberService {
         }
         teamMemberRepository.deleteById(id);
         return true;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        final var user = teamMemberRepository.findByUsername(username);
+        if (user.isEmpty())
+            throw new NotFoundException(String.format("Team member with username %s does not exist in database", username), HttpStatus.NOT_FOUND);
+        return user.get();
     }
 }

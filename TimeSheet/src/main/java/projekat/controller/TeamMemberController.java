@@ -4,14 +4,16 @@ package projekat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 import projekat.api.api.TeammemberApi;
 import projekat.api.model.TeamMemberDTO;
 import projekat.mapper.TeamMemberMapper;
+import projekat.models.Teammember;
+import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +23,12 @@ public class TeamMemberController implements TeammemberApi {
 	@Autowired
 	private TeamMemberService teamMemberService;
 
-	public TeamMemberController(TeamMemberService teamMemberService) {
+	@Autowired
+	private JwtUtilService jwtUtil;
+
+	public TeamMemberController(TeamMemberService teamMemberService, JwtUtilService jwtUtil) {
 		this.teamMemberService = teamMemberService;
+		this.jwtUtil = jwtUtil;
 	}
 
 	@Override

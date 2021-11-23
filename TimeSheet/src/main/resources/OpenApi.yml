@@ -822,6 +822,10 @@ components:
           description: The username of TeamMember
           type: string
           pattern: ^(?!\s*$).+
+        password:
+          description: The password of TeamMember
+          type: string
+          pattern: ^(?!\s*$).+
         email:
           description: The email of TeamMember
           type: string
@@ -836,6 +840,7 @@ components:
         - name
         - username
         - email
+        - password
 
     TimeSheetEntryDTO:
       description: This is an object that represents one user entry
@@ -1004,3 +1009,17 @@ components:
           pattern: ^(?!\s*$).+
       required:
         - name
+    LoginDTO:
+      description: This object represents parameters for login on system
+      type: object
+      properties:
+        username:
+          description: id of category
+          type: integer
+        password:
+          description: name of category
+          type: string
+          pattern: ^(?!\s*$).+
+      required:
+        - username
+        - password
