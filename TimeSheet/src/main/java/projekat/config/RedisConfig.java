@@ -1,5 +1,6 @@
 package projekat.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import java.time.Duration;
 
+@Slf4j
 @Configuration
 @EnableCaching
 public class RedisConfig {
@@ -25,10 +27,10 @@ public class RedisConfig {
     @Value("${spring.cache.redis.time-to-live}")
     private long redisTtl;
 
-    @Bean
+    @Bean("redisTemplate")
     @Autowired
-    public RedisTemplate<Integer, Object> deliveryRedisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<Integer, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, Object> deliveryRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setEnableTransactionSupport(true);
         template.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
@@ -42,7 +44,7 @@ public class RedisConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        //log.info("Redis Cachemanager");
+        log.info("Redis Cachemanager");
         return RedisCacheManager
                 .builder(redisConnectionFactory)
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()

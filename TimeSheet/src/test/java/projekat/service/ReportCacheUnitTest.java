@@ -1,49 +1,41 @@
 package projekat.service;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.CacheManager;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import projekat.TimeSheetApplication;
 import projekat.models.Report;
 import projekat.models.TimeSheetEntry;
 import projekat.repository.TimeSheetEntryRepository;
+import projekat.services.RedisCacheService;
 import projekat.services.ReportService;
 import projekat.util.BaseUT;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TimeSheetApplication.class)
-@AutoConfigureTestDatabase
-@Disabled
 public class ReportCacheUnitTest extends BaseUT {
-
-    @Autowired
-    private CacheManager cacheManager;
 
     @Autowired
     private ReportService service;
 
     @MockBean
+    private RedisCacheService cacheService;
+
+    @MockBean
     private TimeSheetEntryRepository entryRepository;
 
-    @AfterEach
-    public void cleanCache(){
-        cacheManager.getCache("reports").clear();
-    }
-
-    @BeforeEach
-    public void setUp() {
+    @Test
+    void getCachedResultsExistsInCache(){
+        // Arrange
+        final var report = new Report();
+        final var reportHash = report.hashCode();
         final var firstEntry = new TimeSheetEntry();
         final var secondEntry = new TimeSheetEntry();
         final var entryList = new ArrayList<TimeSheetEntry>();
@@ -51,58 +43,37 @@ public class ReportCacheUnitTest extends BaseUT {
         entryList.add(secondEntry);
         Mockito.when(entryRepository.findAll())
                 .thenReturn(entryList);
+        Mockito.when(cacheService.getFromCache(reportHash, List.class))
+                .thenReturn(entryList);
+
+        // Act
+        service.generateReport(report);
+        service.generateReport(report);
+
+        // Assert
+        verify(cacheService, times(2)).getFromCache(report.hashCode(), List.class);
     }
 
     @Test
-    void getCachedResults(){
+    void getCachedResultsNoResultsInCache() {
         // Arrange
         final var report = new Report();
+        report.setCategoryid(1);
         final var reportHash = report.hashCode();
+        final var entry = new TimeSheetEntry();
+        entry.setCategoryid(1);
+        final var entryList = new ArrayList<TimeSheetEntry>();
+        entryList.add(entry);
+        Mockito.when(entryRepository.findAll())
+                .thenReturn(entryList);
+        Mockito.when(cacheService.getFromCache(reportHash, List.class))
+                .thenReturn(null);
+
+        // Act
         service.generateReport(report);
 
-        // Act
-        final var cachedList = getCachedList(reportHash);
-
         // Assert
-        assertEquals(2, cachedList.size());
-    }
-
-    @Test
-    void getCachedResultsNoResults(){
-        // Arrange
-        final var report = new Report();
-        final var reportHash = report.hashCode();
-
-        // Act
-        final var cachedList = getCachedList(reportHash);
-
-        // Assert
-        assertNull(cachedList);
-    }
-
-    @Test @Disabled
-    void getCachedResultsAfter60sec() throws InterruptedException {
-        // Arrange
-        final var report = new Report();
-        final var reportHash = report.hashCode();
-        service.generateReport(report);
-
-        // Act
-        Thread.sleep(60000);
-        final var cachedList = getCachedList(reportHash);
-
-        // Assert
-        assertNull(cachedList);
-    }
-
-    List<TimeSheetEntry> getCachedList(Integer hash) {
-        final var cache = cacheManager.getCache("reports");
-        final var object = cache.get(hash);
-        try {
-            final var listOfCashedEntries = (List<TimeSheetEntry>) object.get();
-            return listOfCashedEntries;
-        } catch (NullPointerException e) {
-            return null;
-        }
+        verify(cacheService, times(1)).getFromCache(report.hashCode(), List.class);
+        verify(entryRepository, times(1)).findAll();
     }
 }
