@@ -1,15 +1,11 @@
 package projekat.models;
 
+import lombok.Data;
+
 import java.io.Serializable;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.Date;
 
-
-@Getter @Setter @NoArgsConstructor
+@Data
 public class Report implements Serializable {
 	private static final long serialVersionUID = 1L;
 
