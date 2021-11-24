@@ -3,6 +3,7 @@ package projekat.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -15,15 +16,9 @@ import projekat.TimeSheetApplication;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
-import projekat.models.Category;
-import projekat.models.Client;
-import projekat.models.Project;
-import projekat.models.TimeSheetEntry;
+import projekat.models.*;
 import projekat.mapper.TimeSheetEntryMapper;
-import projekat.repository.CategoryRepository;
-import projekat.repository.ClientRepository;
-import projekat.repository.ProjectRepository;
-import projekat.repository.TimeSheetEntryRepository;
+import projekat.repository.*;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
@@ -41,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
+@Disabled
 class TimeSheetEntryControllerIntegrationTest extends BaseUT{
 
     @Autowired
@@ -57,6 +53,9 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
 
     private static ObjectMapper objectMapper;
 
@@ -421,7 +420,8 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         final var category = saveTestCategory("Test category");
         final var client = saveTestClient("Test client");
         final var project = saveTestProject("Project Name", "Project Description");
-        final var entry = createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), new Date());
+        final var user = saveTeamMember("Test category");
+        final var entry = createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), user.getTeammemberid(), new Date());
         return entryRepository.saveAndFlush(entry);
     }
 
@@ -445,8 +445,21 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         return projectRepository.saveAndFlush(project);
     }
 
+    private Teammember saveTeamMember(String name) {
+        final var user = createTeamMember(name);
+        return teamMemberRepository.saveAndFlush(user);
+    }
+
     private void cleanDataBase() {
         entryRepository.deleteAll();
         entryRepository.flush();
+        categoryRepository.deleteAll();
+        categoryRepository.flush();
+        clientRepository.deleteAll();
+        clientRepository.flush();
+        projectRepository.deleteAll();
+        projectRepository.flush();
+        teamMemberRepository.deleteAll();
+        teamMemberRepository.flush();
     }
 }

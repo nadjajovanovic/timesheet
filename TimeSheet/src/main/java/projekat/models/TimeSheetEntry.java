@@ -19,7 +19,12 @@ public class TimeSheetEntry implements Serializable {
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ENTRY_ENTRYID_GENERATOR")
     private Integer entryId;
 
-    // TODO add user when authentication is done
+    @ManyToOne
+    @JoinColumn(name="teammember")
+    private Teammember teammember;
+
+    @Column(name = "teammemberid", nullable = false)
+    private Integer teammemberid;
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)

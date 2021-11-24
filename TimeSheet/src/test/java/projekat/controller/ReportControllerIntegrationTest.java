@@ -15,10 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
-import projekat.models.Category;
-import projekat.models.Client;
-import projekat.models.Project;
-import projekat.models.TimeSheetEntry;
+import projekat.models.*;
 import projekat.repository.*;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
@@ -80,13 +77,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Nadja");
         final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        final var entry1 = saveTestEntry(client, category, project, date1);
-        final var entry2 = saveTestEntry(client, category, project, date2);
-        final var entry3 = saveTestEntry(client, category, project, date3);
+        final var entry1 = saveTestEntry(client, category, project, teamMember, date1);
+        final var entry2 = saveTestEntry(client, category, project, teamMember,date2);
+        final var entry3 = saveTestEntry(client, category, project, teamMember,date3);
 
         final var report = new ReportFilterDTO();
 
@@ -113,13 +111,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Nadja");
         final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        final var entry1 = saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        final var entry3 = saveTestEntry(client, category, project, date3);
+        final var entry1 = saveTestEntry(client, category, project, teamMember, date1);
+        saveTestEntry(client, category, project, teamMember, date2);
+        final var entry3 = saveTestEntry(client, category, project, teamMember, date3);
 
         final var report = new ReportFilterDTO();
         report.setStartDate("2021-11-08");
@@ -148,10 +147,11 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client2 = saveTestClient("Bojana");
         final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        final var entry1 = saveTestEntry(client1, category, project, date);
-        saveTestEntry(client2, category, project, date);
+        final var entry1 = saveTestEntry(client1, category, project, teamMember, date);
+        saveTestEntry(client2, category, project, teamMember, date);
 
         final var report = new ReportFilterDTO();
         report.setStartDate("2021-11-1");
@@ -180,10 +180,11 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var category1 = saveTestCategory("Frontend");
         final var category2 = saveTestCategory("Backend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        final var entry1 = saveTestEntry(client, category1, project, date);
-        saveTestEntry(client, category2, project, date);
+        final var entry1 = saveTestEntry(client, category1, project, teamMember, date);
+        saveTestEntry(client, category2, project, teamMember, date);
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(category1.getCategoryid());
@@ -210,10 +211,11 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var category= saveTestCategory("Backend");
         final var project1 = saveTestProject("Cooking App", "App for cooking");
         final var project2 = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date = new GregorianCalendar(2021, Calendar.NOVEMBER, 15).getTime();
 
-        saveTestEntry(client, category, project1, date);
-        final var entry2 = saveTestEntry(client, category, project2, date);
+        saveTestEntry(client, category, project1, teamMember, date);
+        final var entry2 = saveTestEntry(client, category, project2, teamMember, date);
 
         final var report = new ReportFilterDTO();
         report.setProjectId(project2.getProjectid());
@@ -241,12 +243,13 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var category2 = saveTestCategory("Backend");
         final var project1 = saveTestProject("Cooking App", "App for cooking");
         final var project2 = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.SEPTEMBER, 5).getTime();
 
-        saveTestEntry(client, category1, project1, date);
-        saveTestEntry(client, category1, project2, date2);
-        saveTestEntry(client, category2, project2, date);
+        saveTestEntry(client, category1, project1, teamMember, date);
+        saveTestEntry(client, category1, project2, teamMember, date2);
+        saveTestEntry(client, category2, project2, teamMember, date);
 
         final var report = new ReportFilterDTO();
         report.setProjectId(project2.getProjectid());
@@ -293,13 +296,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Jhon");
         final var category = saveTestCategory("Backend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
+        saveTestEntry(client, category, project, teamMember, date1);
+        saveTestEntry(client, category, project, teamMember, date2);
+        saveTestEntry(client, category, project, teamMember, date3);
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(12);
@@ -324,13 +328,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Jane");
         final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
+        saveTestEntry(client, category, project, teamMember, date1);
+        saveTestEntry(client, category, project, teamMember, date2);
+        saveTestEntry(client, category, project, teamMember, date3);
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(category.getCategoryid());
@@ -355,13 +360,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Jane");
         final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
+        saveTestEntry(client, category, project, teamMember, date1);
+        saveTestEntry(client, category, project, teamMember, date2);
+        saveTestEntry(client, category, project, teamMember, date3);
 
         final var report = new ReportFilterDTO();
         report.setStartDate("2021-11-08");
@@ -406,13 +412,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Jane");
         final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
+        saveTestEntry(client, category, project, teamMember, date1);
+        saveTestEntry(client, category, project, teamMember, date2);
+        saveTestEntry(client, category, project, teamMember, date3);
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(1234);
@@ -438,13 +445,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Jane");
         final var category = saveTestCategory("Backend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
+        saveTestEntry(client, category, project, teamMember, date1);
+        saveTestEntry(client, category, project, teamMember, date2);
+        saveTestEntry(client, category, project, teamMember, date3);
 
         final var report = new ReportFilterDTO();
         report.setStartDate("2021-11-08");
@@ -487,13 +495,14 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var client = saveTestClient("Jane");
         final var category = saveTestCategory("Frontend");
         final var project = saveTestProject("Music App", "App for music");
+        final var teamMember = saveTeamMember("John Doe");
         final var date1 = new GregorianCalendar(2021, Calendar.NOVEMBER, 11).getTime();
         final var date2 = new GregorianCalendar(2021, Calendar.OCTOBER, 15).getTime();
         final var date3 = new GregorianCalendar(2021, Calendar.NOVEMBER, 28).getTime();
 
-        saveTestEntry(client, category, project, date1);
-        saveTestEntry(client, category, project, date2);
-        saveTestEntry(client, category, project, date3);
+        saveTestEntry(client, category, project, teamMember, date1);
+        saveTestEntry(client, category, project, teamMember, date2);
+        saveTestEntry(client, category, project, teamMember, date3);
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(1234);
@@ -511,8 +520,8 @@ class ReportControllerIntegrationTest extends BaseUT{
         assertEquals("attachment; filename=reports.csv", response.getResponse().getHeader("Content-Disposition"));
     }
 
-    private TimeSheetEntry saveTestEntry(Client client, Category category, Project project, Date entryDate) {
-        final var entry = createTestEntryWithObjects("Description", category, client, project, entryDate);
+    private TimeSheetEntry saveTestEntry(Client client, Category category, Project project, Teammember teammember, Date entryDate) {
+        final var entry = createTestEntryWithObjects("Description", category, client, project, teammember, entryDate);
         return timeSheetEntryRepository.saveAndFlush(entry);
     }
 
@@ -531,6 +540,10 @@ class ReportControllerIntegrationTest extends BaseUT{
         return projectRepository.saveAndFlush(project);
     }
 
+    private Teammember saveTeamMember(String name) {
+        final var user = createTeamMember(name);
+        return teamMemberRepository.saveAndFlush(user);
+    }
 
     private void cleanDataBase() {
         timeSheetEntryRepository.deleteAll();
@@ -541,5 +554,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         clientRepository.flush();
         projectRepository.deleteAll();
         projectRepository.flush();
+        teamMemberRepository.deleteAll();
+        teamMemberRepository.flush();
     }
 }
