@@ -12,6 +12,7 @@ tags:
   - name: "Client"
   - name: "Country"
   - name: "Category"
+  - name: "Authentication"
 
 paths:
   /teammember:
@@ -804,6 +805,64 @@ paths:
         "404":
           description: NOT FOUND
 
+
+  /authenticate:
+    post:
+      summary: This method authenticates user
+      tags:
+        - "Authentication"
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationRequestDTO'
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponseDTO'
+        "400":
+          description: BAD REQUEST
+
+  /authenticate/resetPassword:
+    post:
+      summary: This method resets users password
+      tags:
+        - "Authentication"
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordDTO'
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: BAD REQUEST
+        "403":
+          description: FORBIDDEN
+
+  /authenticate/register:
+    post:
+      summary: This method adds new user
+      tags:
+        - "Authentication"
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamMemberDTO'
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: BAD REQUEST
+
 components:
   schemas:
 
@@ -826,6 +885,10 @@ components:
           description: The password of TeamMember
           type: string
           pattern: ^(?!\s*$).+
+        repeatedPassword:
+          description: Repeated password - for check
+          type: string
+          pattern: ^(?!\s*$).+
         email:
           description: The email of TeamMember
           type: string
@@ -841,6 +904,7 @@ components:
         - username
         - email
         - password
+        - repeatedPassword
 
     TimeSheetEntryDTO:
       description: This is an object that represents one user entry
@@ -1009,18 +1073,58 @@ components:
           pattern: ^(?!\s*$).+
       required:
         - name
+
     LoginDTO:
-      description: This object represents parameters for login
+      description: This object represents parameters for login on system
       type: object
       properties:
         username:
-          description: username
+          description: id of category
+          type: integer
+        password:
+          description: name of category
+
+    AuthenticationRequestDTO:
+      description: This object represents paramethers for user login request
+      type: object
+      properties:
+        username:
+          description: username for authentication
           type: string
           pattern: ^(?!\s*$).+
         password:
-          description: password
+          description: password for authentication
           type: string
           pattern: ^(?!\s*$).+
       required:
         - username
         - password
+
+    AuthenticationResponseDTO:
+      description: This object contains jwt token, after successful authentication
+      type: object
+      properties:
+        jwt:
+          description: jwt token for user
+          type: string
+
+    ResetPasswordDTO:
+      description: This object represents request for password reset
+      type: object
+      properties:
+        oldPassword:
+          description: password that is already in use
+          type: string
+          pattern: ^(?!\s*$).+
+        newPassword:
+          description: new password
+          type: string
+          pattern: ^(?!\s*$).+
+        newPasswordRepeated:
+          description: new password repeated - chech if password is typed corectly
+          type: string
+          pattern: ^(?!\s*$).+
+      required:
+        - oldPassword
+        - newPassword
+        - newPasswordRepeated

@@ -4,6 +4,7 @@ package projekat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +33,7 @@ public class TeamMemberController implements TeammemberApi {
 	}
 
 	@Override
+	@PreAuthorize("hasRole((enums.Role).ADMIN)")
 	public ResponseEntity<List<TeamMemberDTO>> getTeamMembers() {
 		final var teammembers = teamMemberService.getAll()
 				.stream()
@@ -41,6 +43,7 @@ public class TeamMemberController implements TeammemberApi {
 	}
 
 	@Override
+	@PreAuthorize("hasRole((enums.Role).ADMIN)")
 	public ResponseEntity<TeamMemberDTO> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);
@@ -48,6 +51,7 @@ public class TeamMemberController implements TeammemberApi {
 
 	@CrossOrigin
 	@Override
+	@PreAuthorize("hasRole((enums.Role).ADMIN)")
 	public ResponseEntity<TeamMemberDTO> insertTeamMember(@RequestBody TeamMemberDTO teamMember) {
 		final var inserted = teamMemberService.insert(TeamMemberMapper.toTeamMember(teamMember));
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(inserted), HttpStatus.CREATED);
@@ -55,6 +59,7 @@ public class TeamMemberController implements TeammemberApi {
 
 	@CrossOrigin
 	@Override
+	@PreAuthorize("hasRole((enums.Role).ADMIN)")
 	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
 		final var updated = teamMemberService.update(TeamMemberMapper.toTeamMember(teamMember));
 		return new ResponseEntity(updated, HttpStatus.OK);
@@ -62,6 +67,7 @@ public class TeamMemberController implements TeammemberApi {
 
 	@CrossOrigin
 	@Override
+	@PreAuthorize("hasRole((enums.Role).ADMIN)")
 	public ResponseEntity<TeamMemberDTO> deleteTeamMember(@PathVariable Integer teammemberid) {
 		teamMemberService.delete(teammemberid);
 		return new ResponseEntity<>(HttpStatus.OK);
