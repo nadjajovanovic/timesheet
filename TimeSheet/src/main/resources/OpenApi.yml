@@ -811,7 +811,7 @@ paths:
       summary: This method authenticates user
       tags:
         - "Authentication"
-      operationId: createAuthenticationToken
+      operationId: login
       requestBody:
         content:
           application/json:
