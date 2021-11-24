@@ -4,16 +4,16 @@ package projekat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import projekat.api.api.TeammemberApi;
 import projekat.api.model.TeamMemberDTO;
 import projekat.mapper.TeamMemberMapper;
-import projekat.models.Teammember;
 import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
