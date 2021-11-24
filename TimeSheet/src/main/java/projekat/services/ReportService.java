@@ -39,10 +39,10 @@ public class ReportService {
     public List<TimeSheetEntry> generateReport(Report report) {
 
         final var reportKey = report.hashCode();
-        final var array = redisCacheService.getFromCache(reportKey, List.class);
+        final var cachedTimesheetEntries = redisCacheService.getFromCache(reportKey, List.class);
 
-        if (array != null){
-            final var cached = (List<TimeSheetEntry>)array;
+        if (cachedTimesheetEntries != null){
+            final var cached = (List<TimeSheetEntry>)cachedTimesheetEntries;
             return cached;
         }
 

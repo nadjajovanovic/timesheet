@@ -47,9 +47,7 @@ public class RedisCacheService {
     }
 
     public void removeFromCache(List<Integer> objectCacheKey) {
-        for (var key:objectCacheKey) {
-            cache.evict(key);
-        }
+        objectCacheKey.forEach(cache::evictIfPresent);
     }
 
     public Set<String> getCachedKeys(String redisCacheKeyPrefix) {
