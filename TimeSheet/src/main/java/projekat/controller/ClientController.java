@@ -18,7 +18,7 @@ import java.util.List;
 public class ClientController implements ClientApi {
 
 	@Autowired
-	private ClientService clientService;
+	private final ClientService clientService;
 
 	public ClientController(ClientService clientService) {
 		this.clientService = clientService;

@@ -59,5 +59,4 @@ public class CategoryController implements CategoryApi {
 		categoryService.delete(categoryid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
 }

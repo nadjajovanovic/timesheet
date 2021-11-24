@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 public class TeamMemberController implements TeammemberApi {
 
 	@Autowired
-	private TeamMemberService teamMemberService;
+	private final TeamMemberService teamMemberService;
 
 	@Autowired
-	private JwtUtilService jwtUtil;
+	private final JwtUtilService jwtUtil;
 
 	public TeamMemberController(TeamMemberService teamMemberService, JwtUtilService jwtUtil) {
 		this.teamMemberService = teamMemberService;

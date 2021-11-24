@@ -22,7 +22,7 @@ import java.util.List;
 public class ReportService {
 
     @Autowired
-    private TimeSheetEntryRepository timeSheetEntryRepository;
+    private final TimeSheetEntryRepository timeSheetEntryRepository;
 
     @Autowired
     private RedisCacheService redisCacheService;

@@ -115,6 +115,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teamMember.setUsername("username");
         teamMember.setEmail("test@example.com");
         teamMember.setPassword("password");
+        teamMember.setRepeatedPassword("password");
         teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
         //Act
         final var response = mvc.perform(post("/teammember")
@@ -171,6 +172,10 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         //Arange
         final var teamMember = new Teammember();
         teamMember.setTeammemberid(5);
+        teamMember.setTeammembername("Jhon");
+        teamMember.setUsername("jhon");
+        teamMember.setEmail("test@example.com");
+        teamMember.setPassword("password");
 
         //Act
         final var response = mvc.perform(post("/teammember")
@@ -192,6 +197,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var teamMemberName = "nameForInsert";
         final var inserted = saveTeamMember(teamMemberName);
         final var updatedName = "nameForUpdate";
+        inserted.setTeammembername(updatedName);
+        inserted.setTeammembername("Jhon");
+        inserted.setUsername("jhon");
+        inserted.setEmail("test@example.com");
+        inserted.setPassword("password");
 
         //Act
         final var response = mvc.perform(put("/teammember")
@@ -214,11 +224,14 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var inserted = saveTeamMember(teamMemberName);
         final var updatedName = "";
         inserted.setTeammembername(updatedName);
-
+        inserted.setTeammembername("Jhon");
+        inserted.setUsername("jhon");
+        inserted.setEmail("test@example.com");
+        inserted.setPassword("password");
         //Act
         final var response = mvc.perform(put("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inserted))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(inserted,updatedName)))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -280,6 +293,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     private Teammember saveTeamMember(String teammemberName) {
         final var teammember = new Teammember();
         teammember.setTeammembername(teammemberName);
+        teammember.setPassword("password");
+        teammember.setUsername("username");
+        teammember.setEmail("test@example.com");
         teammember.setHoursperweek(2.3);
         return repository.saveAndFlush(teammember);
     }
@@ -288,11 +304,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var teammember = new TeamMemberDTO();
         teammember.setId(t.getTeammemberid());
         teammember.setName(teammemberName);
-        teammember.setPassword("password");
-        teammember.setUsername("username");
-        teammember.setEmail("test@example.com");
-        teammember.setPassword("password");
+        teammember.setUsername(t.getUsername());
+        teammember.setEmail(t.getEmail());
+        teammember.setPassword(t.getPassword());
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
+        teammember.setRepeatedPassword(t.getPassword());
+        teammember.setStatus(true);
         return teammember;
     }
 

@@ -1,10 +1,12 @@
 package projekat.services;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import projekat.exception.InputFieldException;
 import projekat.exception.NotFoundException;
@@ -18,8 +20,11 @@ import java.util.Optional;
 @Service
 public class TeamMemberService implements UserDetailsService {
 
-    @Autowired
+    @Setter(onMethod_ = {@Autowired})
     private TeamMemberRepository teamMemberRepository;
+
+    @Setter(onMethod_ = {@Autowired})
+    private PasswordEncoder passwordEncoder;
 
     public TeamMemberService(TeamMemberRepository teamMemberRepository) {
         this.teamMemberRepository = teamMemberRepository;
@@ -42,6 +47,7 @@ public class TeamMemberService implements UserDetailsService {
         if (teammember.getTeammemberid() != null) {
             throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
         }
+        teammember.setPassword(passwordEncoder.encode(teammember.getPassword()));
         final var inserted = teamMemberRepository.save(teammember);
         return inserted;
     }
