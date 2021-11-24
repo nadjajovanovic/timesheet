@@ -37,7 +37,7 @@ public class Teammember implements Serializable, UserDetails {
 	private Double hoursperweek;
 
 	@Enumerated(EnumType.STRING)
-	private TeamMemberRoles role;
+	private Collection<TeamMemberRoles> role;
 
 	private Boolean status;
 
@@ -59,12 +59,11 @@ public class Teammember implements Serializable, UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+		return role;
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
-
 		return true;
 	}
 

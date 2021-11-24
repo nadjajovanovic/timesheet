@@ -63,6 +63,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/enums/TeamMemberRoles.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/exception/BadRequestException.java">
           <value>
             <set />
@@ -98,6 +103,16 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/models/Teammember.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/security/SecurityConfigurer.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/CategoryService.java">
           <value>
             <set />
@@ -114,6 +129,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/ProjectService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/main/java/projekat/services/ReportService.java">
           <value>
             <set />
           </value>
@@ -159,6 +179,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/TimeSheet/src/test/java/projekat/controller/ProjectControllerIntegrationTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/TimeSheet/src/test/java/projekat/controller/ReportControllerIntegrationTest.java">
           <value>
             <set />
           </value>
