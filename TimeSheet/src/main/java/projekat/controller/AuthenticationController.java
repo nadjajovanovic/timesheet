@@ -83,6 +83,7 @@ public class AuthenticationController implements AuthenticateApi {
             throw new BadRequestException("Passwords do not match", HttpStatus.BAD_REQUEST);
         }
         final var teamMember = TeamMemberMapper.toTeamMember(teamMemberDTO);
+        teamMember.setPassword(passwordEncoder.encode(teamMember.getPassword()));
         teamMemberService.insert(teamMember);
         return new ResponseEntity<>(HttpStatus.OK);
     }

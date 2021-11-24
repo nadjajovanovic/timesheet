@@ -1,6 +1,5 @@
 package projekat.filters;
 
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,12 +19,11 @@ import java.io.IOException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    @Setter(onMethod_ = {@Autowired})
+    @Autowired
     private TeamMemberService teamMemberService;
 
-    @Setter(onMethod_ = {@Autowired})
+    @Autowired
     private JwtUtilService jwtUtilService;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -49,5 +47,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+
     }
 }

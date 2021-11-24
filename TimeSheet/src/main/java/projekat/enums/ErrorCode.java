@@ -6,5 +6,6 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR,
     INVALID_DATE_FORMAT,
     ID_EXISTS,
-    ID_NOT_FOUND
+    ID_NOT_FOUND,
+    FORBIDDEN
 }
