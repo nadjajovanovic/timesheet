@@ -15,7 +15,6 @@ import projekat.mapper.TeamMemberMapper;
 import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
 
-import javax.annotation.security.RolesAllowed;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,7 @@ public class TeamMemberController implements TeammemberApi {
 	}
 
 	@Override
-	@PreAuthorize("hasRole('projekat.enums.TeamMembersRoles.ADMIN')")
+	@PreAuthorize("hasRole('WORKER')")
 	public ResponseEntity<List<TeamMemberDTO>> getTeamMembers() {
 		final var teammembers = teamMemberService.getAll()
 				.stream()
@@ -44,7 +43,7 @@ public class TeamMemberController implements TeammemberApi {
 	}
 
 	@Override
-	@PreAuthorize("hasRole('projekat.enums.TeamMembersRoles.ADMIN')")
+	@PreAuthorize("hasRole('WORKER')")
 	public ResponseEntity<TeamMemberDTO> getTeamMember(@PathVariable Integer teammemberid) {
 		final var oneTeammember = teamMemberService.getOne(teammemberid);
 		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(oneTeammember.get()), HttpStatus.OK);

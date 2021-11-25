@@ -3,12 +3,13 @@ package projekat.enums;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum TeamMemberRoles implements GrantedAuthority {
-    ADMIN,
-    WORKER;
+    ROLE_ADMIN,
+    ROLE_WORKER;
 
     @Override
     public String getAuthority() {
-        return name();
+        final var roleName = name();
+        return roleName;
     }
 
 }

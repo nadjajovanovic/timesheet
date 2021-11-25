@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import projekat.enums.TeamMemberRoles;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class Teammember implements Serializable, UserDetails {
 	private Double hoursperweek;
 
 	@Enumerated(EnumType.STRING)
-	private Collection<TeamMemberRoles> role;
+	private TeamMemberRoles role;
 
 	private Boolean status;
 
@@ -59,7 +60,8 @@ public class Teammember implements Serializable, UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return role;
+		final var authorityList = Arrays.asList(TeamMemberRoles.ROLE_ADMIN);
+		return authorityList;
 	}
 
 	@Override
