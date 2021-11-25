@@ -40,10 +40,12 @@ public class BaseUT {
         return teammember;
     }
 
-    protected TimeSheetEntry createTestEntry(String description, Integer categoryid, Integer clientid, Integer projectId, Date entryDate) {
+    protected TimeSheetEntry createTestEntry(String description, Integer categoryid, Integer clientid, Integer projectId,
+                                              Integer teamMmberId, Date entryDate) {
         final var entry = new TimeSheetEntry();
         entry.setDescription(description);
         entry.setClientid(clientid);
+        entry.setTeammemberid(teamMmberId);
         entry.setProjectid(projectId);
         entry.setCategoryid(categoryid);
         entry.setTime(3.5);
@@ -51,7 +53,8 @@ public class BaseUT {
         return entry;
     }
 
-    protected TimeSheetEntry createTestEntryWithObjects(String description, Category category, Client client, Project project, Date entryDate) {
+    protected TimeSheetEntry createTestEntryWithObjects(String description, Category category, Client client,
+                                                        Project project, Teammember teammember, Date entryDate) {
         final var entry = new TimeSheetEntry();
         entry.setDescription(description);
         entry.setClient(client);
@@ -60,6 +63,8 @@ public class BaseUT {
         entry.setProjectid(project.getProjectid());
         entry.setCategory(category);
         entry.setCategoryid(category.getCategoryid());
+        entry.setTeammember(teammember);
+        entry.setTeammemberid(teammember.getTeammemberid());
         entry.setTime(3.5);
         entry.setEntryDate(entryDate);
         return entry;

@@ -21,8 +21,7 @@ public class TimeSheetEntryMapper {
         dto.setTotalTimeSpent(totalTime);
         dto.setProjectName(entry.getProject().getProjectname());
         dto.setCategoryName(entry.getCategory().getCategoryname());
-        // TODO add team member name when authentication is done
-        dto.setTeamMemberName(null);
+        dto.setTeamMemberName(entry.getTeammember().getTeammembername());
         return dto;
     }
 
@@ -34,8 +33,8 @@ public class TimeSheetEntryMapper {
         dto.setTimeSpent(BigDecimal.valueOf(entry.getTime()));
         dto.setProjectId(entry.getProjectid());
         dto.setCategoryId(entry.getCategoryid());
-        // TODO add team member name when authentication is done
         dto.setClientId(entry.getClientid());
+        dto.setTeamMemberId(entry.getTeammemberid());
         return dto;
     }
 
@@ -47,7 +46,7 @@ public class TimeSheetEntryMapper {
         entry.setTime(dto.getTimeSpent().doubleValue());
         entry.setProjectid(dto.getProjectId());
         entry.setCategoryid(dto.getCategoryId());
-        // TODO add team member name when authentication is done
+        entry.setTeammemberid(dto.getTeamMemberId());
         entry.setClientid(dto.getClientId());
         return entry;
     }

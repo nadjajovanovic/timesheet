@@ -4,18 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import projekat.api.model.TimeSheetEntryDTO;
-import projekat.enums.ErrorCode;
-import projekat.exception.NotFoundException;
+import projekat.exception.BadRequestException;
 import projekat.exception.InputFieldException;
+import projekat.exception.NotFoundException;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.models.Category;
 import projekat.models.Client;
 import projekat.models.Project;
 import projekat.models.TimeSheetEntry;
-import projekat.repository.CategoryRepository;
-import projekat.repository.ClientRepository;
-import projekat.repository.ProjectRepository;
-import projekat.repository.TimeSheetEntryRepository;
+import projekat.repository.*;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -35,12 +32,17 @@ public class TimeSheetEntryService {
     @Autowired
     private final CategoryRepository categoryRepository;
 
+    @Autowired
+    private final TeamMemberRepository teamMemberRepository;
+
     public TimeSheetEntryService(TimeSheetEntryRepository timeSheetEntryRepository, ClientRepository clientRepository,
-                                    ProjectRepository projectRepository, CategoryRepository categoryRepository) {
+                                    ProjectRepository projectRepository, CategoryRepository categoryRepository,
+                                 TeamMemberRepository teamMemberRepository) {
         this.timeSheetEntryRepository = timeSheetEntryRepository;
         this.clientRepository = clientRepository;
         this.projectRepository = projectRepository;
         this.categoryRepository = categoryRepository;
+        this.teamMemberRepository = teamMemberRepository;
     }
 
     public Collection<TimeSheetEntry> getAll() {
@@ -94,7 +96,6 @@ public class TimeSheetEntryService {
         if (!timeSheetEntryRepository.existsById(entry.getEntryId())){
             throw new NotFoundException(String.format("Timesheet entry with id %d does not exist in database", entry.getEntryId()), HttpStatus.NOT_FOUND);
         }
-
         if (!categoryRepository.existsById(entry.getCategoryid())){
             throw new NotFoundException(String.format("Category with id %d does not exist in database", entry.getCategoryid()), HttpStatus.NOT_FOUND);
         }
@@ -105,6 +106,11 @@ public class TimeSheetEntryService {
 
         if (!projectRepository.existsById(entry.getProjectid())) {
             throw new NotFoundException(String.format("Project with id %d does not exist in database", entry.getProjectid()), HttpStatus.NOT_FOUND);
+        }
+
+        final var entryTeamMemberId = timeSheetEntryRepository.getTeamMemberIdOfEntry(entry.getEntryId());
+        if(!entry.getTeammemberid().equals(entryTeamMemberId)){
+            throw new BadRequestException("You are not allowed to change this entry", HttpStatus.FORBIDDEN);
         }
 
         final var emptyCategory = createEmptyCategory(entry.getCategoryid());
