@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import projekat.enums.TeamMemberRoles;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,7 +60,8 @@ public class Teammember implements Serializable, UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+		final var authorityList = Arrays.asList(TeamMemberRoles.ROLE_ADMIN);
+		return authorityList;
 	}
 
 	@Override
