@@ -939,6 +939,9 @@
           clientId:
             description: Name of the client user worked for
             type: integer
+          teamMemberId:
+            description: Name of the user that enter this entry
+            type: integer
         required:
           - timeSpent
           - date
