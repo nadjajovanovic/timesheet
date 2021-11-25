@@ -13,7 +13,6 @@ import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -25,6 +24,7 @@ public class TeamMemberService implements UserDetailsService {
 
     @Setter(onMethod_ = {@Autowired})
     private PasswordEncoder passwordEncoder;
+
 
     public TeamMemberService(TeamMemberRepository teamMemberRepository) {
         this.teamMemberRepository = teamMemberRepository;

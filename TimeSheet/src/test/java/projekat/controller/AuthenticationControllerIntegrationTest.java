@@ -1,6 +1,7 @@
 package projekat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
+import projekat.util.AuthFactory;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
@@ -30,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
@@ -57,7 +60,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @Test
     void login() throws Exception {
         //Arrange
-        final var username = "admin";
+        final var username = "adminTest";
         final var password = "adminju";
         final var authenticationRequestDTO = new AuthenticationRequestDTO();
         authenticationRequestDTO.setUsername(username);
@@ -80,7 +83,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @Test
     void loginBadRequest() throws Exception {
         //Arrange
-        final var username = "admin";
+        final var username = "adminTest";
         final var password = "badPassword";
         final var authenticationRequestDTO = new AuthenticationRequestDTO();
         authenticationRequestDTO.setUsername(username);
@@ -110,11 +113,11 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         resetPasswordDTO.setNewPassword(newPassword);
         resetPasswordDTO.setOldPassword(oldPassword);
         resetPasswordDTO.setNewPasswordRepeated(repeatedPassword);
-        saveTeamMember();
+        final var teammember = saveTeamMember();
 
         //act
         final var response = mvc.perform(post("/authenticate/resetPassword")
-                        .header("Authorization","Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTYzNzc5Nzk5OCwiaWF0IjoxNjM3NzYxOTk4fQ.xCDav14ummS54JcRxL1mLTxl5dG9YS5AGypHtOHvk_c")
+                        .header("Authorization", loginTeammember(teammember.getUsername(),teammember.getPassword()) )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(resetPasswordDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -136,11 +139,10 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         resetPasswordDTO.setNewPassword(newPassword);
         resetPasswordDTO.setOldPassword(oldPassword);
         resetPasswordDTO.setNewPasswordRepeated(repeatedPassword);
-        saveTeamMember();
-
+        final var teammember = saveTeamMember();
         //act
         final var response = mvc.perform(post("/authenticate/resetPassword")
-                        .header("Authorization","Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTYzNzc5Nzk5OCwiaWF0IjoxNjM3NzYxOTk4fQ.xCDav14ummS54JcRxL1mLTxl5dG9YS5AGypHtOHvk_c")
+                        .header("Authorization", loginTeammember(teammember.getUsername(),teammember.getPassword()) )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(resetPasswordDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -188,7 +190,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         final var teammember = new Teammember();
         teammember.setTeammembername("name");
         teammember.setPassword("$2a$10$oUvS02vbxyTUe3J5ZlGV8e4lM2Rnkdfcvcc9cXAtQYCbxq3rfgiKe");
-        teammember.setUsername("admin");
+        teammember.setUsername("adminTest");
         teammember.setEmail("test@example.com");
         teammember.setStatus(true);
         teammember.setHoursperweek(2.3);
@@ -205,6 +207,11 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         teammember.setStatus(true);
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         return teammember;
+    }
+
+    private String loginTeammember(String userName,String password){
+        final var response = AuthFactory.createAuth(userName,password);
+        return  "Bearer "+ response;
     }
 
     private void cleanDataBase() {

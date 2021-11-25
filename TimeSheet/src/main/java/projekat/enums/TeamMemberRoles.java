@@ -11,5 +11,4 @@ public enum TeamMemberRoles implements GrantedAuthority {
         final var roleName = name();
         return roleName;
     }
-
 }

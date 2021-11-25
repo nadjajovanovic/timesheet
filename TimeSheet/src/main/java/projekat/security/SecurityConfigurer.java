@@ -1,6 +1,7 @@
 
 package projekat.security;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,8 +19,11 @@ import projekat.services.TeamMemberService;
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
-    @Autowired
+    @Setter(onMethod_ = {@Autowired})
     private JwtRequestFilter jwtRequestFilter;
+
+    @Setter(onMethod_ = {@Autowired})
+    private TeamMemberService service;
 
     @Override
     @Bean
@@ -31,9 +35,6 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-
-    @Autowired
-    private TeamMemberService service;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -50,5 +51,4 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
-
 }
