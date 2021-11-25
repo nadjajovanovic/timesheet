@@ -117,7 +117,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
 
         //act
         final var response = mvc.perform(post("/authenticate/resetPassword")
-                        .header("Authorization", loginTeammember(teammember.getUsername(),teammember.getPassword()) )
+                        .header("Authorization", AuthFactory.createAuth(teammember.getUsername(),teammember.getPassword()) )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(resetPasswordDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -142,7 +142,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         final var teammember = saveTeamMember();
         //act
         final var response = mvc.perform(post("/authenticate/resetPassword")
-                        .header("Authorization", loginTeammember(teammember.getUsername(),teammember.getPassword()) )
+                        .header("Authorization", AuthFactory.createAuth(teammember.getUsername(),teammember.getPassword()) )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(resetPasswordDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -207,11 +207,6 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         teammember.setStatus(true);
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         return teammember;
-    }
-
-    private String loginTeammember(String userName,String password){
-        final var response = AuthFactory.createAuth(userName,password);
-        return  "Bearer "+ response;
     }
 
     private void cleanDataBase() {

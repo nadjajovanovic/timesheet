@@ -13,8 +13,9 @@ public class AuthFactory {
 
     public String createAuth(String userName, String password ){
         Map<String, Object> claims = new HashMap<>();
-        return Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
+        final var jwt =  Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(Long.MAX_VALUE))
                 .signWith(SignatureAlgorithm.HS256,"Secret key").compact();
+        return "Bearer "+jwt;
     }
 }
