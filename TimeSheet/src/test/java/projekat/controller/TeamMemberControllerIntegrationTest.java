@@ -1,7 +1,6 @@
 package projekat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.internal.CommonErrors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +14,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
-import projekat.enums.TeamMemberRoles;
-import projekat.exception.ApiException;
 import projekat.exception.ErrorResponse;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
-import projekat.util.AuthFactory;
 import projekat.util.BaseUT;
+import projekat.util.Headers;
 import projekat.util.ResponseReader;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -38,11 +35,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase
 class TeamMemberControllerIntegrationTest extends BaseUT{
 
+    private  Teammember teammember;
+
     @Autowired
     private MockMvc mvc;
 
     @Autowired
     private TeamMemberRepository repository;
+
+    @Autowired
+    private Headers headers;
 
     private static ObjectMapper objectMapper;
 
@@ -54,17 +56,19 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDatabase() {
         cleanDataBase();
+        teammember=headers.saveTeamMember();
     }
+
+
 
     @Test
     void getAllTeamMembers() throws Exception {
         //Arrange
-        final var teamMemberName = "Jhon";
-        final var teamMember = saveTeamMember(teamMemberName);
+        final var teamMemberName = "name";
+       // saveTeamMember(teamMemberName);
 
         //act
         final var response = mvc.perform(get("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -78,12 +82,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void getOneTeamMember() throws Exception {
         //Arrange
-        final var teamMemberName = "First";
-        final var inserted = saveTeamMember(teamMemberName);
+        final var teamMemberName = "name";
+        final var inserted = teammember;
 
         //Act
         final var response = mvc.perform(get("/teammember/{id}", inserted.getTeammemberid())
-                        .header("Authorization", AuthFactory.createAuth(inserted.getUsername(),inserted.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -98,10 +101,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void getOneTeamMemberNotFound() throws Exception {
         //Arange
         final var teamMemberId = "100";
-        final var teamMemberSaved = saveTeamMember("jhon");
+//        saveTeamMember("jhon");
         //Act
         final var response = mvc.perform(get("/teammember/{teamMemberId}", teamMemberId)
-                        .header("Authorization", AuthFactory.createAuth(teamMemberSaved.getUsername(),teamMemberSaved.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
         final var error = ResponseReader.readResponse(response, ErrorResponse.class);
@@ -113,7 +115,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateTeamMember() throws Exception {
         //Arange
-        final var teamMemberName = "Please insert me";
+        final var teamMemberName = "name";
         final var teamMemberHours = 3;
         final var teamMember = new TeamMemberDTO();
         teamMember.setName(teamMemberName);
@@ -122,10 +124,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         teamMember.setPassword("password");
         teamMember.setRepeatedPassword("password");
         teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
-        final var teamMemberSaved = saveTeamMember("jhon");
+
         //Act
         final var response = mvc.perform(post("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(teamMemberSaved.getUsername(),teamMemberSaved.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teamMember))
                         .accept(MediaType.APPLICATION_JSON))
@@ -144,10 +145,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         final var teamMember = new TeamMemberDTO();
         teamMember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         teamMember.setName("");
-        final var teamMemberSaved = saveTeamMember("jhon");
+        //saveTeamMember("jhon");
         //Act
         final var response = mvc.perform(post("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(teamMemberSaved.getUsername(),teamMemberSaved.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teamMember))
                         .accept(MediaType.APPLICATION_JSON))
@@ -160,12 +160,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateTeamMemberNameNotExist() throws Exception {
         //Arange
-        final var teamMember = saveTeamMember("jhon");
+        //final var teamMember = saveTeamMember("jhon");
         //Act
         final var response = mvc.perform(post("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"")))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teammember,"")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -175,13 +174,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testCreateTeamMemberIdExists() throws Exception {
         //Arange
-        final var teamMember = saveTeamMember("jhon");
+        //final var teamMember = saveTeamMember("jhon");
 
         //Act
         final var response = mvc.perform(post("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teamMember,"John Doe")))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teammember,"John Doe")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -196,17 +194,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void testUpdateTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "nameForInsert";
-        final var inserted = saveTeamMember(teamMemberName);
         final var updatedName = "nameForUpdate";
-        inserted.setTeammembername("Jhon");
-        inserted.setUsername("username");
-        inserted.setEmail("test@example.com");
-        inserted.setPassword("password");
+
         //Act
         final var response = mvc.perform(put("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(inserted.getUsername(),inserted.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(inserted,updatedName)))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teammember,updatedName)))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -220,13 +213,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateTeamMemberBadRequest() throws Exception {
         //Arange
-        final var teamMemberName = "NameForInsert";
-        final var inserted = saveTeamMember(teamMemberName);
+        final var inserted = teammember;
         final var updatedName = "";
         inserted.setTeammembername(updatedName);
         //Act
         final var response = mvc.perform(put("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(inserted.getUsername(),inserted.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(saveTeamMemberDTO(inserted,updatedName)))
                         .accept(MediaType.APPLICATION_JSON))
@@ -239,12 +230,11 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     @Test
     void testUpdateTeamMemberNoId() throws Exception {
         //Arange
-        final var inserted = saveTeamMember("name");
+        final var inserted = teammember;
         inserted.setTeammemberid(null);
 
         //act
         final var response = mvc.perform(put("/teammember")
-                        .header("Authorization", AuthFactory.createAuth(inserted.getUsername(),inserted.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(saveTeamMemberDTO(inserted,"name")))
                         .accept(MediaType.APPLICATION_JSON))
@@ -261,11 +251,10 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void deleteTeamMember() throws Exception {
         //Arange
         final var teamMemberName = "Delete me";
-        final var inserted = saveTeamMember(teamMemberName);
+        final var inserted = teammember;
 
         //act
         final var response = mvc.perform(delete("/teammember/{teammemberid}", inserted.getTeammemberid())
-                        .header("Authorization", AuthFactory.createAuth(inserted.getUsername(),inserted.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -277,10 +266,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     void deleteTeamMemberNotFound() throws Exception {
         //Arange
         final var teamMemberId = "100";
-        final var inserted = saveTeamMember("jhon");
+        //saveTeamMember("jhon");
         //act
         final var response = mvc.perform(delete("/teammember/{teammemberid}", teamMemberId)
-                        .header("Authorization", AuthFactory.createAuth(inserted.getUsername(),inserted.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
         final var error =  ResponseReader.readResponse(response, ErrorResponse.class);
@@ -290,23 +278,13 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
-    private Teammember saveTeamMember(String teammemberName) {
-        final var teammember = new Teammember();
-        teammember.setTeammembername(teammemberName);
-        teammember.setPassword("password");
-        teammember.setUsername("username");
-        teammember.setEmail("test@example.com");
-        teammember.setHoursperweek(2.3);
-        teammember.setStatus(true);
-        return repository.saveAndFlush(teammember);
-    }
 
     private TeamMemberDTO saveTeamMemberDTO(Teammember t,String teammemberName) {
         final var teammember = new TeamMemberDTO();
         teammember.setId(t.getTeammemberid());
         teammember.setName(teammemberName);
         teammember.setUsername(t.getUsername());
-        teammember.setEmail(t.getEmail());
+        teammember.setEmail("test@example.com");
         teammember.setPassword(t.getPassword());
         teammember.setStatus(t.getStatus());
         teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));

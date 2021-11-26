@@ -62,7 +62,7 @@ public class TeamMemberController implements TeammemberApi {
 	@PreAuthorize("hasRole('projekat.enums.TeamMembersRoles.ADMIN')")
 	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
 		final var updated = teamMemberService.update(TeamMemberMapper.toTeamMember(teamMember));
-		return new ResponseEntity(updated, HttpStatus.OK);
+		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(updated), HttpStatus.OK);
 	}
 
 	@CrossOrigin

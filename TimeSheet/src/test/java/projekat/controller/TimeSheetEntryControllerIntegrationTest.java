@@ -20,6 +20,7 @@ import projekat.models.*;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.repository.*;
 import projekat.util.BaseUT;
+import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
 import java.math.BigDecimal;
@@ -57,6 +58,9 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @Autowired
     private TeamMemberRepository teamMemberRepository;
 
+    @Autowired
+    private Headers headers;
+
     private static ObjectMapper objectMapper;
 
     @BeforeAll
@@ -67,7 +71,10 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDataBase() {
         cleanDataBase();
+        headers.saveTeamMember();
     }
+
+
 
     @Test
     void getAllEntries() throws Exception {
@@ -76,7 +83,6 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         final var secondEntryDescription = "SecondEntryDescription";
         createTestEntry(firstEntryDescription);
         createTestEntry(secondEntryDescription);
-
          //Act
         final var response = mvc.perform(get("/entry")
                         .accept(MediaType.APPLICATION_JSON))
@@ -95,7 +101,6 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var entryDescription = "FirstEntry";
         final var inserted = createTestEntry(entryDescription);
-
         //Act
         final var response = mvc.perform(get("/entry/{id}", inserted.getEntryId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -194,6 +199,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setTimeSpent(BigDecimal.valueOf(4.5));
         entry.setDate("2021-10-10");
 
+
         // Act
         final var response = mvc.perform(post("/entry")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -290,6 +296,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setDate("2021-11-04");
         entry.setTimeSpent(BigDecimal.valueOf(-2.3));
 
+
         // Act
         final var response = mvc.perform(post("/entry")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -308,6 +315,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         final var dto = TimeSheetEntryMapper.toEntryDTO(entry);
         final var updatedDescription = "7.5h total";
         dto.setDescription(updatedDescription);
+
 
         // Act
         final var response = mvc.perform(put("/entry")
@@ -350,6 +358,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entryDTO.setTimeSpent(BigDecimal.valueOf(2.5));
         entryDTO.setId(null);
 
+
         // Act
         final var response = mvc.perform(put("/entry")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -389,7 +398,6 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var entryDescription = "FirstEntry";
         final var inserted = createTestEntry(entryDescription);
-
         //Act
         final var response = mvc.perform(delete("/entry/{id}", inserted.getEntryId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -420,7 +428,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         final var category = saveTestCategory("Test category");
         final var client = saveTestClient("Test client");
         final var project = saveTestProject("Project Name", "Project Description");
-        final var user = saveTeamMember("Test category");
+        final var user = saveTeamMember("name");
         final var entry = createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), user.getTeammemberid(), new Date());
         return entryRepository.saveAndFlush(entry);
     }

@@ -21,8 +21,8 @@ import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
-import projekat.util.AuthFactory;
 import projekat.util.BaseUT;
+import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
 import java.math.BigDecimal;
@@ -44,6 +44,9 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @Autowired
     private TeamMemberRepository repository;
 
+    @Autowired
+    private Headers headers;
+
     private static ObjectMapper objectMapper;
 
     @BeforeAll
@@ -54,6 +57,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @BeforeEach
     void doCleanDatabase() {
         cleanDataBase();
+        headers.saveTeamMember();
     }
 
 
@@ -65,7 +69,6 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         final var authenticationRequestDTO = new AuthenticationRequestDTO();
         authenticationRequestDTO.setUsername(username);
         authenticationRequestDTO.setPassword(password);
-        saveTeamMember();
 
         //act
         final var response = mvc.perform(post("/authenticate")
@@ -88,7 +91,6 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         final var authenticationRequestDTO = new AuthenticationRequestDTO();
         authenticationRequestDTO.setUsername(username);
         authenticationRequestDTO.setPassword(password);
-        saveTeamMember();
 
         //act
         final var response = mvc.perform(post("/authenticate")
@@ -113,11 +115,9 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         resetPasswordDTO.setNewPassword(newPassword);
         resetPasswordDTO.setOldPassword(oldPassword);
         resetPasswordDTO.setNewPasswordRepeated(repeatedPassword);
-        final var teammember = saveTeamMember();
 
         //act
         final var response = mvc.perform(post("/authenticate/resetPassword")
-                        .header("Authorization", AuthFactory.createAuth(teammember.getUsername(),teammember.getPassword()) )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(resetPasswordDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -139,10 +139,9 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         resetPasswordDTO.setNewPassword(newPassword);
         resetPasswordDTO.setOldPassword(oldPassword);
         resetPasswordDTO.setNewPasswordRepeated(repeatedPassword);
-        final var teammember = saveTeamMember();
+
         //act
         final var response = mvc.perform(post("/authenticate/resetPassword")
-                        .header("Authorization", AuthFactory.createAuth(teammember.getUsername(),teammember.getPassword()) )
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(resetPasswordDTO))
                         .accept(MediaType.APPLICATION_JSON))
@@ -184,17 +183,6 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
         //Assert
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
 
-    }
-
-    private Teammember saveTeamMember() {
-        final var teammember = new Teammember();
-        teammember.setTeammembername("name");
-        teammember.setPassword("$2a$10$oUvS02vbxyTUe3J5ZlGV8e4lM2Rnkdfcvcc9cXAtQYCbxq3rfgiKe");
-        teammember.setUsername("adminTest");
-        teammember.setEmail("test@example.com");
-        teammember.setStatus(true);
-        teammember.setHoursperweek(2.3);
-        return repository.saveAndFlush(teammember);
     }
 
     private TeamMemberDTO saveTeamMemberDTO() {
