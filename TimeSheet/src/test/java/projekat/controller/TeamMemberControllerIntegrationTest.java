@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
@@ -18,9 +20,7 @@ import projekat.exception.ErrorResponse;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
-import projekat.util.Headers;
 import projekat.util.ResponseReader;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -33,20 +33,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-class TeamMemberControllerIntegrationTest extends BaseUT{
-
-    private  Teammember teammember;
+class TeamMemberControllerIntegrationTest extends BaseUT {
 
     @Autowired
+    protected WebApplicationContext context;
+
     private MockMvc mvc;
 
     @Autowired
     private TeamMemberRepository repository;
 
-    @Autowired
-    private Headers headers;
-
     private static ObjectMapper objectMapper;
+
+    private Teammember teammember;
+
 
     @BeforeAll
     static void setUp() {
@@ -54,18 +54,21 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
     }
 
     @BeforeEach
-    void doCleanDatabase() {
+    void cleanSetup() {
         cleanDataBase();
-        teammember=headers.saveTeamMember();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
+        teammember = saveTeamMember(); // creates admin TODO: Change this
+
+        testAuthFactory.loginUser("adminTest");
     }
-
-
 
     @Test
     void getAllTeamMembers() throws Exception {
         //Arrange
         final var teamMemberName = "name";
-       // saveTeamMember(teamMemberName);
 
         //act
         final var response = mvc.perform(get("/teammember")
@@ -99,7 +102,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void getOneTeamMemberNotFound() throws Exception {
-        //Arange
+        //Arrange
         final var teamMemberId = "100";
 //        saveTeamMember("jhon");
         //Act
@@ -114,7 +117,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void testCreateTeamMember() throws Exception {
-        //Arange
+        //Arrange
         final var teamMemberName = "name";
         final var teamMemberHours = 3;
         final var teamMember = new TeamMemberDTO();
@@ -141,7 +144,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void testCreateTeamMemberBadRequest() throws Exception {
-        //Arange
+        //Arrange
         final var teamMember = new TeamMemberDTO();
         teamMember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         teamMember.setName("");
@@ -159,7 +162,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void testCreateTeamMemberNameNotExist() throws Exception {
-        //Arange
+        //Arrange
         //final var teamMember = saveTeamMember("jhon");
         //Act
         final var response = mvc.perform(post("/teammember")
@@ -173,7 +176,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void testCreateTeamMemberIdExists() throws Exception {
-        //Arange
+        //Arrange
         //final var teamMember = saveTeamMember("jhon");
 
         //Act
@@ -192,7 +195,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void testUpdateTeamMember() throws Exception {
-        //Arange
+        //Arrange
         final var teamMemberName = "nameForInsert";
         final var updatedName = "nameForUpdate";
 
@@ -212,7 +215,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void testUpdateTeamMemberBadRequest() throws Exception {
-        //Arange
+        //Arrange
         final var inserted = teammember;
         final var updatedName = "";
         inserted.setTeammembername(updatedName);
@@ -229,7 +232,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void testUpdateTeamMemberNoId() throws Exception {
-        //Arange
+        //Arrange
         final var inserted = teammember;
         inserted.setTeammemberid(null);
 
@@ -249,7 +252,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void deleteTeamMember() throws Exception {
-        //Arange
+        //Arrange
         final var teamMemberName = "Delete me";
         final var inserted = teammember;
 
@@ -264,7 +267,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT{
 
     @Test
     void deleteTeamMemberNotFound() throws Exception {
-        //Arange
+        //Arrange
         final var teamMemberId = "100";
         //saveTeamMember("jhon");
         //act
