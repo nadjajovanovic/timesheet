@@ -14,14 +14,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ClientDTO;
+import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
 import projekat.mapper.ClientMapper;
 import projekat.models.Client;
+import projekat.models.Teammember;
 import projekat.repository.ClientRepository;
+import projekat.repository.TeamMemberRepository;
+import projekat.util.AuthFactory;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +45,9 @@ class ClientControllerIntegrationTest extends BaseUT{
     @Autowired
     private ClientRepository repository;
 
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
+
     private static ObjectMapper objectMapper;
 
     @BeforeAll
@@ -57,9 +65,12 @@ class ClientControllerIntegrationTest extends BaseUT{
         //Arrange
         final var firstClientName = "Jane Doe";
         saveTestClient(firstClientName);
+        final var teamMemberName = "John";
+        final var teamMember = saveTeamMember(teamMemberName);
 
         //Act
         final var response = mvc.perform(get("/client")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(), teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -75,9 +86,12 @@ class ClientControllerIntegrationTest extends BaseUT{
         //Arrange
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
+        final var teamMemberName = "John";
+        final var teamMember = saveTeamMember(teamMemberName);
 
         //Act
         final var response = mvc.perform(get("/client/{clientid}", inserted.getClientid())
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(), teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -92,9 +106,12 @@ class ClientControllerIntegrationTest extends BaseUT{
     void getOneClientNotFound() throws Exception{
         //Arrange
         final var clientId = "100";
+        final var teamMemberName = "John";
+        final var teamMember = saveTeamMember(teamMemberName);
 
         //Act
         final var response = mvc.perform(get("/client/{clientid}", clientId)
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(), teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
         final var error = ResponseReader.readResponse(response, ErrorResponse.class);
@@ -110,9 +127,20 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var clientName = "Jane Doe";
         final var client = new ClientDTO();
         client.setName(clientName);
+        final var teamMemberName = "John";
+        final var teamMemberHours = 3;
+        final var teamMember = new TeamMemberDTO();
+        teamMember.setName(teamMemberName);
+        teamMember.setUsername("username");
+        teamMember.setEmail("test@example.com");
+        teamMember.setPassword("password");
+        teamMember.setRepeatedPassword("password");
+        teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
+        final var teamMemberSaved = saveTeamMember("John");
 
         //Act
         final var response = mvc.perform(post("/client")
+                        .header("Authorization", AuthFactory.createAuth(teamMemberSaved.getUsername(),teamMemberSaved.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
@@ -130,9 +158,14 @@ class ClientControllerIntegrationTest extends BaseUT{
         //Arange
         final var client = new ClientDTO();
         client.setName("");
+        final var teamMember = new TeamMemberDTO();
+        teamMember.setHoursPerWeek(BigDecimal.valueOf(2.3));
+        teamMember.setName("");
+        final var teamMemberSaved = saveTeamMember("John");
 
         //Act
         final var response = mvc.perform(post("/client")
+                        .header("Authorization", AuthFactory.createAuth(teamMemberSaved.getUsername(),teamMemberSaved.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
@@ -146,9 +179,11 @@ class ClientControllerIntegrationTest extends BaseUT{
     void testCreateClientNameNotExist() throws Exception {
         //Arange
         final var client = new ClientDTO();
+        final var teamMember = saveTeamMember("John");
 
         //Act
         final var response = mvc.perform(post("/client")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
@@ -165,9 +200,11 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var client = new ClientDTO();
         client.setName(clientName);
         client.setId(5);
+        final var teamMember = saveTeamMember("John");
 
         //Act
         final var response = mvc.perform(post("/client")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
@@ -185,9 +222,15 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
         final var updateName = "Jane A Doe";
+        final var teamMemberName = "John";
+        final var insertedTeamMember = saveTeamMember(teamMemberName);
+        insertedTeamMember.setUsername("username");
+        insertedTeamMember.setEmail("test@example.com");
+        insertedTeamMember.setPassword("password");
 
         //Act
         final var response = mvc.perform(put("/client")
+                        .header("Authorization", AuthFactory.createAuth(insertedTeamMember.getUsername(),insertedTeamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(saveTestClientDTO(inserted, updateName)))
                         .accept(MediaType.APPLICATION_JSON))
@@ -206,9 +249,13 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var inserted = saveTestClient(clientName);
         final var updateName = "";
         inserted.setClientname(updateName);
+        final var teamMemberName = "John";
+        final var insertedTeamMember = saveTeamMember(teamMemberName);
+
 
         //Act
         final var response = mvc.perform(put("/client")
+                        .header("Authorization", AuthFactory.createAuth(insertedTeamMember.getUsername(),insertedTeamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inserted))
                         .accept(MediaType.APPLICATION_JSON))
@@ -223,9 +270,11 @@ class ClientControllerIntegrationTest extends BaseUT{
         //Arange
         final var client = new ClientDTO();
         client.setName("Jane Doe");
+        final var teamMember = saveTeamMember("John");
 
         //Act
         final var response = mvc.perform(put("/client")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
@@ -244,9 +293,11 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
         inserted.setClientid(9999);
+        final var teamMember = saveTeamMember("John");
 
         // Act
         final var response = mvc.perform(put("/client")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ClientMapper.toClientDTO(inserted)))
                         .accept(MediaType.APPLICATION_JSON))
@@ -263,9 +314,11 @@ class ClientControllerIntegrationTest extends BaseUT{
         //Arange
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
+        final var teamMember = saveTeamMember("John");
 
         //Act
         final var response = mvc.perform(delete("/client/{clientid}", inserted.getClientid())
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -277,9 +330,11 @@ class ClientControllerIntegrationTest extends BaseUT{
     void deleteClientNotFound() throws Exception {
         //Arrange
         final var clientId = "100";
+        final var teamMember = saveTeamMember("John");
 
         //Act
         final var response = mvc.perform(delete("/client/{clientid}", clientId)
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
         final var error = ResponseReader.readResponse(response, ErrorResponse.class);
@@ -349,6 +404,31 @@ class ClientControllerIntegrationTest extends BaseUT{
         client.setId(c.getClientid());
         client.setName(clientName);
         return client;
+    }
+
+    private Teammember saveTeamMember(String teammemberName) {
+        final var teammember = new Teammember();
+        teammember.setTeammembername(teammemberName);
+        teammember.setPassword("password");
+        teammember.setUsername("username");
+        teammember.setEmail("test@example.com");
+        teammember.setHoursperweek(2.3);
+        teammember.setStatus(true);
+        return teamMemberRepository.saveAndFlush(teammember);
+    }
+
+    private TeamMemberDTO saveTeamMemberDTO(Teammember t, String teammemberName) {
+        final var teammember = new TeamMemberDTO();
+        teammember.setId(t.getTeammemberid());
+        teammember.setName(teammemberName);
+        teammember.setUsername(t.getUsername());
+        teammember.setEmail(t.getEmail());
+        teammember.setPassword(t.getPassword());
+        teammember.setStatus(t.getStatus());
+        teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
+        teammember.setRepeatedPassword(t.getPassword());
+        teammember.setStatus(true);
+        return teammember;
     }
 
     private void cleanDataBase() {

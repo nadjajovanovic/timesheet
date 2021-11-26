@@ -5,9 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import projekat.TimeSheetApplication;
 import projekat.api.model.CountryDTO;
+import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
 import projekat.models.Country;
+import projekat.models.Teammember;
 import projekat.repository.CountryRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,9 +22,12 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import projekat.repository.TeamMemberRepository;
+import projekat.util.AuthFactory;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,6 +46,9 @@ class CountryControllerIntegrationTest extends BaseUT{
 
     @Autowired
     private CountryRepository repository;
+
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
 
     private static ObjectMapper objectMapper;
 
@@ -61,9 +69,12 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var secondCountryName = "Spain";
         saveTestCountry(firstCountryName);
         saveTestCountry(secondCountryName);
+        final var teamMemberName = "John";
+        final var teamMember = saveTeamMember(teamMemberName);
 
         //Act
         final var response = mvc.perform(get("/country")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(), teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -80,9 +91,12 @@ class CountryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var countryName = "Romania";
         final var inserted = saveTestCountry(countryName);
+        final var teamMemberName = "John";
+        final var teamMember = saveTeamMember(teamMemberName);
 
         //Act
         final var response = mvc.perform(get("/country/{id}", inserted.getCountryid())
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(), teamMember.getPassword()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -97,11 +111,15 @@ class CountryControllerIntegrationTest extends BaseUT{
     void getOneCountryNotFound() throws Exception {
         //Arrange
         final var countryId = 123;
+        final var teamMemberName = "John";
+        final var teamMember = saveTeamMember(teamMemberName);
 
         //Act
-        final var response = mvc.perform(get("/country/{id}", countryId))
+        //Act
+        final var response = mvc.perform(get("/country/{id}", countryId)
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(), teamMember.getPassword()))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         final var error = ResponseReader.readResponse(response, ErrorResponse.class);
         //assert
         assertEquals(ErrorCode.NOT_FOUND.toString(),error.getErrorCode());
@@ -114,9 +132,18 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var countryName = "Spain";
         final var country = new CountryDTO();
         country.setName(countryName);
+        final var teamMemberHours = 3;
+        final var teamMember = new TeamMemberDTO();
+        teamMember.setUsername("username");
+        teamMember.setEmail("test@example.com");
+        teamMember.setPassword("password");
+        teamMember.setRepeatedPassword("password");
+        teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
+        final var teamMemberSaved = saveTeamMember("John");
 
         // Act
         final var response = mvc.perform(post("/country")
+                        .header("Authorization", AuthFactory.createAuth(teamMemberSaved.getUsername(),teamMemberSaved.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country))
                         .accept(MediaType.APPLICATION_JSON))
@@ -134,9 +161,13 @@ class CountryControllerIntegrationTest extends BaseUT{
         //Arange
         final var country = new CountryDTO();
         country.setName("");
+        final var teamMember = new TeamMemberDTO();
+        teamMember.setHoursPerWeek(BigDecimal.valueOf(2.3));
+        final var teamMemberSaved = saveTeamMember("John");
 
         // Act
         final var response = mvc.perform(post("/country")
+                        .header("Authorization", AuthFactory.createAuth(teamMemberSaved.getUsername(),teamMemberSaved.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country)))
                 .andReturn();
@@ -149,9 +180,11 @@ class CountryControllerIntegrationTest extends BaseUT{
     void testCreateCountryNameNotExist() throws Exception {
         //Arange
         final var country = new CountryDTO();
+        final var teamMember = saveTeamMember("John");
 
         // Act
         final var response = mvc.perform(post("/country")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country)))
                 .andReturn();
@@ -166,15 +199,17 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var countryName = "Greece";
         final var country = new CountryDTO();
         country.setName(countryName);
-        country.setCountryid(123);
+        country.setCountryid(5);
+        final var teamMember = saveTeamMember("John");
 
         // Act
         final var response = mvc.perform(post("/country")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country)))
                 .andReturn();
-
         final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
         // Assert
         assertEquals(HttpStatus.NOT_FOUND.value(), responseObject.getStatusCode());
         assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
@@ -186,9 +221,15 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var countryName = "Itly";
         final var inserted = saveTestCountry(countryName);
         final var updatedName = "Italy";
+        final var teamMemberName = "John";
+        final var insertedTeamMember = saveTeamMember(teamMemberName);
+        insertedTeamMember.setUsername("username");
+        insertedTeamMember.setEmail("test@example.com");
+        insertedTeamMember.setPassword("password");
 
         // Act
         final var response = mvc.perform(put("/country")
+                        .header("Authorization", AuthFactory.createAuth(insertedTeamMember.getUsername(),insertedTeamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(saveTestCountryDTO(inserted, updatedName)))
                         .accept(MediaType.APPLICATION_JSON))
@@ -208,9 +249,12 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var inserted = saveTestCountry(countryName);
         final var updatedName = "";
         inserted.setCountryname(updatedName);
+        final var teamMemberName = "John";
+        final var insertedTeamMember = saveTeamMember(teamMemberName);
 
         // Act
         final var response = mvc.perform(put("/country")
+                        .header("Authorization", AuthFactory.createAuth(insertedTeamMember.getUsername(),insertedTeamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inserted)))
                 .andReturn();
@@ -224,9 +268,11 @@ class CountryControllerIntegrationTest extends BaseUT{
         //Arange
         final var country = new CountryDTO();
         country.setName("United States of America");
+        final var teamMember = saveTeamMember("John");
 
         //Act
-        final var response = mvc.perform(put("/client")
+        final var response = mvc.perform(put("/country")
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(country))
                         .accept(MediaType.APPLICATION_JSON))
@@ -244,9 +290,12 @@ class CountryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var countryName = "Italy";
         final var inserted = saveTestCountry(countryName);
+        final var teamMember = saveTeamMember("John");
 
         //Act
-        final var response = mvc.perform(delete("/country/{id}", inserted.getCountryid()))
+        final var response = mvc.perform(delete("/country/{id}", inserted.getCountryid())
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         //Assert
@@ -257,8 +306,12 @@ class CountryControllerIntegrationTest extends BaseUT{
     void deleteCountryNotFound() throws Exception {
         //Arrange
         final var countryId = 99;
+        final var teamMember = saveTeamMember("John");
+
         //Act
-        final var response = mvc.perform(delete("/country/{id}", countryId))
+        final var response = mvc.perform(delete("/country/{id}", countryId)
+                        .header("Authorization", AuthFactory.createAuth(teamMember.getUsername(),teamMember.getPassword()))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         final var error =  ResponseReader.readResponse(response, ErrorResponse.class);
@@ -278,6 +331,31 @@ class CountryControllerIntegrationTest extends BaseUT{
         country.setCountryid(c.getCountryid());
         country.setName(countryName);
         return country;
+    }
+
+    private Teammember saveTeamMember(String teammemberName) {
+        final var teammember = new Teammember();
+        teammember.setTeammembername(teammemberName);
+        teammember.setPassword("password");
+        teammember.setUsername("username");
+        teammember.setEmail("test@example.com");
+        teammember.setHoursperweek(2.3);
+        teammember.setStatus(true);
+        return teamMemberRepository.saveAndFlush(teammember);
+    }
+
+    private TeamMemberDTO saveTeamMemberDTO(Teammember t, String teammemberName) {
+        final var teammember = new TeamMemberDTO();
+        teammember.setId(t.getTeammemberid());
+        teammember.setName(teammemberName);
+        teammember.setUsername(t.getUsername());
+        teammember.setEmail(t.getEmail());
+        teammember.setPassword(t.getPassword());
+        teammember.setStatus(t.getStatus());
+        teammember.setHoursPerWeek(BigDecimal.valueOf(2.3));
+        teammember.setRepeatedPassword(t.getPassword());
+        teammember.setStatus(true);
+        return teammember;
     }
 
     private void cleanDataBase() {
