@@ -19,10 +19,8 @@ import projekat.api.model.ResetPasswordDTO;
 import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
-import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
-import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
 import java.math.BigDecimal;
@@ -44,9 +42,6 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @Autowired
     private TeamMemberRepository repository;
 
-    @Autowired
-    private Headers headers;
-
     private static ObjectMapper objectMapper;
 
     @BeforeAll
@@ -57,7 +52,6 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @BeforeEach
     void doCleanDatabase() {
         cleanDataBase();
-        headers.saveTeamMember();
     }
 
 
@@ -185,7 +179,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
 
     }
 
-    private TeamMemberDTO saveTeamMemberDTO() {
+    protected TeamMemberDTO saveTeamMemberDTO() {
         final var teammember = new TeamMemberDTO();
         teammember.setName("name");
         teammember.setPassword("password");

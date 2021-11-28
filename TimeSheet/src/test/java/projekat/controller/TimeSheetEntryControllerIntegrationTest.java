@@ -20,7 +20,6 @@ import projekat.models.*;
 import projekat.mapper.TimeSheetEntryMapper;
 import projekat.repository.*;
 import projekat.util.BaseUT;
-import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
 import java.math.BigDecimal;
@@ -58,9 +57,6 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @Autowired
     private TeamMemberRepository teamMemberRepository;
 
-    @Autowired
-    private Headers headers;
-
     private static ObjectMapper objectMapper;
 
     @BeforeAll
@@ -71,10 +67,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDataBase() {
         cleanDataBase();
-        headers.saveTeamMember();
     }
-
-
 
     @Test
     void getAllEntries() throws Exception {
