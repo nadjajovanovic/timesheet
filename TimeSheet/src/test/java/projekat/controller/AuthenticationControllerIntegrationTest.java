@@ -21,6 +21,7 @@ import projekat.enums.ErrorCode;
 import projekat.exception.ErrorResponse;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
+import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
 import java.math.BigDecimal;
@@ -42,6 +43,9 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @Autowired
     private TeamMemberRepository repository;
 
+    @Autowired
+    private Headers headers;
+
     private static ObjectMapper objectMapper;
 
     @BeforeAll
@@ -52,6 +56,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     @BeforeEach
     void doCleanDatabase() {
         cleanDataBase();
+        headers.saveTeamMember();
     }
 
 
