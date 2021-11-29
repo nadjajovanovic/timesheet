@@ -53,7 +53,8 @@ class ProjectControllerIntegrationTest extends BaseUT{
 
     private static ObjectMapper objectMapper;
 
-    private Teammember teammember;
+    private final String usernameAdmin = "adminTest";
+    private final String usernameWorker = "workerTest";
 
     @BeforeAll
     static void setUp() {
@@ -67,9 +68,8 @@ class ProjectControllerIntegrationTest extends BaseUT{
                 .webAppContextSetup(context)
                 .build();
 
-        final var username = "adminTest";
-        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
-        testAuthFactory.loginUser(username);
+        registerUser(usernameAdmin, TeamMemberRoles.ROLE_ADMIN);
+        registerUser(usernameWorker, TeamMemberRoles.ROLE_WORKER);
     }
 
     @Test
@@ -81,6 +81,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var secondProjectDescription = "Make Application for Booking";
         saveTestProject(firstProjectName, firstProjectDescription);
         saveTestProject(secondProjectName, secondProjectDescription);
+        testAuthFactory.loginUser(usernameWorker);
 
         //Act
         final var response = mvc.perform(get("/project")
@@ -103,6 +104,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var projectName = "Booking Software";
         final var projectDescription = "Make Application for Booking";
         final var insertedProject = saveTestProject(projectName, projectDescription);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(get("/project/{id}", insertedProject.getProjectid())
@@ -121,6 +123,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
     void getOneProjectNotFoundTest() throws Exception {
         //Arrange
         final var projectId = 100;
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(get("/project/{id}", projectId))
@@ -141,6 +144,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         project.setName(projectName);
         project.setDescription(projectDescription);
         project.setStatus("Active");
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(post("/project")
@@ -158,10 +162,35 @@ class ProjectControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testCreateProjectForbidden() throws Exception {
+        //Arrange
+        final var projectName = "Cinema App";
+        final var projectDescription = "Make App for ticket reservation";
+        final var project = new ProjectDTO();
+        project.setName(projectName);
+        project.setDescription(projectDescription);
+        project.setStatus("Active");
+        testAuthFactory.loginUser(usernameWorker);
+
+        // Act
+        final var response = mvc.perform(post("/project")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(project))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var responseCategory = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), responseCategory.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), responseCategory.getErrorCode());
+    }
+
+    @Test
     void testCreateProjectBadRequest() throws Exception {
         //Arrange
         final var project = new ProjectDTO();
         project.setName("  ");
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(post("/project")
@@ -178,6 +207,8 @@ class ProjectControllerIntegrationTest extends BaseUT{
         //Arrange
         final var project = new ProjectDTO();
         project.setStatus("Active");
+        testAuthFactory.loginUser(usernameAdmin);
+
         // Act
         final var response = mvc.perform(post("/project")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -198,6 +229,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         project.setName(projectName);
         project.setDescription(projectDescription);
         project.setStatus("Active");
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(post("/project")
@@ -220,6 +252,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var updatedName = "Booking App";
         final var dto = ProjectMapper.toProjectDTO(insertedProject);
         dto.setName(updatedName);
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(put("/project")
@@ -237,6 +270,30 @@ class ProjectControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testUpdateProjectForbidden() throws Exception {
+        //Arrange
+        final var projectName = "Project Title";
+        final var projectDescription = "Project Description";
+        final var insertedProject = saveTestProject(projectName, projectDescription);
+        final var updatedName = "Booking App";
+        final var dto = ProjectMapper.toProjectDTO(insertedProject);
+        dto.setName(updatedName);
+        testAuthFactory.loginUser(usernameWorker);
+
+        // Act
+        final var response = mvc.perform(put("/project")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var responseProject = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), responseProject.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), responseProject.getErrorCode());
+    }
+
+    @Test
     void testUpdateProjectBadRequest() throws Exception {
         //Arrange
         final var projectName = "Cinema App";
@@ -245,6 +302,8 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var updatedName = "   ";
         inserted.setProjectname(updatedName);
         final var dto = ProjectMapper.toProjectDTO(inserted);
+        testAuthFactory.loginUser(usernameAdmin);
+
         // Act
         final var response = mvc.perform(put("/project")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -262,6 +321,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var projectDescription = "App for ticket reservation";
         final var inserted = saveTestProject(projectName, projectDescription);
         inserted.setProjectid(9999);
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(put("/category")
@@ -285,6 +345,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         project.setName(projectName);
         project.setDescription(projectDescription);
         project.setStatus("Active");
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(put("/project")
@@ -305,6 +366,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         final var projectName = "TimeSheet App";
         final var projectDescription = "Application for time tracking";
         final var insertedProject = saveTestProject(projectName, projectDescription);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(delete("/project/{id}", insertedProject.getProjectid()))
@@ -315,9 +377,29 @@ class ProjectControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void deleteProjectTestForbidden() throws Exception {
+        //Arrange
+        final var projectName = "TimeSheet App";
+        final var projectDescription = "Application for time tracking";
+        final var insertedProject = saveTestProject(projectName, projectDescription);
+        testAuthFactory.loginUser(usernameWorker);
+
+        //Act
+        final var response = mvc.perform(delete("/project/{id}", insertedProject.getProjectid()))
+                .andReturn();
+
+        final var errorResponse = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), errorResponse.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), errorResponse.getErrorCode());
+    }
+
+    @Test
     void deleteProjectNotFound() throws Exception {
         //Arrange
         final var projectId = 100;
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(delete("/project/{id}", projectId))
@@ -342,6 +424,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         saveTestProject(fourthProjectName, null);
         final var paramName = "keyword";
         final var paramValue = "app";
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(get("/project/filter")
@@ -367,6 +450,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
         saveTestProject(secondProjectName, null);
         final var paramName = "keyword";
         final var paramValue = "very long value";
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(get("/project/filter")

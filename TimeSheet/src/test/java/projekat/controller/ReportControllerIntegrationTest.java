@@ -65,7 +65,8 @@ class ReportControllerIntegrationTest extends BaseUT{
 
     private static ObjectMapper objectMapper;
 
-    private Teammember teammember;
+    private final String usernameAdmin = "adminTest";
+    private final String usernameWorker = "workerTest";
 
     @BeforeAll
     static void setUp() {
@@ -81,10 +82,8 @@ class ReportControllerIntegrationTest extends BaseUT{
                 .webAppContextSetup(context)
                 .build();
 
-        final var username = "adminTest";
-        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
-        testAuthFactory.loginUser(username);
-
+        registerUser(usernameAdmin, TeamMemberRoles.ROLE_ADMIN);
+        registerUser(usernameWorker, TeamMemberRoles.ROLE_WORKER);
     }
 
     @Test
@@ -104,6 +103,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var entry3 = saveTestEntry(client, category, project, teamMember,date3);
 
         final var report = new ReportFilterDTO();
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report")
@@ -140,6 +140,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var report = new ReportFilterDTO();
         report.setStartDate("2021-11-08");
         report.setEndDate("2021-11-30");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report")
@@ -174,6 +175,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         report.setStartDate("2021-11-1");
         report.setEndDate("2021-11-30");
         report.setClientId(client1.getClientid());
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report")
@@ -205,6 +207,7 @@ class ReportControllerIntegrationTest extends BaseUT{
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(category1.getCategoryid());
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report")
@@ -236,6 +239,7 @@ class ReportControllerIntegrationTest extends BaseUT{
 
         final var report = new ReportFilterDTO();
         report.setProjectId(project2.getProjectid());
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report")
@@ -273,6 +277,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         report.setCategoryId(category1.getCategoryid());
         report.setStartDate("2021-10-01");
         report.setEndDate("2021-10-31");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report")
@@ -291,6 +296,7 @@ class ReportControllerIntegrationTest extends BaseUT{
     void generatePdfNoEntities() throws Exception {
         //Arange
         final var report = new ReportFilterDTO();
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(get("/report/getPdf")
@@ -324,6 +330,7 @@ class ReportControllerIntegrationTest extends BaseUT{
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(12);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(get("/report/getPdf")
@@ -356,6 +363,7 @@ class ReportControllerIntegrationTest extends BaseUT{
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(category.getCategoryid());
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(get("/report/getPdf")
@@ -389,6 +397,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var report = new ReportFilterDTO();
         report.setStartDate("2021-11-08");
         report.setEndDate("2021-11-30");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report/export/excel")
@@ -408,6 +417,7 @@ class ReportControllerIntegrationTest extends BaseUT{
     void generateExcelNoEntities() throws Exception {
         //Arange
         final var report = new ReportFilterDTO();
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report/export/excel")
@@ -440,6 +450,7 @@ class ReportControllerIntegrationTest extends BaseUT{
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(1234);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/report/export/excel")
@@ -474,6 +485,7 @@ class ReportControllerIntegrationTest extends BaseUT{
         final var report = new ReportFilterDTO();
         report.setStartDate("2021-11-08");
         report.setEndDate("2021-11-30");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //act
         final var response = mvc.perform(post("/report/export/csv")
@@ -492,6 +504,7 @@ class ReportControllerIntegrationTest extends BaseUT{
     void generateCsvNoEntities() throws Exception {
         //arange
         final var report = new ReportFilterDTO();
+        testAuthFactory.loginUser(usernameAdmin);
 
         //act
         final var response = mvc.perform(post("/report/export/csv")
@@ -523,6 +536,7 @@ class ReportControllerIntegrationTest extends BaseUT{
 
         final var report = new ReportFilterDTO();
         report.setCategoryId(1234);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //act
         final var response = mvc.perform(post("/report/export/csv")
