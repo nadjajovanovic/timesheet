@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
+import projekat.api.model.ClientDTO;
 import projekat.api.model.CountryDTO;
 import projekat.enums.ErrorCode;
 import projekat.enums.TeamMemberRoles;
@@ -51,6 +52,9 @@ class CountryControllerIntegrationTest extends BaseUT{
 
     private static ObjectMapper objectMapper;
 
+    private final String usernameAdmin = "adminTest";
+    private final String usernameWorker = "workerTest";
+
     private Teammember teammember;
 
     @BeforeAll
@@ -64,9 +68,9 @@ class CountryControllerIntegrationTest extends BaseUT{
         mvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .build();
-        final var username = "adminTest";
-        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
-        testAuthFactory.loginUser(username);
+
+        registerUser(usernameAdmin, TeamMemberRoles.ROLE_ADMIN);
+        registerUser(usernameWorker, TeamMemberRoles.ROLE_WORKER);
     }
 
     @Test
@@ -129,6 +133,7 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var countryName = "Spain";
         final var country = new CountryDTO();
         country.setName(countryName);
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(post("/country")
@@ -145,10 +150,33 @@ class CountryControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testCreateCountryForbidden() throws Exception {
+        //Arrange
+        final var countryName = "Spain";
+        final var country = new CountryDTO();
+        country.setName(countryName);
+        testAuthFactory.loginUser(usernameWorker);
+
+        //Act
+        final var response = mvc.perform(post("/country")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(country))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var responseClient = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        //assert
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), responseClient.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), responseClient.getErrorCode());
+    }
+
+    @Test
     void testCreateCountryBadRequest() throws Exception {
         //Arange
         final var country = new CountryDTO();
         country.setName("");
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(post("/country")
@@ -164,6 +192,8 @@ class CountryControllerIntegrationTest extends BaseUT{
     void testCreateCountryNameNotExist() throws Exception {
         //Arange
         final var country = new CountryDTO();
+        testAuthFactory.loginUser(usernameAdmin);
+
         // Act
         final var response = mvc.perform(post("/country")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -181,6 +211,7 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var country = new CountryDTO();
         country.setName(countryName);
         country.setCountryid(5);
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(post("/country")
@@ -200,6 +231,7 @@ class CountryControllerIntegrationTest extends BaseUT{
         final var countryName = "Itly";
         final var inserted = saveTestCountry(countryName);
         final var updatedName = "Italy";
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(put("/country")
@@ -216,11 +248,33 @@ class CountryControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testUpdateCountryForbidden() throws Exception {
+        //Arrange
+        final var countryName = "Itly";
+        final var inserted = saveTestCountry(countryName);
+        final var updatedName = "Italy";
+        testAuthFactory.loginUser(usernameWorker);
+
+        // Act
+        final var response = mvc.perform(put("/country")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(saveTestCountryDTO(inserted, updatedName)))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), error.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), error.getErrorCode());
+    }
+
+    @Test
     void testUpdateCountryBadRequest() throws Exception {
         //Arange
         final var countryName = "Serbia";
         final var inserted = saveTestCountry(countryName);
         final var updatedName = "";
+        testAuthFactory.loginUser(usernameAdmin);
 
         inserted.setCountryname(updatedName);
 
@@ -239,6 +293,7 @@ class CountryControllerIntegrationTest extends BaseUT{
         //Arange
         final var country = new CountryDTO();
         country.setName("United States of America");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(put("/country")
@@ -259,6 +314,7 @@ class CountryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var countryName = "Italy";
         final var inserted = saveTestCountry(countryName);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(delete("/country/{id}", inserted.getCountryid())
@@ -270,9 +326,28 @@ class CountryControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void deleteCountryForbidden() throws Exception {
+        //Arrange
+        final var clientName = "Jane Doe";
+        final var inserted = saveTestCountry(clientName);
+        testAuthFactory.loginUser(usernameWorker);
+
+        //Act
+        final var response = mvc.perform(delete("/country/{countryid}", inserted.getCountryid())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), error.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), error.getErrorCode());
+    }
+
+    @Test
     void deleteCountryNotFound() throws Exception {
         //Arrange
         final var countryId = 99;
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(delete("/country/{id}", countryId)
