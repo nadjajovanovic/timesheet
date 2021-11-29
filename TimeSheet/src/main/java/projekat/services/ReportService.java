@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import projekat.api.model.TimeSheetEntryReportDTO;
 import projekat.exception.BadRequestException;
@@ -31,11 +32,13 @@ public class ReportService {
         this.timeSheetEntryRepository = timeSheetEntryRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public List<TimeSheetEntry> getAll(){
         return timeSheetEntryRepository.findAll();
     }
 
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public List<TimeSheetEntry> generateReport(Report report) {
 
         final var reportKey = report.hashCode();
@@ -61,6 +64,7 @@ public class ReportService {
         return filteredReports;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public InputStream createDocument(List<TimeSheetEntryReportDTO> timeSheetEntryReportDTOList) {
 
         final var document = new Document(PageSize.A4);

@@ -36,6 +36,7 @@ public class TimeSheetEntryService {
     @Autowired
     private final TeamMemberRepository teamMemberRepository;
 
+
     public TimeSheetEntryService(TimeSheetEntryRepository timeSheetEntryRepository, ClientRepository clientRepository,
                                     ProjectRepository projectRepository, CategoryRepository categoryRepository,
                                  TeamMemberRepository teamMemberRepository) {
@@ -46,11 +47,13 @@ public class TimeSheetEntryService {
         this.teamMemberRepository = teamMemberRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public Collection<TimeSheetEntry> getAll() {
         final var entries = timeSheetEntryRepository.findAll();
         return entries;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public Optional<TimeSheetEntry> getOne(Integer id) {
         if (!timeSheetEntryRepository.existsById(id)) {
             throw new NotFoundException(String.format("Timesheet entry with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
@@ -59,7 +62,7 @@ public class TimeSheetEntryService {
         return entry;
     }
 
-    @PreAuthorize("hasRole('WORKER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public TimeSheetEntry create(TimeSheetEntryDTO dto){
 
         if (dto.getId() != null) {
@@ -91,6 +94,7 @@ public class TimeSheetEntryService {
         return insertedEntry;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public TimeSheetEntry update(TimeSheetEntry entry) {
         if (entry.getEntryId() == null) {
             throw new InputFieldException("Id is not present in request", HttpStatus.NOT_FOUND);
@@ -126,6 +130,7 @@ public class TimeSheetEntryService {
         return updatedEntry;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete (Integer id) {
         if (!timeSheetEntryRepository.existsById(id)){
             throw new NotFoundException(String.format("Timesheet entry with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
