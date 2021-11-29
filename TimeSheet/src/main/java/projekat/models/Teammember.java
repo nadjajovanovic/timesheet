@@ -60,7 +60,7 @@ public class Teammember implements Serializable, UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		final var authorityList = Arrays.asList(TeamMemberRoles.ROLE_ADMIN);
+		final var authorityList = Arrays.asList(role);
 		return authorityList;
 	}
 
