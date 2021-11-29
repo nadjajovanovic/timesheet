@@ -3,17 +3,22 @@ package projekat.services;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.InputFieldException;
 import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -30,11 +35,13 @@ public class TeamMemberService implements UserDetailsService {
         this.teamMemberRepository = teamMemberRepository;
     }
 
+    @PreAuthorize("hasRole('WORKER')")
     public Collection<Teammember> getAll() {
         final var teammembers = teamMemberRepository.findAll();
         return teammembers;
     }
 
+    @PreAuthorize("hasRole('WORKER')")
     public Optional<Teammember> getOne(Integer id) {
         if (!teamMemberRepository.existsById(id)) {
             throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
@@ -43,6 +50,7 @@ public class TeamMemberService implements UserDetailsService {
         return oneTeamMember;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Teammember insert(Teammember teammember) {
         if (teammember.getTeammemberid() != null) {
             throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
@@ -52,7 +60,12 @@ public class TeamMemberService implements UserDetailsService {
         return inserted;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public Teammember update(Teammember teammember) {
+        final var user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final var username = ((Teammember)user).getUsername();
+        if( teammember.getRole().equals(TeamMemberRoles.ROLE_WORKER) && !Objects.equals(teammember.getUsername(), username))
+           throw new AccessDeniedException("Access denied");
         if (teammember.getTeammemberid() == null) {
             throw new InputFieldException("Id is not present in request", HttpStatus.BAD_REQUEST);
         }
@@ -63,6 +76,7 @@ public class TeamMemberService implements UserDetailsService {
         return updated;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete(Integer id) {
         if (!teamMemberRepository.existsById(id)) {
             throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), HttpStatus.NOT_FOUND);

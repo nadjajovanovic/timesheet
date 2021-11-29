@@ -33,8 +33,8 @@ public class ControllersAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
-        final var error = new ErrorResponse(ErrorCode.FORBIDDEN.toString(), "You are not allowed to perform this action", HttpStatus.UNAUTHORIZED.value());
-        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        final var error = new ErrorResponse(ErrorCode.FORBIDDEN.toString(), "You are not allowed to perform this action", HttpStatus.FORBIDDEN.value());
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = RuntimeException.class)
