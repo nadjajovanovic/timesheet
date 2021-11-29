@@ -11,13 +11,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ProjectDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
 import projekat.mapper.ProjectMapper;
 import projekat.models.Project;
+import projekat.models.Teammember;
 import projekat.repository.ProjectRepository;
+import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
@@ -35,12 +40,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ProjectControllerIntegrationTest extends BaseUT{
 
     @Autowired
+    protected WebApplicationContext context;
+
+    @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ProjectRepository repository;
 
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
+
     private static ObjectMapper objectMapper;
+
+    private Teammember teammember;
 
     @BeforeAll
     static void setUp() {
@@ -50,6 +63,14 @@ class ProjectControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDataBase() {
         cleanDataBase();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
+        teammember = registerUser("adminTest", TeamMemberRoles.ROLE_ADMIN);
+
+        testAuthFactory.loginUser("adminTest");
+
     }
 
     @Test
@@ -369,5 +390,7 @@ class ProjectControllerIntegrationTest extends BaseUT{
     private void cleanDataBase() {
         repository.deleteAll();
         repository.flush();
+        teamMemberRepository.deleteAll();
+        teamMemberRepository.flush();
     }
 }

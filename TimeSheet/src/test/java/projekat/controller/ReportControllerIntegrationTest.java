@@ -12,9 +12,12 @@ import org.springframework.cache.Cache;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ReportFilterDTO;
 import projekat.api.model.TimeSheetEntryReportDTO;
+import projekat.enums.TeamMemberRoles;
 import projekat.models.*;
 import projekat.repository.*;
 import projekat.util.BaseUT;
@@ -35,6 +38,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
 class ReportControllerIntegrationTest extends BaseUT{
+
+    @Autowired
+    protected WebApplicationContext context;
 
     @Autowired
     private MockMvc mvc;
@@ -59,6 +65,8 @@ class ReportControllerIntegrationTest extends BaseUT{
 
     private static ObjectMapper objectMapper;
 
+    private Teammember teammember;
+
     @BeforeAll
     static void setUp() {
         objectMapper = new ObjectMapper();
@@ -68,6 +76,15 @@ class ReportControllerIntegrationTest extends BaseUT{
     void settingUpDatabase() {
         cleanDataBase();
         cache.clear();
+
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
+        teammember = registerUser("adminTest", TeamMemberRoles.ROLE_ADMIN);
+
+        testAuthFactory.loginUser("adminTest");
+
     }
 
     @Test

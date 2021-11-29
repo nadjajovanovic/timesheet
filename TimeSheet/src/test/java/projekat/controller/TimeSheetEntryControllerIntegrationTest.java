@@ -3,7 +3,6 @@ package projekat.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -17,12 +16,12 @@ import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
-import projekat.models.*;
 import projekat.mapper.TimeSheetEntryMapper;
+import projekat.models.*;
 import projekat.repository.*;
 import projekat.util.BaseUT;
-import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
 import java.math.BigDecimal;
@@ -33,13 +32,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-@Disabled
 class TimeSheetEntryControllerIntegrationTest extends BaseUT{
 
     @Autowired
@@ -65,6 +62,8 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
 
     private static ObjectMapper objectMapper;
 
+    private Teammember teammember;
+
     @BeforeAll
     static void setUp() {
         objectMapper = new ObjectMapper();
@@ -77,9 +76,9 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                 .webAppContextSetup(context)
                 .build();
 
-        saveTeamMember(); // creates admin TODO: Change this
+        teammember = registerUser("workerTest", TeamMemberRoles.ROLE_WORKER);
 
-        testAuthFactory.loginUser("adminTest");
+        testAuthFactory.loginUser("workerTest");
     }
 
     @Test
@@ -87,8 +86,8 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var firstEntryDescription = "FirstEntryDescription";
         final var secondEntryDescription = "SecondEntryDescription";
-        createTestEntry(firstEntryDescription);
-        createTestEntry(secondEntryDescription);
+        createTestEntry(firstEntryDescription, teammember.getTeammemberid());
+        createTestEntry(secondEntryDescription, teammember.getTeammemberid());
          //Act
         final var response = mvc.perform(get("/entry")
                         .accept(MediaType.APPLICATION_JSON))
@@ -106,7 +105,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void getOneEntry() throws Exception {
         //Arrange
         final var entryDescription = "FirstEntry";
-        final var inserted = createTestEntry(entryDescription);
+        final var inserted = createTestEntry(entryDescription, teammember.getTeammemberid());
         //Act
         final var response = mvc.perform(get("/entry/{id}", inserted.getEntryId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -317,7 +316,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void testUpdateEntry() throws Exception {
         //Arrange
         final var description = "5h total";
-        final var entry = createTestEntry(description);
+        final var entry = createTestEntry(description, teammember.getTeammemberid());
         final var dto = TimeSheetEntryMapper.toEntryDTO(entry);
         final var updatedDescription = "7.5h total";
         dto.setDescription(updatedDescription);
@@ -341,7 +340,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void testUpdateEntryBadRequest() throws Exception {
         //Arrange
         final var description = "Work day";
-        final var entry = createTestEntry(description);
+        final var entry = createTestEntry(description, teammember.getTeammemberid());
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
         entryDTO.setTimeSpent(BigDecimal.valueOf(25.5));
 
@@ -359,7 +358,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void testUpdateEntryBadRequestIdNotExist() throws Exception {
         //Arrange
         final var description = "Work day";
-        final var entry = createTestEntry(description);
+        final var entry = createTestEntry(description, teammember.getTeammemberid());
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
         entryDTO.setTimeSpent(BigDecimal.valueOf(2.5));
         entryDTO.setId(null);
@@ -383,7 +382,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void testUpdateEntryNotFound() throws Exception {
         //Arrange
         final var description = "Demo project";
-        final var entry = createTestEntry(description);
+        final var entry = createTestEntry(description, teammember.getTeammemberid());
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
         entryDTO.setId(2345);
 
@@ -403,7 +402,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void deleteEntry() throws Exception {
         //Arrange
         final var entryDescription = "FirstEntry";
-        final var inserted = createTestEntry(entryDescription);
+        final var inserted = createTestEntry(entryDescription, teammember.getTeammemberid());
         //Act
         final var response = mvc.perform(delete("/entry/{id}", inserted.getEntryId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -430,12 +429,11 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         assertEquals(HttpStatus.NOT_FOUND.value(),error.getStatusCode());
     }
 
-    private TimeSheetEntry createTestEntry(String description) {
+    private TimeSheetEntry createTestEntry(String description, int userId) {
         final var category = saveTestCategory("Test category");
         final var client = saveTestClient("Test client");
         final var project = saveTestProject("Project Name", "Project Description");
-        final var user = saveTeamMember("name");
-        final var entry = createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), user.getTeammemberid(), new Date());
+        final var entry = createTestEntry(description, category.getCategoryid(), client.getClientid(), project.getProjectid(), userId, new Date());
         return entryRepository.saveAndFlush(entry);
     }
 

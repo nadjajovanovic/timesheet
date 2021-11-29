@@ -1,34 +1,38 @@
 package projekat.controller;
-import org.junit.jupiter.api.Disabled;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.CategoryDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
 import projekat.mapper.CategoryMapper;
 import projekat.models.Category;
+import projekat.models.Teammember;
+import projekat.repository.CategoryRepository;
+import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
-import projekat.repository.CategoryRepository;
+
 import java.util.Arrays;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.http.MediaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
@@ -36,12 +40,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class CategoryControllerIntegrationTest extends BaseUT{
 
     @Autowired
+    protected WebApplicationContext context;
+
+    @Autowired
     private MockMvc mvc;
 
     @Autowired
     private CategoryRepository repository;
 
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
+
     private static ObjectMapper objectMapper;
+
+    private Teammember teammember;
 
     @BeforeAll
     static void setUp() {
@@ -51,6 +63,14 @@ class CategoryControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDataBase() {
         cleanDataBase();
+        cleanDataBase();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
+        teammember = registerUser("adminTest", TeamMemberRoles.ROLE_ADMIN);
+
+        testAuthFactory.loginUser("adminTest");
     }
 
     @Test
@@ -312,6 +332,8 @@ class CategoryControllerIntegrationTest extends BaseUT{
     private void cleanDataBase() {
         repository.deleteAll();
         repository.flush();
+        teamMemberRepository.deleteAll();
+        teamMemberRepository.flush();
     }
 }
 

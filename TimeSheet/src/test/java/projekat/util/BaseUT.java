@@ -91,4 +91,16 @@ public class BaseUT {
         teammember.setHoursperweek(2.3);
         return teamMemberRepository.saveAndFlush(teammember);
     }
+
+    protected Teammember registerUser(String username, TeamMemberRoles role) { // save into DB
+        final var teammember = new Teammember();
+        teammember.setTeammembername("name");
+        teammember.setPassword("$2a$10$oUvS02vbxyTUe3J5ZlGV8e4lM2Rnkdfcvcc9cXAtQYCbxq3rfgiKe");
+        teammember.setUsername(username);
+        teammember.setEmail("test@example.com");
+        teammember.setStatus(true);
+        teammember.setRole(role);
+        teammember.setHoursperweek(2.3);
+        return teamMemberRepository.saveAndFlush(teammember);
+    }
 }
