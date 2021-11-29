@@ -81,9 +81,9 @@ class ReportControllerIntegrationTest extends BaseUT{
                 .webAppContextSetup(context)
                 .build();
 
-        teammember = registerUser("adminTest", TeamMemberRoles.ROLE_ADMIN);
-
-        testAuthFactory.loginUser("adminTest");
+        final var username = "adminTest";
+        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
+        testAuthFactory.loginUser(username);
 
     }
 

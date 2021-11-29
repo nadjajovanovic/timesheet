@@ -12,10 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ClientDTO;
-import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
 import projekat.mapper.ClientMapper;
 import projekat.models.Client;
@@ -23,10 +25,8 @@ import projekat.models.Teammember;
 import projekat.repository.ClientRepository;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
-import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,15 +40,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ClientControllerIntegrationTest extends BaseUT{
 
     @Autowired
+    protected WebApplicationContext context;
+
+    @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ClientRepository repository;
 
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
+
     private static ObjectMapper objectMapper;
 
-    @Autowired
-    private Headers headers;
+    private Teammember teammember;
 
     @BeforeAll
     static void setUp() {
@@ -58,6 +63,12 @@ class ClientControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDatabase() {
         cleanDataBase();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+        final var username = "adminTest";
+        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
+        testAuthFactory.loginUser(username);
     }
 
     @Test
@@ -154,7 +165,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     void testCreateClientNameNotExist() throws Exception {
         //Arange
         final var client = new ClientDTO();
-        headers.saveTeamMember();
+
         //Act
         final var response = mvc.perform(post("/client")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -362,5 +373,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     private void cleanDataBase() {
         repository.deleteAll();
         repository.flush();
+        teamMemberRepository.deleteAll();
+        teamMemberRepository.flush();
     }
 }

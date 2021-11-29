@@ -20,10 +20,11 @@ import projekat.api.model.AuthenticationResponseDTO;
 import projekat.api.model.ResetPasswordDTO;
 import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
+import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
-import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
 import java.math.BigDecimal;
@@ -50,6 +51,8 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
 
     private static ObjectMapper objectMapper;
 
+    private Teammember teammember;
+
     @BeforeAll
     static void setUp() {
         objectMapper = new ObjectMapper();
@@ -62,9 +65,9 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
                 .webAppContextSetup(context)
                 .build();
 
-        saveTeamMember(); // creates admin TODO: Change this
-
-        testAuthFactory.loginUser("adminTest");
+        final var username = "adminTest";
+        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
+        testAuthFactory.loginUser(username);
     }
 
 

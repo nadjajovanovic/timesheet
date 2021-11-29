@@ -11,20 +11,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.CountryDTO;
-import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
 import projekat.models.Country;
 import projekat.models.Teammember;
 import projekat.repository.CountryRepository;
 import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
-import projekat.util.Headers;
 import projekat.util.ResponseReader;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase
 class CountryControllerIntegrationTest extends BaseUT{
 
-
+    @Autowired
+    protected WebApplicationContext context;
 
     @Autowired
     private MockMvc mvc;
@@ -48,10 +49,9 @@ class CountryControllerIntegrationTest extends BaseUT{
     @Autowired
     private TeamMemberRepository teamMemberRepository;
 
-    @Autowired
-    private Headers headers;
-
     private static ObjectMapper objectMapper;
+
+    private Teammember teammember;
 
     @BeforeAll
     static void setUp(){
@@ -61,6 +61,12 @@ class CountryControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDataBase() {
         cleanDataBase();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+        final var username = "adminTest";
+        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
+        testAuthFactory.loginUser(username);
     }
 
     @Test
@@ -267,7 +273,7 @@ class CountryControllerIntegrationTest extends BaseUT{
     void deleteCountryNotFound() throws Exception {
         //Arrange
         final var countryId = 99;
-        headers.saveTeamMember();
+
         //Act
         final var response = mvc.perform(delete("/country/{id}", countryId)
                         .accept(MediaType.APPLICATION_JSON))
@@ -295,5 +301,7 @@ class CountryControllerIntegrationTest extends BaseUT{
     private void cleanDataBase() {
         repository.deleteAll();
         repository.flush();
+        teamMemberRepository.deleteAll();
+        teamMemberRepository.flush();
     }
 }

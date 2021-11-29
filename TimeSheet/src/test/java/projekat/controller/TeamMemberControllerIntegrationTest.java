@@ -16,9 +16,11 @@ import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TeamMemberDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
+import projekat.repository.TimeSheetEntryRepository;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
@@ -43,6 +45,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     @Autowired
     private TeamMemberRepository repository;
 
+    @Autowired
+    private TimeSheetEntryRepository timeSheetEntryRepository;
+
     private static ObjectMapper objectMapper;
 
     private Teammember teammember;
@@ -60,9 +65,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
                 .webAppContextSetup(context)
                 .build();
 
-        teammember = saveTeamMember(); // creates admin TODO: Change this
-
-        testAuthFactory.loginUser("adminTest");
+        final var username = "adminTest";
+        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
+        testAuthFactory.loginUser(username);
     }
 
     @Test
@@ -297,6 +302,8 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     }
 
     private void cleanDataBase() {
+        timeSheetEntryRepository.deleteAll();
+        timeSheetEntryRepository.flush();
         repository.deleteAll();
         repository.flush();
     }

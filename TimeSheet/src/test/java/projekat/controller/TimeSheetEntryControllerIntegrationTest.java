@@ -76,9 +76,9 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                 .webAppContextSetup(context)
                 .build();
 
-        teammember = registerUser("workerTest", TeamMemberRoles.ROLE_WORKER);
-
-        testAuthFactory.loginUser("workerTest");
+        final var username = "workerTest";
+        teammember = registerUser(username, TeamMemberRoles.ROLE_WORKER);
+        testAuthFactory.loginUser(username);
     }
 
     @Test
