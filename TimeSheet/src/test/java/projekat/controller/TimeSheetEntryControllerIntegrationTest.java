@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.enums.ErrorCode;
@@ -50,7 +52,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     private CategoryRepository categoryRepository;
 
     @Autowired
-    private Headers headers;
+    protected WebApplicationContext context;
 
     @Autowired
     private ClientRepository clientRepository;
@@ -69,9 +71,15 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     }
 
     @BeforeEach
-    void doCleanDataBase() {
+    void cleanSetup() {
         cleanDataBase();
-        headers.saveTeamMember();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
+        saveTeamMember(); // creates admin TODO: Change this
+
+        testAuthFactory.loginUser("adminTest");
     }
 
     @Test

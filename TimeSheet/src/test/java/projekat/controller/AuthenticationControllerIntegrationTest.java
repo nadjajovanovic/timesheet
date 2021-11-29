@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.AuthenticationRequestDTO;
 import projekat.api.model.AuthenticationResponseDTO;
@@ -44,7 +46,7 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     private TeamMemberRepository repository;
 
     @Autowired
-    private Headers headers;
+    protected WebApplicationContext context;
 
     private static ObjectMapper objectMapper;
 
@@ -54,9 +56,15 @@ public class AuthenticationControllerIntegrationTest extends BaseUT {
     }
 
     @BeforeEach
-    void doCleanDatabase() {
+    void cleanSetup() {
         cleanDataBase();
-        headers.saveTeamMember();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
+        saveTeamMember(); // creates admin TODO: Change this
+
+        testAuthFactory.loginUser("adminTest");
     }
 
 
