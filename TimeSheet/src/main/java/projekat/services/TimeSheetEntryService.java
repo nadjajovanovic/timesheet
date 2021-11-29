@@ -2,6 +2,7 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import projekat.api.model.TimeSheetEntryDTO;
 import projekat.exception.BadRequestException;
@@ -58,6 +59,7 @@ public class TimeSheetEntryService {
         return entry;
     }
 
+    @PreAuthorize("hasRole('WORKER')")
     public TimeSheetEntry create(TimeSheetEntryDTO dto){
 
         if (dto.getId() != null) {
