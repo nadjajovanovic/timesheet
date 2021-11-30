@@ -27,7 +27,8 @@ import projekat.util.ResponseReader;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,8 +51,10 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
 
     private static ObjectMapper objectMapper;
 
-    private Teammember teammember;
+    private final String usernameAdmin = "adminTest";
+    private final String usernameWorker = "workerTest";
 
+    private Teammember registeredWorker;
 
     @BeforeAll
     static void setUp() {
@@ -65,15 +68,14 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
                 .webAppContextSetup(context)
                 .build();
 
-        final var username = "adminTest";
-        teammember = registerUser(username, TeamMemberRoles.ROLE_ADMIN);
-        testAuthFactory.loginUser(username);
+        registerUser(usernameAdmin, TeamMemberRoles.ROLE_ADMIN);
+        registeredWorker = registerUser(usernameWorker, TeamMemberRoles.ROLE_WORKER);
     }
 
     @Test
     void getAllTeamMembers() throws Exception {
         //Arrange
-        final var teamMemberName = "name";
+        testAuthFactory.loginUser(usernameAdmin);
 
         //act
         final var response = mvc.perform(get("/teammember")
@@ -83,15 +85,16 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
         final var teamMembers = Arrays.asList(ResponseReader.readResponse(response, TeamMemberDTO[].class));
 
         //Assert
-        assertEquals(1, teamMembers.size());
-        assertEquals(teamMemberName, teamMembers.get(0).getName());
+        assertEquals(2, teamMembers.size());
+        assertEquals(usernameAdmin, teamMembers.get(0).getUsername());
+        assertEquals(usernameWorker, teamMembers.get(1).getUsername());
     }
 
     @Test
     void getOneTeamMember() throws Exception {
         //Arrange
-        final var teamMemberName = "name";
-        final var inserted = teammember;
+        final var inserted = registeredWorker;
+        testAuthFactory.loginUser(usernameWorker);
 
         //Act
         final var response = mvc.perform(get("/teammember/{id}", inserted.getTeammemberid())
@@ -101,7 +104,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
         final var teamMember = ResponseReader.readResponse(response, TeamMemberDTO.class);
 
         //Assert
-        assertEquals(teamMemberName, teamMember.getName());
+        assertEquals(usernameWorker, teamMember.getUsername());
         assertEquals(inserted.getTeammemberid(), teamMember.getId());
     }
 
@@ -109,7 +112,8 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     void getOneTeamMemberNotFound() throws Exception {
         //Arrange
         final var teamMemberId = "100";
-//        saveTeamMember("jhon");
+        testAuthFactory.loginUser(usernameAdmin);
+
         //Act
         final var response = mvc.perform(get("/teammember/{teamMemberId}", teamMemberId)
                         .accept(MediaType.APPLICATION_JSON))
@@ -132,6 +136,7 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
         teamMember.setPassword("password");
         teamMember.setRepeatedPassword("password");
         teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/teammember")
@@ -148,12 +153,41 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     }
 
     @Test
+    void testCreateTeamMemberForbidden() throws Exception {
+        //Arrange
+        final var teamMemberName = "name";
+        final var teamMemberHours = 3;
+        final var teamMember = new TeamMemberDTO();
+        teamMember.setName(teamMemberName);
+        teamMember.setUsername("username");
+        teamMember.setEmail("test@example.com");
+        teamMember.setPassword("password");
+        teamMember.setRepeatedPassword("password");
+        teamMember.setHoursPerWeek(BigDecimal.valueOf(teamMemberHours));
+        testAuthFactory.loginUser(usernameWorker);
+
+        //Act
+        final var response = mvc.perform(post("/teammember")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(teamMember))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        final var responseError = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        //Assert
+        assertEquals(ErrorCode.FORBIDDEN.toString(), responseError.getErrorCode());
+        assertEquals(HttpStatus.FORBIDDEN.value(), responseError.getStatusCode());
+    }
+
+    @Test
     void testCreateTeamMemberBadRequest() throws Exception {
         //Arrange
         final var teamMember = new TeamMemberDTO();
         teamMember.setHoursPerWeek(BigDecimal.valueOf(2.3));
         teamMember.setName("");
-        //saveTeamMember("jhon");
+        testAuthFactory.loginUser(usernameAdmin);
+
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -168,11 +202,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     @Test
     void testCreateTeamMemberNameNotExist() throws Exception {
         //Arrange
-        //final var teamMember = saveTeamMember("jhon");
+        testAuthFactory.loginUser(usernameAdmin);
+
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teammember,"")))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(registeredWorker,"")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -182,12 +217,12 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     @Test
     void testCreateTeamMemberIdExists() throws Exception {
         //Arrange
-        //final var teamMember = saveTeamMember("jhon");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teammember,"John Doe")))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(registeredWorker,"John Doe")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -201,13 +236,13 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     @Test
     void testUpdateTeamMember() throws Exception {
         //Arrange
-        final var teamMemberName = "nameForInsert";
-        final var updatedName = "nameForUpdate";
+        final var updatedName = "John";
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(put("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(teammember,updatedName)))
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(registeredWorker,updatedName)))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -219,11 +254,35 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     }
 
     @Test
+    void testUpdateSomeoneElseProfile() throws Exception {
+        //Arrange
+        final var updatedName = "John";
+        final var newUserUsername = "jane";
+        registerUser(newUserUsername, TeamMemberRoles.ROLE_WORKER);
+        testAuthFactory.loginUser(newUserUsername);
+
+        //Act
+        final var response = mvc.perform(put("/teammember")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(saveTeamMemberDTO(registeredWorker,updatedName)))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        final var responseError = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        //Assert
+        assertEquals(ErrorCode.BAD_REQUEST.toString(), responseError.getErrorCode());
+        assertEquals(HttpStatus.FORBIDDEN.value(), responseError.getStatusCode());
+    }
+
+    @Test
     void testUpdateTeamMemberBadRequest() throws Exception {
         //Arrange
-        final var inserted = teammember;
+        final var inserted = registeredWorker;
         final var updatedName = "";
         inserted.setTeammembername(updatedName);
+        testAuthFactory.loginUser(usernameAdmin);
+
         //Act
         final var response = mvc.perform(put("/teammember")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -238,8 +297,9 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     @Test
     void testUpdateTeamMemberNoId() throws Exception {
         //Arrange
-        final var inserted = teammember;
+        final var inserted = registeredWorker;
         inserted.setTeammemberid(null);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //act
         final var response = mvc.perform(put("/teammember")
@@ -258,8 +318,8 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     @Test
     void deleteTeamMember() throws Exception {
         //Arrange
-        final var teamMemberName = "Delete me";
-        final var inserted = teammember;
+        final var inserted = registeredWorker;
+        testAuthFactory.loginUser(usernameAdmin);
 
         //act
         final var response = mvc.perform(delete("/teammember/{teammemberid}", inserted.getTeammemberid())
@@ -271,10 +331,30 @@ class TeamMemberControllerIntegrationTest extends BaseUT {
     }
 
     @Test
+    void deleteTeamMemberForbidden() throws Exception {
+        //Arrange
+        final var newUserUsername = "jane";
+        final var inserted = registerUser(newUserUsername, TeamMemberRoles.ROLE_WORKER);
+        testAuthFactory.loginUser(usernameWorker);
+
+        //act
+        final var response = mvc.perform(delete("/teammember/{teammemberid}", inserted.getTeammemberid())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        final var error =  ResponseReader.readResponse(response, ErrorResponse.class);
+
+        //assert
+        assertEquals(ErrorCode.FORBIDDEN.toString(),error.getErrorCode());
+        assertEquals(HttpStatus.FORBIDDEN.value(),error.getStatusCode());
+    }
+
+    @Test
     void deleteTeamMemberNotFound() throws Exception {
         //Arrange
         final var teamMemberId = "100";
-        //saveTeamMember("jhon");
+        testAuthFactory.loginUser(usernameAdmin);
+
         //act
         final var response = mvc.perform(delete("/teammember/{teammemberid}", teamMemberId)
                         .accept(MediaType.APPLICATION_JSON))

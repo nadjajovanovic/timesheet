@@ -71,7 +71,7 @@ public class ReportExcelExporter {
             createCell(row, columnCount++, entry.getProjectName(), style);
             createCell(row, columnCount++, entry.getCategoryName(), style);
             createCell(row, columnCount++, entry.getDescription(), style);
-            createCell(row, columnCount++, entry.getTotalTimeSpent(), style);
+            createCell(row, columnCount, entry.getTotalTimeSpent(), style);
         }
     }
 

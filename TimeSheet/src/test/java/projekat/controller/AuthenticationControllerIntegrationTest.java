@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TimeSheetApplication.class)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
-public class AuthenticationControllerIntegrationTest extends BaseUT {
+class AuthenticationControllerIntegrationTest extends BaseUT {
 
     @Autowired
     private MockMvc mvc;

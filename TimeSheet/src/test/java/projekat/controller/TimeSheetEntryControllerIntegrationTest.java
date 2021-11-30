@@ -62,7 +62,10 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
 
     private static ObjectMapper objectMapper;
 
-    private Teammember teammember;
+    private final String usernameAdmin = "adminTest";
+    private final String usernameWorker = "workerTest";
+
+    private Teammember registeredWorker;
 
     @BeforeAll
     static void setUp() {
@@ -76,9 +79,8 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
                 .webAppContextSetup(context)
                 .build();
 
-        final var username = "workerTest";
-        teammember = registerUser(username, TeamMemberRoles.ROLE_WORKER);
-        testAuthFactory.loginUser(username);
+       registeredWorker = registerUser(usernameWorker, TeamMemberRoles.ROLE_WORKER);
+       registerUser(usernameAdmin, TeamMemberRoles.ROLE_ADMIN);
     }
 
     @Test
@@ -86,9 +88,11 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         //Arrange
         final var firstEntryDescription = "FirstEntryDescription";
         final var secondEntryDescription = "SecondEntryDescription";
-        createTestEntry(firstEntryDescription, teammember.getTeammemberid());
-        createTestEntry(secondEntryDescription, teammember.getTeammemberid());
-         //Act
+        createTestEntry(firstEntryDescription, registeredWorker.getTeammemberid());
+        createTestEntry(secondEntryDescription, registeredWorker.getTeammemberid());
+        testAuthFactory.loginUser(usernameAdmin);
+
+        //Act
         final var response = mvc.perform(get("/entry")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -105,7 +109,9 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void getOneEntry() throws Exception {
         //Arrange
         final var entryDescription = "FirstEntry";
-        final var inserted = createTestEntry(entryDescription, teammember.getTeammemberid());
+        final var inserted = createTestEntry(entryDescription, registeredWorker.getTeammemberid());
+        testAuthFactory.loginUser(usernameWorker);
+
         //Act
         final var response = mvc.perform(get("/entry/{id}", inserted.getEntryId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -122,6 +128,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void getOneEntryNotFound() throws Exception {
         //Arrange
         final var entryId = 100;
+        testAuthFactory.loginUser(usernameWorker);
 
         //Act
         final var response = mvc.perform(get("/entry/{id}", entryId)
@@ -150,6 +157,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setProjectId(project.getProjectid());
         entry.setTimeSpent(BigDecimal.valueOf(4.5));
         entry.setDate("2021-11-10");
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -181,6 +189,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setProjectId(null);
         entry.setTimeSpent(BigDecimal.valueOf(4.5));
         entry.setDate("2021-11-11");
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -203,6 +212,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setProjectId(project.getProjectid());
         entry.setTimeSpent(BigDecimal.valueOf(4.5));
         entry.setDate("2021-10-10");
+        testAuthFactory.loginUser(usernameWorker);
 
 
         // Act
@@ -226,6 +236,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setProjectid(project.getProjectid());
         entry.setTime(4.5);
         entry.setEntryDate(new Date());
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -248,6 +259,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setProjectId(project.getProjectid());
         entry.setTimeSpent(BigDecimal.valueOf(4.5));
         entry.setDate("2021-11-10");
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -274,6 +286,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setTimeSpent(BigDecimal.valueOf(4.5));
         entry.setDate("2021-10-10");
         entry.setId(4);
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(post("/entry")
@@ -300,6 +313,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
         entry.setProjectId(project.getProjectid());
         entry.setDate("2021-11-04");
         entry.setTimeSpent(BigDecimal.valueOf(-2.3));
+        testAuthFactory.loginUser(usernameWorker);
 
 
         // Act
@@ -316,11 +330,11 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void testUpdateEntry() throws Exception {
         //Arrange
         final var description = "5h total";
-        final var entry = createTestEntry(description, teammember.getTeammemberid());
+        final var entry = createTestEntry(description, registeredWorker.getTeammemberid());
         final var dto = TimeSheetEntryMapper.toEntryDTO(entry);
         final var updatedDescription = "7.5h total";
         dto.setDescription(updatedDescription);
-
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(put("/entry")
@@ -337,12 +351,39 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testUpdateSomeoneElseEntry() throws Exception {
+        //Arrange
+        final var description = "5h total";
+        final var entry = createTestEntry(description, registeredWorker.getTeammemberid());
+        final var dto = TimeSheetEntryMapper.toEntryDTO(entry);
+        final var updatedDescription = "7.5h total";
+        dto.setDescription(updatedDescription);
+        final var newUserUsername = "jane";
+        final var newUser = registerUser(newUserUsername, TeamMemberRoles.ROLE_WORKER);
+        testAuthFactory.loginUser(newUserUsername);
+
+        // Act
+        final var response = mvc.perform(put("/entry")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        final var responseError = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(ErrorCode.BAD_REQUEST.toString(), responseError.getErrorCode());
+        assertEquals(HttpStatus.FORBIDDEN.value(), responseError.getStatusCode());
+    }
+
+    @Test
     void testUpdateEntryBadRequest() throws Exception {
         //Arrange
         final var description = "Work day";
-        final var entry = createTestEntry(description, teammember.getTeammemberid());
+        final var entry = createTestEntry(description, registeredWorker.getTeammemberid());
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
         entryDTO.setTimeSpent(BigDecimal.valueOf(25.5));
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(put("/entry")
@@ -358,11 +399,11 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void testUpdateEntryBadRequestIdNotExist() throws Exception {
         //Arrange
         final var description = "Work day";
-        final var entry = createTestEntry(description, teammember.getTeammemberid());
+        final var entry = createTestEntry(description, registeredWorker.getTeammemberid());
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
         entryDTO.setTimeSpent(BigDecimal.valueOf(2.5));
         entryDTO.setId(null);
-
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(put("/entry")
@@ -382,9 +423,10 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void testUpdateEntryNotFound() throws Exception {
         //Arrange
         final var description = "Demo project";
-        final var entry = createTestEntry(description, teammember.getTeammemberid());
+        final var entry = createTestEntry(description, registeredWorker.getTeammemberid());
         final var entryDTO = TimeSheetEntryMapper.toEntryDTO(entry);
         entryDTO.setId(2345);
+        testAuthFactory.loginUser(usernameWorker);
 
         // Act
         final var response = mvc.perform(put("/entry")
@@ -402,7 +444,9 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void deleteEntry() throws Exception {
         //Arrange
         final var entryDescription = "FirstEntry";
-        final var inserted = createTestEntry(entryDescription, teammember.getTeammemberid());
+        final var inserted = createTestEntry(entryDescription, registeredWorker.getTeammemberid());
+        testAuthFactory.loginUser(usernameAdmin);
+
         //Act
         final var response = mvc.perform(delete("/entry/{id}", inserted.getEntryId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -416,6 +460,7 @@ class TimeSheetEntryControllerIntegrationTest extends BaseUT{
     void deleteEntryNotFound() throws Exception {
         //Arrange
         final var entryId = 100;
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(delete("/entry/{id}", entryId)

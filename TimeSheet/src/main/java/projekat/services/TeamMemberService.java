@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import projekat.enums.TeamMemberRoles;
+import projekat.exception.BadRequestException;
 import projekat.exception.InputFieldException;
 import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
@@ -35,13 +36,13 @@ public class TeamMemberService implements UserDetailsService {
         this.teamMemberRepository = teamMemberRepository;
     }
 
-    @PreAuthorize("hasRole('WORKER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Collection<Teammember> getAll() {
         final var teammembers = teamMemberRepository.findAll();
         return teammembers;
     }
 
-    @PreAuthorize("hasRole('WORKER')")
+    @PreAuthorize("hasRole('WORKER') or hasRole('ADMIN')")
     public Optional<Teammember> getOne(Integer id) {
         if (!teamMemberRepository.existsById(id)) {
             throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
@@ -63,9 +64,9 @@ public class TeamMemberService implements UserDetailsService {
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public Teammember update(Teammember teammember) {
         final var user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final var username = ((Teammember)user).getUsername();
-        if( teammember.getRole().equals(TeamMemberRoles.ROLE_WORKER) && !Objects.equals(teammember.getUsername(), username))
-           throw new AccessDeniedException("Access denied");
+        final var loggedInUser = (Teammember)user;
+        if(loggedInUser.getRole().equals(TeamMemberRoles.ROLE_WORKER) && !Objects.equals(teammember.getUsername(), loggedInUser.getUsername()))
+            throw new BadRequestException("You are not allowed to change this entry", HttpStatus.FORBIDDEN);
         if (teammember.getTeammemberid() == null) {
             throw new InputFieldException("Id is not present in request", HttpStatus.BAD_REQUEST);
         }
