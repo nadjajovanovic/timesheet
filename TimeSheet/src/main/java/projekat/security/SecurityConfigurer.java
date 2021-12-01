@@ -2,6 +2,7 @@
 package projekat.security;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import projekat.filters.JwtRequestFilter;
+import projekat.services.CustomOAuth2UserService;
+import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
 
 @EnableWebSecurity
@@ -57,8 +60,20 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .antMatchers("/entry").hasRole("WORKER")
                 .antMatchers("/report").hasRole("ADMIN")
                 .anyRequest().authenticated()
+                .and()
+                .oauth2Login()
+                    .userInfoEndpoint()
+                    .userService(oAuth2UserService)
+                    .and()
+                    .successHandler(oAuth2LoginSuccessHandler)
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
+
+    @Autowired
+    private CustomOAuth2UserService oAuth2UserService;
+
+    @Autowired
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 }

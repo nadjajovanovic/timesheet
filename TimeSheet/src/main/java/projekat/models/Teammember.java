@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import projekat.enums.AuthenticationProvider;
 import projekat.enums.TeamMemberRoles;
 
 import javax.persistence.*;
@@ -45,6 +46,9 @@ public class Teammember implements Serializable, UserDetails {
 	private String username;
 
 	private String password;
+
+	@Enumerated(EnumType.STRING)
+	private AuthenticationProvider provider;
 
 	//bi-directional many-to-one association to Project
 	@JsonIgnore
