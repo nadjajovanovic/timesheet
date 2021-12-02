@@ -181,8 +181,10 @@ class AuthenticationControllerIntegrationTest extends BaseUT {
 
     @Test
     void registrationBadRequest() throws Exception {
+        //Arrange
         final var inserted = saveTeamMemberDTO();
         inserted.setRepeatedPassword("bad");
+
         //act
         final var response = mvc.perform(post("/authenticate/register")
                         .contentType(MediaType.APPLICATION_JSON)

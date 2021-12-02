@@ -166,7 +166,6 @@ class ClientControllerIntegrationTest extends BaseUT{
                 .andReturn();
         final var responseClient = ResponseReader.readResponse(response, ErrorResponse.class);
 
-        //assert
         // Assert
         assertEquals(HttpStatus.FORBIDDEN.value(), responseClient.getStatusCode());
         assertEquals(ErrorCode.FORBIDDEN.toString(), responseClient.getErrorCode());
@@ -222,8 +221,8 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
         assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
@@ -246,6 +245,7 @@ class ClientControllerIntegrationTest extends BaseUT{
                 .andReturn();
         final var reponseClient = ResponseReader.readResponse(response, ClientDTO.class);
 
+        //Assert
         assertNotNull(reponseClient.getId());
         assertEquals(updateName, reponseClient.getName());
     }
@@ -286,7 +286,7 @@ class ClientControllerIntegrationTest extends BaseUT{
 
         final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
 
-        // Assert
+        //Assert
         assertEquals(HttpStatus.NOT_FOUND.value(), responseObject.getStatusCode());
         assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
     }
