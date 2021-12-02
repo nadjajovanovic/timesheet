@@ -2,10 +2,10 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import projekat.enums.ErrorCode;
-import projekat.exception.NotFoundException;
 import projekat.exception.InputFieldException;
+import projekat.exception.NotFoundException;
 import projekat.models.Project;
 import projekat.repository.ProjectRepository;
 
@@ -35,6 +35,7 @@ public class ProjectService {
         return project;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Project create(Project project){
         if (project.getProjectid() != null) {
             throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
@@ -43,6 +44,7 @@ public class ProjectService {
         return insertedProject;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Project update(Project project){
         if (project.getProjectid() == null) {
             throw new InputFieldException("Id is not present in request", HttpStatus.BAD_REQUEST);
@@ -54,6 +56,7 @@ public class ProjectService {
         return updatedProject;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete(Integer id) {
         if(!projectRepository.existsById(id)) {
             throw new NotFoundException(String.format("Project with id %d does not exist in database", id),HttpStatus.NOT_FOUND);

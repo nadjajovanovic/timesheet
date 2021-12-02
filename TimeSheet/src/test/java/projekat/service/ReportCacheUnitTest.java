@@ -20,7 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest(classes = TimeSheetApplication.class)
-public class ReportCacheUnitTest extends BaseUT {
+class ReportCacheUnitTest extends BaseUT {
 
     @Autowired
     private ReportService service;

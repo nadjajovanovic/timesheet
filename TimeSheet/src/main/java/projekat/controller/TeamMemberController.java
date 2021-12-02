@@ -15,7 +15,6 @@ import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class TeamMemberController implements TeammemberApi {
@@ -36,7 +35,7 @@ public class TeamMemberController implements TeammemberApi {
 		final var teammembers = teamMemberService.getAll()
 				.stream()
 				.map(TeamMemberMapper::toTeamMemberDTO)
-				.collect(Collectors.toList());
+				.toList();
 		return new ResponseEntity(teammembers, HttpStatus.OK);
 	}
 
@@ -57,7 +56,7 @@ public class TeamMemberController implements TeammemberApi {
 	@Override
 	public ResponseEntity<TeamMemberDTO> updateTeamMember (@RequestBody TeamMemberDTO teamMember) {
 		final var updated = teamMemberService.update(TeamMemberMapper.toTeamMember(teamMember));
-		return new ResponseEntity(updated, HttpStatus.OK);
+		return new ResponseEntity(TeamMemberMapper.toTeamMemberDTO(updated), HttpStatus.OK);
 	}
 
 	@CrossOrigin

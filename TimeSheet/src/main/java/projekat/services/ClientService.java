@@ -2,6 +2,7 @@ package projekat.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import projekat.exception.InputFieldException;
 import projekat.exception.NotFoundException;
@@ -33,6 +34,7 @@ public class ClientService  {
         return oneClient;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Client insert(Client client) {
         if (client.getClientid() != null) {
             throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
@@ -41,6 +43,7 @@ public class ClientService  {
         return inserted;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Client update(Client client) {
 
         if (client.getClientid() == null) {
@@ -53,6 +56,7 @@ public class ClientService  {
         return updated;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete(Integer id) {
         if (!clientRepository.existsById(id)) {
             throw new NotFoundException(String.format("Client with id %d does not exist in database", id), HttpStatus.NOT_FOUND);

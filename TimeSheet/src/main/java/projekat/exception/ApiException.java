@@ -12,9 +12,9 @@ import java.time.ZonedDateTime;
 @Setter
 @NoArgsConstructor
 public class ApiException extends RuntimeException {
-    protected  String message;
-    protected  Throwable throwable;
-    protected  HttpStatus httpStatus;
+    protected String message;
+    protected Throwable throwable;
+    protected HttpStatus httpStatus;
     protected ZonedDateTime timestamp;
     protected ErrorCode errorCode;
 

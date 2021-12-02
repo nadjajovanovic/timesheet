@@ -1,9 +1,7 @@
 package projekat.util;
 
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.springframework.http.HttpStatus;
-import projekat.enums.ErrorCode;
 import projekat.exception.ParseInputException;
 
 import java.text.ParseException;
@@ -12,8 +10,8 @@ import java.util.Date;
 
 @UtilityClass
 public class DateFormatter {
-    final static String format = "yyyy-MM-dd";
-    final static SimpleDateFormat formatter = new SimpleDateFormat(format);
+    private static final String format = "yyyy-MM-dd";
+    private static final SimpleDateFormat formatter = new SimpleDateFormat(format);
 
     public String dateToString(Date date){
         final var formattedDate = formatter.format(date);

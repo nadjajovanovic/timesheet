@@ -1,5 +1,6 @@
 package projekat.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,13 +13,18 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import projekat.TimeSheetApplication;
 import projekat.api.model.ClientDTO;
 import projekat.enums.ErrorCode;
+import projekat.enums.TeamMemberRoles;
 import projekat.exception.ErrorResponse;
 import projekat.mapper.ClientMapper;
 import projekat.models.Client;
+import projekat.models.Teammember;
 import projekat.repository.ClientRepository;
+import projekat.repository.TeamMemberRepository;
 import projekat.util.BaseUT;
 import projekat.util.ResponseReader;
 
@@ -35,12 +41,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ClientControllerIntegrationTest extends BaseUT{
 
     @Autowired
+    protected WebApplicationContext context;
+
+    @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ClientRepository repository;
 
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
+
     private static ObjectMapper objectMapper;
+
+    private final String usernameAdmin = "adminTest";
+    private final String usernameWorker = "workerTest";
+
+    private Teammember teammember;
 
     @BeforeAll
     static void setUp() {
@@ -50,6 +67,12 @@ class ClientControllerIntegrationTest extends BaseUT{
     @BeforeEach
     void doCleanDatabase() {
         cleanDataBase();
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+
+        registerUser(usernameAdmin, TeamMemberRoles.ROLE_ADMIN);
+        registerUser(usernameWorker, TeamMemberRoles.ROLE_WORKER);
     }
 
     @Test
@@ -75,6 +98,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         //Arrange
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
+
 
         //Act
         final var response = mvc.perform(get("/client/{clientid}", inserted.getClientid())
@@ -110,6 +134,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var clientName = "Jane Doe";
         final var client = new ClientDTO();
         client.setName(clientName);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -126,10 +151,32 @@ class ClientControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testCreateClientForbidden() throws Exception {
+        //Arrange
+        final var clientName = "Jane Doe";
+        final var client = new ClientDTO();
+        client.setName(clientName);
+        testAuthFactory.loginUser(usernameWorker);
+
+        //Act
+        final var response = mvc.perform(post("/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(client))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var responseClient = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), responseClient.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), responseClient.getErrorCode());
+    }
+
+    @Test
     void testCreateClientBadRequest() throws Exception {
         //Arange
         final var client = new ClientDTO();
         client.setName("");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -146,6 +193,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     void testCreateClientNameNotExist() throws Exception {
         //Arange
         final var client = new ClientDTO();
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -165,6 +213,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var client = new ClientDTO();
         client.setName(clientName);
         client.setId(5);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(post("/client")
@@ -172,8 +221,8 @@ class ClientControllerIntegrationTest extends BaseUT{
                         .content(objectMapper.writeValueAsString(client))
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
+
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST.value(), responseObject.getStatusCode());
         assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
@@ -185,6 +234,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
         final var updateName = "Jane A Doe";
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(put("/client")
@@ -195,6 +245,7 @@ class ClientControllerIntegrationTest extends BaseUT{
                 .andReturn();
         final var reponseClient = ResponseReader.readResponse(response, ClientDTO.class);
 
+        //Assert
         assertNotNull(reponseClient.getId());
         assertEquals(updateName, reponseClient.getName());
     }
@@ -206,6 +257,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var inserted = saveTestClient(clientName);
         final var updateName = "";
         inserted.setClientname(updateName);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(put("/client")
@@ -223,6 +275,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         //Arange
         final var client = new ClientDTO();
         client.setName("Jane Doe");
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(put("/client")
@@ -233,7 +286,7 @@ class ClientControllerIntegrationTest extends BaseUT{
 
         final var responseObject = ResponseReader.readResponse(response, ErrorResponse.class);
 
-        // Assert
+        //Assert
         assertEquals(HttpStatus.NOT_FOUND.value(), responseObject.getStatusCode());
         assertEquals(ErrorCode.NOT_FOUND.toString(), responseObject.getErrorCode());
     }
@@ -244,6 +297,7 @@ class ClientControllerIntegrationTest extends BaseUT{
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
         inserted.setClientid(9999);
+        testAuthFactory.loginUser(usernameAdmin);
 
         // Act
         final var response = mvc.perform(put("/client")
@@ -259,10 +313,33 @@ class ClientControllerIntegrationTest extends BaseUT{
     }
 
     @Test
+    void testUpdateClientForbidden() throws Exception {
+        //Arrange
+        final var clientName = "Jane Doe";
+        final var inserted = saveTestClient(clientName);
+        final var updatedName = "Jane A Doe";
+        inserted.setClientname(updatedName);
+        testAuthFactory.loginUser(usernameWorker);
+
+        // Act
+        final var response = mvc.perform(put("/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(saveTestClientDTO(inserted, updatedName)))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), error.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), error.getErrorCode());
+    }
+
+    @Test
     void deleteClient() throws Exception {
         //Arange
         final var clientName = "Jane Doe";
         final var inserted = saveTestClient(clientName);
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(delete("/client/{clientid}", inserted.getClientid())
@@ -277,6 +354,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     void deleteClientNotFound() throws Exception {
         //Arrange
         final var clientId = "100";
+        testAuthFactory.loginUser(usernameAdmin);
 
         //Act
         final var response = mvc.perform(delete("/client/{clientid}", clientId)
@@ -287,6 +365,24 @@ class ClientControllerIntegrationTest extends BaseUT{
         // Assert
         assertEquals(HttpStatus.NOT_FOUND.value(), error.getStatusCode());
         assertEquals(ErrorCode.NOT_FOUND.toString(), error.getErrorCode());
+    }
+
+    @Test
+    void deleteClientForbidden() throws Exception {
+        //Arrange
+        final var clientName = "Jane Doe";
+        final var inserted = saveTestClient(clientName);
+        testAuthFactory.loginUser(usernameWorker);
+
+        //Act
+        final var response = mvc.perform(delete("/client/{clientid}", inserted.getClientid())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+        final var error = ResponseReader.readResponse(response, ErrorResponse.class);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN.value(), error.getStatusCode());
+        assertEquals(ErrorCode.FORBIDDEN.toString(), error.getErrorCode());
     }
 
     @Test
@@ -354,5 +450,7 @@ class ClientControllerIntegrationTest extends BaseUT{
     private void cleanDataBase() {
         repository.deleteAll();
         repository.flush();
+        teamMemberRepository.deleteAll();
+        teamMemberRepository.flush();
     }
 }
