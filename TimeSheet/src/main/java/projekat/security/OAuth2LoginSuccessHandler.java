@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import projekat.enums.AuthenticationProvider;
 import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
 
@@ -29,8 +30,10 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         log.info("Authentication Success");
-        final var oauthUser = (DefaultOidcUser) authentication.getPrincipal();
-        final var userDetails = teamMemberService.processOAuthPostLogin(oauthUser.getEmail());
+        final var oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+        final var clientName = oauthUser.getOauth2ClientName();
+        final var authenticationProvider = AuthenticationProvider.valueOf(clientName.toUpperCase());
+        final var userDetails = teamMemberService.processOAuthPostLogin(oauthUser.getEmail(), authenticationProvider);
         final var jwt = jwtUtilService.generateToken(userDetails);
         response.getWriter().println(jwt);
         response.setStatus(HttpStatus.OK.value());

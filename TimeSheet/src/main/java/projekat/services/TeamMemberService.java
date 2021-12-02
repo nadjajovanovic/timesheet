@@ -96,20 +96,21 @@ public class TeamMemberService implements UserDetailsService {
         return user.get();
     }
 
-    public UserDetails processOAuthPostLogin(String username) {
-        final var existUser = teamMemberRepository.findByUsername(username);
+    public UserDetails processOAuthPostLogin(String username, AuthenticationProvider provider) {
+        final var optionalUser = teamMemberRepository.findByUsername(username);
 
-        if (existUser.isEmpty()) {
+        if (optionalUser.isEmpty()) {
             final var newUser = new Teammember();
             newUser.setUsername(username);
+            newUser.setEmail(username);
             newUser.setStatus(true);
             newUser.setHoursperweek(35.5);
             newUser.setRole(TeamMemberRoles.ROLE_WORKER);
-            newUser.setProvider(AuthenticationProvider.GOOGLE);
+            newUser.setProvider(provider);
             teamMemberRepository.save(newUser);
             return newUser;
         }
-        return existUser.get();
+        return optionalUser.get();
     }
 
 }
