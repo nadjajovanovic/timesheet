@@ -1,8 +1,10 @@
 package projekat.controller;
 
+import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,12 +23,20 @@ import projekat.mapper.TeamMemberMapper;
 import projekat.models.Teammember;
 import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
+import projekat.templates.ResetPasswordMailTemplate;
+import projekat.templates.WelcomeMailTemplates;
 
 @RestController
 public class AuthenticationController implements AuthenticateApi {
 
     @Autowired
     private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private  JavaMailSender mailSender;
+
+    @Autowired
+    private Configuration config;
 
     @Autowired
     private final TeamMemberService teamMemberService;
@@ -74,6 +84,8 @@ public class AuthenticationController implements AuthenticateApi {
         final var teammember = (Teammember)teamMemberService.loadUserByUsername(username);
         teammember.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
         teamMemberService.update(teammember);
+        final var template = new ResetPasswordMailTemplate(resetPasswordDTO);
+        template.sendEmail(mailSender,config);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -84,7 +96,10 @@ public class AuthenticationController implements AuthenticateApi {
         }
         final var teamMember = TeamMemberMapper.toTeamMember(teamMemberDTO);
         teamMember.setPassword(passwordEncoder.encode(teamMember.getPassword()));
-        teamMemberService.insert(teamMember);
+
+        teamMemberService.registration(teamMember);
+        final var template = new WelcomeMailTemplates(teamMemberDTO);
+        template.sendEmail(mailSender,config);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
