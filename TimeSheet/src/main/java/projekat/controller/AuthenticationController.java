@@ -30,6 +30,12 @@ import projekat.templates.WelcomeMailTemplates;
 public class AuthenticationController implements AuthenticateApi {
 
     @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    private Configuration config;
+
+    @Autowired
     private final AuthenticationManager authenticationManager;
 
     @Autowired
@@ -96,7 +102,6 @@ public class AuthenticationController implements AuthenticateApi {
         }
         final var teamMember = TeamMemberMapper.toTeamMember(teamMemberDTO);
         teamMember.setPassword(passwordEncoder.encode(teamMember.getPassword()));
-
         teamMemberService.registration(teamMember);
         final var template = new WelcomeMailTemplates(teamMemberDTO);
         template.sendEmail(mailSender,config);

@@ -1,8 +1,15 @@
 package projekat.services;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.Setter;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,15 +18,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import projekat.enums.TeamMemberRoles;
 import projekat.exception.InputFieldException;
 import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
 import projekat.repository.TeamMemberRepository;
 
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class TeamMemberService implements UserDetailsService {
@@ -30,6 +39,7 @@ public class TeamMemberService implements UserDetailsService {
     @Setter(onMethod_ = {@Autowired})
     private PasswordEncoder passwordEncoder;
 
+    ;
 
     public TeamMemberService(TeamMemberRepository teamMemberRepository) {
         this.teamMemberRepository = teamMemberRepository;
@@ -50,7 +60,6 @@ public class TeamMemberService implements UserDetailsService {
         return oneTeamMember;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public Teammember insert(Teammember teammember) {
         if (teammember.getTeammemberid() != null) {
             throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);

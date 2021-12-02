@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface TeamMemberRepository extends JpaRepository<Teammember, Integer>{
    Optional<Teammember> findByUsername(String username);
+  // public void sendEmail(Mail mail);
 }
