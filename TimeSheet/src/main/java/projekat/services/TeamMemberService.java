@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import projekat.enums.TeamMemberRoles;
-import projekat.exception.BadRequestException;
 import projekat.exception.InputFieldException;
 import projekat.exception.NotFoundException;
 import projekat.models.Teammember;
@@ -46,13 +45,13 @@ public class TeamMemberService implements UserDetailsService {
         this.teamMemberRepository = teamMemberRepository;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WORKER')")
     public Collection<Teammember> getAll() {
         final var teammembers = teamMemberRepository.findAll();
         return teammembers;
     }
 
-    @PreAuthorize("hasRole('WORKER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WORKER')")
     public Optional<Teammember> getOne(Integer id) {
         if (!teamMemberRepository.existsById(id)) {
             throw new NotFoundException(String.format("Team member with id %d does not exist in database", id), HttpStatus.NOT_FOUND);
@@ -70,12 +69,21 @@ public class TeamMemberService implements UserDetailsService {
         return inserted;
     }
 
+    public Teammember registration(Teammember teammember) {
+        if (teammember.getTeammemberid() != null) {
+            throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
+        }
+        teammember.setPassword(passwordEncoder.encode(teammember.getPassword()));
+        final var inserted = teamMemberRepository.save(teammember);
+        return inserted;
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasRole('WORKER')")
     public Teammember update(Teammember teammember) {
         final var user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final var loggedInUser = (Teammember)user;
-        if(loggedInUser.getRole().equals(TeamMemberRoles.ROLE_WORKER) && !Objects.equals(teammember.getUsername(), loggedInUser.getUsername()))
-            throw new BadRequestException("You are not allowed to change this entry", HttpStatus.FORBIDDEN);
+        final var username = ((Teammember)user).getUsername();
+        if( teammember.getRole().equals(TeamMemberRoles.ROLE_WORKER) && !Objects.equals(teammember.getUsername(), username))
+           throw new AccessDeniedException("Access denied");
         if (teammember.getTeammemberid() == null) {
             throw new InputFieldException("Id is not present in request", HttpStatus.BAD_REQUEST);
         }

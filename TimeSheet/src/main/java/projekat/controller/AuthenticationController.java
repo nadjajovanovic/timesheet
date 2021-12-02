@@ -39,6 +39,12 @@ public class AuthenticationController implements AuthenticateApi {
     private final AuthenticationManager authenticationManager;
 
     @Autowired
+    private  JavaMailSender mailSender;
+
+    @Autowired
+    private Configuration config;
+
+    @Autowired
     private final TeamMemberService teamMemberService;
 
     @Autowired
@@ -96,7 +102,7 @@ public class AuthenticationController implements AuthenticateApi {
         }
         final var teamMember = TeamMemberMapper.toTeamMember(teamMemberDTO);
         teamMember.setPassword(passwordEncoder.encode(teamMember.getPassword()));
-        teamMemberService.insert(teamMember);
+        teamMemberService.registration(teamMember);
         final var template = new WelcomeMailTemplates(teamMemberDTO);
         template.sendEmail(mailSender,config);
         return new ResponseEntity<>(HttpStatus.OK);
