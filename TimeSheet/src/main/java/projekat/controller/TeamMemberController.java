@@ -1,20 +1,32 @@
 package projekat.controller;
 
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.bind.annotation.*;
 import projekat.api.api.TeammemberApi;
 import projekat.api.model.TeamMemberDTO;
+import projekat.exception.NotFoundException;
 import projekat.mapper.TeamMemberMapper;
+import projekat.models.Teammember;
 import projekat.services.JwtUtilService;
 import projekat.services.TeamMemberService;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 @RestController
 public class TeamMemberController implements TeammemberApi {
@@ -24,6 +36,12 @@ public class TeamMemberController implements TeammemberApi {
 
 	@Autowired
 	private final JwtUtilService jwtUtil;
+
+	@Autowired
+	JavaMailSender mailSender;
+
+	@Autowired
+	private Configuration config;
 
 	public TeamMemberController(TeamMemberService teamMemberService, JwtUtilService jwtUtil) {
 		this.teamMemberService = teamMemberService;
