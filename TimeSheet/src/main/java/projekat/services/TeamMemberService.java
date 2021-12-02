@@ -3,7 +3,6 @@ package projekat.services;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import projekat.enums.AuthenticationProvider;
 import projekat.enums.TeamMemberRoles;
 import projekat.exception.BadRequestException;
 import projekat.exception.InputFieldException;
@@ -36,6 +36,7 @@ public class TeamMemberService implements UserDetailsService {
         this.teamMemberRepository = teamMemberRepository;
     }
 
+
     @PreAuthorize("hasRole('ADMIN')")
     public Collection<Teammember> getAll() {
         final var teammembers = teamMemberRepository.findAll();
@@ -57,6 +58,7 @@ public class TeamMemberService implements UserDetailsService {
             throw new InputFieldException("Id is present in request", HttpStatus.BAD_REQUEST);
         }
         teammember.setPassword(passwordEncoder.encode(teammember.getPassword()));
+        teammember.setProvider(AuthenticationProvider.LOCAL);
         final var inserted = teamMemberRepository.save(teammember);
         return inserted;
     }
@@ -93,4 +95,22 @@ public class TeamMemberService implements UserDetailsService {
             throw new NotFoundException(String.format("Team member with username %s does not exist in database", username), HttpStatus.NOT_FOUND);
         return user.get();
     }
+
+    public UserDetails processOAuthPostLogin(String username, AuthenticationProvider provider) {
+        final var optionalUser = teamMemberRepository.findByUsername(username);
+
+        if (optionalUser.isEmpty()) {
+            final var newUser = new Teammember();
+            newUser.setUsername(username);
+            newUser.setEmail(username);
+            newUser.setStatus(true);
+            newUser.setHoursperweek(35.5);
+            newUser.setRole(TeamMemberRoles.ROLE_WORKER);
+            newUser.setProvider(provider);
+            teamMemberRepository.save(newUser);
+            return newUser;
+        }
+        return optionalUser.get();
+    }
+
 }
