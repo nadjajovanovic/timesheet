@@ -9,10 +9,7 @@ import projekat.exception.BadRequestException;
 import projekat.exception.InputFieldException;
 import projekat.exception.NotFoundException;
 import projekat.mapper.TimeSheetEntryMapper;
-import projekat.models.Category;
-import projekat.models.Client;
-import projekat.models.Project;
-import projekat.models.TimeSheetEntry;
+import projekat.models.*;
 import projekat.repository.*;
 
 import java.util.Collection;
@@ -81,6 +78,9 @@ public class TimeSheetEntryService {
             throw new NotFoundException(String.format("Project with id %d does not exist in database", dto.getProjectId()), HttpStatus.NOT_FOUND);
         }
 
+        if (!teamMemberRepository.existsById(dto.getTeamMemberId())) {
+            throw new NotFoundException(String.format("Team member with id %d does not exist in database", dto.getTeamMemberId()), HttpStatus.NOT_FOUND);
+        }
 
         final var entry = TimeSheetEntryMapper.fromEntryDTO(dto);
 
@@ -90,6 +90,8 @@ public class TimeSheetEntryService {
         entry.setClient(emptyClient);
         final var emptyProject = createEmptyProject(entry.getProjectid());
         entry.setProject(emptyProject);
+        final var emptyTeamMember = createEmptyTeamMember(entry.getTeammemberid());
+        entry.setTeammember(emptyTeamMember);
         final var insertedEntry = timeSheetEntryRepository.save(entry);
         return insertedEntry;
     }
@@ -125,6 +127,8 @@ public class TimeSheetEntryService {
         entry.setClient(emptyClient);
         final var emptyProject = createEmptyProject(entry.getProjectid());
         entry.setProject(emptyProject);
+        final var emptyTeamMember = createEmptyTeamMember(entry.getTeammemberid());
+        entry.setTeammember(emptyTeamMember);
 
         final var updatedEntry = timeSheetEntryRepository.save(entry);
         return updatedEntry;
@@ -155,5 +159,11 @@ public class TimeSheetEntryService {
         final var project = new Project();
         project.setProjectid(projectId);
         return project;
+    }
+
+    private Teammember createEmptyTeamMember(Integer userId) {
+        final var user = new Teammember();
+        user.setTeammemberid(userId);
+        return user;
     }
 }
