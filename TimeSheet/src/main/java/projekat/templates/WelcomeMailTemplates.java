@@ -1,9 +1,7 @@
 package projekat.templates;
 
 import freemarker.template.Configuration;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
@@ -17,7 +15,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -37,12 +34,12 @@ public class WelcomeMailTemplates extends MailTemplate {
     public void sendEmail(JavaMailSender mailSender,Configuration config) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
-            Map<String, Object> model = new HashMap<>();
+            final var model = new HashMap<>();
             model.put("username", username);
             model.put("password", password);
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            Template t = config.getTemplate("welcome-email-template.ftl");
-            String html = FreeMarkerTemplateUtils.processTemplateIntoString(t,model);
+            final var mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+            final var t = config.getTemplate("welcome-email-template.ftl");
+            final var html = FreeMarkerTemplateUtils.processTemplateIntoString(t,model);
             mimeMessageHelper.setSubject("Welcome");
             mimeMessageHelper.setFrom("adminteam@example.com");
             mimeMessageHelper.setTo(email);
