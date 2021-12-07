@@ -1,47 +1,43 @@
-package projekat.templates;
+package projekat.services;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import projekat.api.model.ResetPasswordDTO;
 import projekat.exception.MailException;
-import projekat.models.Teammember;
+import projekat.repository.MailRepository;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.HashMap;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class ResetPasswordMailTemplate extends MailTemplate{
+@Service
+public class MailService implements MailRepository {
 
-    private String password;
+    @Autowired
+    JavaMailSender mailSender;
 
-    public ResetPasswordMailTemplate(ResetPasswordDTO resetPasswordDTO) {
-        this.password = resetPasswordDTO.getNewPassword();
+    @Autowired
+    Configuration config;
+
+    public MailService(JavaMailSender mailSender, Configuration config) {
+        this.mailSender = mailSender;
+        this.config = config;
     }
 
     @Override
-    public void sendEmail(JavaMailSender mailSender,Configuration config) {
+    public void sendEmail(HashMap map,String email, String template, String subject){
         MimeMessage mimeMessage = mailSender.createMimeMessage();
-        final var user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final var email = ((Teammember)user).getEmail();
         try {
-            final var model = new HashMap<>();
-            model.put("password", password);
             final var mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            final var t = config.getTemplate("reset-password-email-template.ftl");
-            final var html = FreeMarkerTemplateUtils.processTemplateIntoString(t,model);
-            mimeMessageHelper.setSubject("Reset password");
+            final var t = config.getTemplate(template);
+            final var html = FreeMarkerTemplateUtils.processTemplateIntoString(t,map);
+            mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setFrom("adminteam@example.com");
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setText(html, true);

@@ -1,10 +1,8 @@
 package projekat.controller;
 
-import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,9 +20,10 @@ import projekat.exception.NotFoundException;
 import projekat.mapper.TeamMemberMapper;
 import projekat.models.Teammember;
 import projekat.services.JwtUtilService;
+import projekat.services.MailService;
 import projekat.services.TeamMemberService;
-import projekat.templates.ResetPasswordMailTemplate;
-import projekat.templates.WelcomeMailTemplates;
+
+import java.util.HashMap;
 
 @RestController
 public class AuthenticationController implements AuthenticateApi {
@@ -33,10 +32,7 @@ public class AuthenticationController implements AuthenticateApi {
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    private  JavaMailSender mailSender;
-
-    @Autowired
-    private Configuration config;
+    MailService mailService;
 
     @Autowired
     private final TeamMemberService teamMemberService;
@@ -55,7 +51,6 @@ public class AuthenticationController implements AuthenticateApi {
 
     @Override
     public ResponseEntity<AuthenticationResponseDTO> login(AuthenticationRequestDTO authenticationRequestDTO) {
-
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequestDTO.getUsername(), authenticationRequestDTO.getPassword())
@@ -84,8 +79,11 @@ public class AuthenticationController implements AuthenticateApi {
         final var teammember = (Teammember)teamMemberService.loadUserByUsername(username);
         teammember.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
         teamMemberService.update(teammember);
-        final var template = new ResetPasswordMailTemplate(resetPasswordDTO);
-        template.sendEmail(mailSender,config);
+        final var template = "reset-password-email-template.ftl";
+        final var model = new HashMap<>();
+        final var subject = "Reset password";
+        model.put("password", resetPasswordDTO.getNewPassword());
+        mailService.sendEmail(model,teammember.getEmail(),template,subject);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -98,8 +96,12 @@ public class AuthenticationController implements AuthenticateApi {
         teamMember.setPassword(passwordEncoder.encode(teamMember.getPassword()));
 
         teamMemberService.registration(teamMember);
-        final var template = new WelcomeMailTemplates(teamMemberDTO);
-        template.sendEmail(mailSender,config);
+        final var template = "welcome-email-template.ftl";
+        final var model = new HashMap<>();
+        final var subject = "Welcome";
+        model.put("username", teamMemberDTO.getUsername());
+        model.put("password", teamMemberDTO.getPassword());
+        mailService.sendEmail(model,teamMemberDTO.getEmail(),template,subject);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
